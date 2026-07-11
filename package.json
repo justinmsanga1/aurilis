@@ -7,6 +7,7 @@
     "backend": "node server.cjs",
     "dev": "vite",
     "dev:full": "node scripts/dev-full.cjs",
+    "seed:clean": "node scripts/seed-clean-state.cjs",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview"

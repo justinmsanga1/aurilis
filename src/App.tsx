@@ -216,8 +216,8 @@ function App() {
     window.localStorage.getItem('auralis-active-user-id'),
   )
   const [login, setLogin] = useState<LoginState>({
-    username: 'kapinga',
-    password: '1234',
+    username: '',
+    password: '',
     error: '',
   })
   const fallbackUser = appMembers[0] ?? seedMembers[0]
@@ -936,6 +936,8 @@ function App() {
             <label>
               Username
               <input
+                autoComplete="username"
+                placeholder="Enter your username"
                 value={login.username}
                 onChange={(event) =>
                   setLogin((current) => ({
@@ -949,6 +951,8 @@ function App() {
             <label>
               Password
               <input
+                autoComplete="current-password"
+                placeholder="Enter your password"
                 type="password"
                 value={login.password}
                 onChange={(event) =>
@@ -1357,6 +1361,28 @@ function Dashboard({
     personalPlan.due > 0
       ? Math.min(Math.round((personalPlan.paid / personalPlan.due) * 100), 100)
       : 0
+  const paidPlans = topDebtors.filter(({ plan }) => plan.remaining === 0).length
+  const partialPlans = topDebtors.filter(
+    ({ plan }) => plan.paid > 0 && plan.remaining > 0,
+  ).length
+  const riskPlans = topDebtors.filter(({ plan }) => plan.paid === 0).length
+  const progressRows = [
+    {
+      label: 'Fully paid',
+      value: paidPlans,
+      tone: 'paid',
+    },
+    {
+      label: 'Partial',
+      value: partialPlans,
+      tone: 'partial',
+    },
+    {
+      label: 'At risk',
+      value: riskPlans,
+      tone: 'risk',
+    },
+  ]
   const penaltyMessage =
     personalPlan.remaining > 0
       ? `${formatTzs(personalPlan.penalty)} at risk`
@@ -1442,6 +1468,39 @@ function Dashboard({
         <div>
           <small>LIVE</small>
           <strong>{collectionRate >= 75 ? 'High' : collectionRate >= 45 ? 'Watch' : 'Low'}</strong>
+        </div>
+      </article>
+
+      <article className="bento-card cycle-progress-card">
+        <div className="panel-title">
+          <div>
+            <p className="eyebrow">July progress</p>
+            <h2>{collectionRate}% collected</h2>
+          </div>
+          <ReportRing percent={collectionRate} label={formatTzs(summary.totalPaid)} />
+        </div>
+        <div className="cycle-progress-track" aria-label="July member payment progress">
+          {progressRows.map((row) => (
+            <i
+              className={`cycle-segment ${row.tone}`}
+              key={row.label}
+              style={{
+                width: `${memberCount > 0 ? Math.max((row.value / memberCount) * 100, row.value > 0 ? 8 : 0) : 0}%`,
+              }}
+            />
+          ))}
+        </div>
+        <div className="cycle-progress-rows">
+          {progressRows.map((row) => (
+            <div className={`cycle-progress-row ${row.tone}`} key={row.label}>
+              <span>{row.label}</span>
+              <strong>{row.value}</strong>
+            </div>
+          ))}
+        </div>
+        <div className="cycle-progress-money">
+          <span>Remaining</span>
+          <strong>{formatTzs(summary.remaining)}</strong>
         </div>
       </article>
 
@@ -1590,15 +1649,27 @@ function MembersView({
   const selectedTransactions = transactions.filter(
     (transaction) => transaction.memberId === selectedMember.id,
   )
-  const importedContributionTotal = getMemberRecords(selectedMember.id).reduce(
-    (sum, record) => sum + record.liquid + record.mwekeza,
-    0,
+  const importedTotals = getMemberRecords(selectedMember.id).reduce(
+    (totals, record) => ({
+      utt: totals.utt + record.liquid,
+      mwekeza: totals.mwekeza + record.mwekeza,
+    }),
+    { utt: 0, mwekeza: 0 },
   )
-  const manualContributionTotal = selectedTransactions.reduce(
-    (sum, transaction) => sum + transaction.amount,
-    0,
+  const manualTotals = selectedTransactions.reduce(
+    (totals, transaction) => ({
+      utt:
+        totals.utt +
+        transaction.allocation.liquid +
+        transaction.allocation.debt +
+        transaction.allocation.overpayment,
+      mwekeza: totals.mwekeza + transaction.allocation.mwekeza,
+    }),
+    { utt: 0, mwekeza: 0 },
   )
-  const allTimeContributionTotal = importedContributionTotal + manualContributionTotal
+  const allTimeUttTotal = importedTotals.utt + manualTotals.utt
+  const allTimeMwekezaTotal = importedTotals.mwekeza + manualTotals.mwekeza
+  const allTimeContributionTotal = allTimeUttTotal + allTimeMwekezaTotal
   const roleCount = new Set(plans.map(({ member }) => member.role)).size
 
   if (detailOpen) {
@@ -1667,6 +1738,8 @@ function MembersView({
             ) : null}
             <div className="profile-metrics">
               <Metric label="All-time paid" value={formatTzs(allTimeContributionTotal)} />
+              <Metric label="UTT paid" value={formatTzs(allTimeUttTotal)} />
+              <Metric label="Mwekeza paid" value={formatTzs(allTimeMwekezaTotal)} />
               <Metric label="Starting debt" value={formatTzs(selectedPlan.startingDebt)} />
               <Metric label="Debt installment" value={formatTzs(selectedPlan.installment)} />
               <Metric label="July due" value={formatTzs(selectedPlan.due)} />
