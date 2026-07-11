@@ -174,7 +174,10 @@ export const julyPlanForMember = (
   const paid = importedPaid + manualPaid
   const due = settings.monthlyContribution + installment
   const remaining = Math.max(due - paid, 0)
-  const penalty = remaining > 0 ? due * settings.penaltyRate : 0
+  const debtPaid = Math.max(paid - settings.monthlyContribution, 0)
+  const debtInstallmentRemaining = Math.max(installment - debtPaid, 0)
+  const debtPenaltyBase = debtInstallmentRemaining > 0 ? startingDebt : 0
+  const penalty = debtPenaltyBase * settings.penaltyRate
   const carryover = remaining > 0 ? remaining + penalty : 0
   const status =
     remaining === 0
@@ -192,6 +195,8 @@ export const julyPlanForMember = (
     manualPaid,
     paid,
     remaining,
+    debtInstallmentRemaining,
+    debtPenaltyBase,
     penalty,
     carryover,
     status,

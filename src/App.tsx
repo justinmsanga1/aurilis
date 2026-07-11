@@ -230,6 +230,15 @@ function App() {
   const [activeTab, setActiveTab] = useState<Tab>('dashboard')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const [seenNotifications, setSeenNotifications] = useState<Record<string, number>>(
+    () => {
+      try {
+        return JSON.parse(window.localStorage.getItem('auralis-seen-notifications') ?? '{}')
+      } catch {
+        return {}
+      }
+    },
+  )
   const [selectedMemberId, setSelectedMemberId] = useState(fallbackUser.id)
   const [memberDetailOpen, setMemberDetailOpen] = useState(false)
   const [memberDraft, setMemberDraft] = useState<MemberDraft>({
@@ -362,6 +371,16 @@ function App() {
       body: `${meeting.date} at ${meeting.time}`,
       tone: 'calendar',
     })),
+    ...chatMessages.slice(-3).reverse().map((message) => {
+      const member = appMembers.find((item) => item.id === message.memberId)
+
+      return {
+        id: `chat-${message.id}`,
+        title: member ? `${member.fullName} sent a chat` : 'New chat message',
+        body: message.body,
+        tone: 'chat',
+      }
+    }),
     ...transactions.slice(0, 3).map((transaction) => {
       const member = appMembers.find((item) => item.id === transaction.memberId)
 
@@ -373,6 +392,23 @@ function App() {
       }
     }),
   ].slice(0, 6)
+  const notificationOwner = activeUser?.id ?? 'guest'
+  const chatSeenKey = `${notificationOwner}:chat`
+  const updatesSeenKey = `${notificationOwner}:updates`
+  const chatSeenAt = seenNotifications[chatSeenKey] ?? 0
+  const updatesSeenAt = seenNotifications[updatesSeenKey] ?? 0
+  const chatUnreadCount = activeUser
+    ? chatMessages.filter(
+        (message) =>
+          message.memberId !== activeUser.id && Date.parse(message.createdAt) > chatSeenAt,
+      ).length
+    : 0
+  const updateNotificationTimes = [
+    ...announcements.map((notice) => Date.parse(`${notice.date}T23:59:59`)),
+    ...meetings.map((meeting) => Date.parse(`${meeting.date}T${meeting.time || '00:00'}`)),
+  ].filter(Number.isFinite)
+  const updatesUnreadCount = updateNotificationTimes.filter((time) => time > updatesSeenAt).length
+  const notificationBadgeCount = chatUnreadCount + updatesUnreadCount
   const mobileCoreIds: Tab[] = isAdmin
     ? ['dashboard', 'members', 'payments', 'projects']
     : canRecordPayments
@@ -384,9 +420,27 @@ function App() {
   const mobileMenuItems = availableNavItems.filter(
     (item) => !mobileCoreIds.includes(item.id),
   )
+  const badgeForTab = (tab: Tab) => {
+    if (tab === 'chat') return chatUnreadCount
+    if (tab === 'notices' || tab === 'meetings') return updatesUnreadCount
+    return 0
+  }
+  const mobileMenuBadgeCount = mobileMenuItems.reduce(
+    (sum, item) => sum + badgeForTab(item.id),
+    0,
+  )
+  const markNotificationSeen = (kind: 'chat' | 'updates') => {
+    const key = kind === 'chat' ? chatSeenKey : updatesSeenKey
+    setSeenNotifications((current) => ({
+      ...current,
+      [key]: Date.now(),
+    }))
+  }
   const navigateTo = (tab: Tab) => {
     if (!canRecordPayments && tab === 'payments') return
     if (!isAdmin && tab === 'settings') return
+    if (tab === 'chat') markNotificationSeen('chat')
+    if (tab === 'notices' || tab === 'meetings') markNotificationSeen('updates')
     setActiveTab(tab)
     setMobileMenuOpen(false)
     setNotificationsOpen(false)
@@ -407,6 +461,13 @@ function App() {
       setActiveTab('dashboard')
     }
   }, [activeTab, canRecordPayments, isAdmin])
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      'auralis-seen-notifications',
+      JSON.stringify(seenNotifications),
+    )
+  }, [seenNotifications])
 
   const handleLogin = (event: React.FormEvent) => {
     event.preventDefault()
@@ -961,9 +1022,19 @@ function App() {
               className={notificationsOpen ? 'icon-button alert active' : 'icon-button alert'}
               type="button"
               aria-label="Notifications"
-              onClick={() => setNotificationsOpen((open) => !open)}
+              onClick={() => {
+                const shouldOpen = !notificationsOpen
+                if (shouldOpen) {
+                  markNotificationSeen('chat')
+                  markNotificationSeen('updates')
+                }
+                setNotificationsOpen(shouldOpen)
+              }}
             >
               <Bell size={20} />
+              {notificationBadgeCount > 0 ? (
+                <b className="nav-badge top-alert">{Math.min(notificationBadgeCount, 9)}</b>
+              ) : null}
             </button>
             <Avatar
               memberName={activeUser.fullName}
@@ -1183,6 +1254,9 @@ function App() {
           >
             <item.icon size={20} />
             <span>{item.label}</span>
+            {badgeForTab(item.id) > 0 ? (
+              <b className="nav-badge">{Math.min(badgeForTab(item.id), 9)}</b>
+            ) : null}
           </button>
         ))}
         {mobileMenuItems.length > 0 ? (
@@ -1193,6 +1267,9 @@ function App() {
           >
             <Menu size={20} />
             <span>Menu</span>
+            {mobileMenuBadgeCount > 0 ? (
+              <b className="nav-badge">{Math.min(mobileMenuBadgeCount, 9)}</b>
+            ) : null}
           </button>
         ) : null}
       </nav>
@@ -1232,7 +1309,11 @@ function App() {
                 >
                   <item.icon size={18} />
                   <span>{item.label}</span>
-                  <ChevronRight size={18} />
+                  {badgeForTab(item.id) > 0 ? (
+                    <b className="nav-badge drawer">{Math.min(badgeForTab(item.id), 9)}</b>
+                  ) : (
+                    <ChevronRight size={18} />
+                  )}
                 </button>
               ))}
             </div>
@@ -1509,6 +1590,15 @@ function MembersView({
   const selectedTransactions = transactions.filter(
     (transaction) => transaction.memberId === selectedMember.id,
   )
+  const importedContributionTotal = getMemberRecords(selectedMember.id).reduce(
+    (sum, record) => sum + record.liquid + record.mwekeza,
+    0,
+  )
+  const manualContributionTotal = selectedTransactions.reduce(
+    (sum, transaction) => sum + transaction.amount,
+    0,
+  )
+  const allTimeContributionTotal = importedContributionTotal + manualContributionTotal
   const roleCount = new Set(plans.map(({ member }) => member.role)).size
 
   if (detailOpen) {
@@ -1576,6 +1666,7 @@ function MembersView({
               </div>
             ) : null}
             <div className="profile-metrics">
+              <Metric label="All-time paid" value={formatTzs(allTimeContributionTotal)} />
               <Metric label="Starting debt" value={formatTzs(selectedPlan.startingDebt)} />
               <Metric label="Debt installment" value={formatTzs(selectedPlan.installment)} />
               <Metric label="July due" value={formatTzs(selectedPlan.due)} />
