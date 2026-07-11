@@ -5293,4 +5293,55 @@ body,
   }
 }
 
+/* Clean nav selection: underline instead of filled active boxes. */
+.bottom-nav button,
+.mobile-menu-list button {
+  position: relative;
+}
+
+.bottom-nav button.active {
+  background: transparent;
+  box-shadow: none;
+  color: #064e2b;
+  transform: none;
+}
+
+.bottom-nav button.active svg {
+  color: #064e2b;
+}
+
+.bottom-nav button.active::after {
+  background: linear-gradient(90deg, #f2b705, #064e2b);
+  border-radius: 999px;
+  bottom: 4px;
+  content: '';
+  height: 3px;
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%);
+  width: 24px;
+}
+
+.mobile-menu-list button.active,
+.mobile-menu-list button:hover {
+  background: linear-gradient(145deg, #ffffff, #f1f8eb);
+  border-color: rgba(193, 218, 198, 0.72);
+  box-shadow: var(--shadow-soft);
+  color: #064e2b;
+}
+
+.mobile-menu-list button.active::after {
+  background: linear-gradient(180deg, #f2b705, #064e2b);
+  border-radius: 999px;
+  bottom: 10px;
+  content: '';
+  position: absolute;
+  top: 10px;
+  width: 4px;
+}
+
+.mobile-menu-list button.active::after {
+  left: 0;
+}
+
 
