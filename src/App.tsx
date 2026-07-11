@@ -178,6 +178,18 @@ type BackupPayload = {
   meetings: Meeting[]
   chatMessages: ChatMessage[]
   avatars: AvatarMap
+  reports?: ReportSnapshot[]
+}
+
+type ReportSnapshot = {
+  id: string
+  scope: 'Chairman' | 'Member'
+  memberId: string
+  action: 'copy' | 'csv'
+  title: string
+  body: string
+  createdAt: string
+  createdBy: string
 }
 
 const navItems: Array<{ id: Tab; label: string; icon: typeof Home }> = [
@@ -278,6 +290,10 @@ function App() {
   const [chatDraft, setChatDraft] = useState('')
   const [reportCopied, setReportCopied] = useState(false)
   const [backupMessage, setBackupMessage] = useState('')
+  const [reports, setReports] = useStoredState<ReportSnapshot[]>(
+    'auralis-reports-v1',
+    [],
+  )
   const [transactions, setTransactions] = useStoredState<TransactionRecord[]>(
     'auralis-transactions-v1',
     [],
@@ -746,8 +762,30 @@ function App() {
     setChatMessages((current) => current.filter((message) => message.id !== messageId))
   }
 
-  const copyReport = async (text: string) => {
+  const saveReportSnapshot = (
+    action: ReportSnapshot['action'],
+    title: string,
+    body: string,
+  ) => {
+    if (!activeUser) return
+
+    const snapshot: ReportSnapshot = {
+      id: `report-${Date.now()}-${action}`,
+      scope: isAdmin ? 'Chairman' : 'Member',
+      memberId: activeUser.id,
+      action,
+      title,
+      body,
+      createdAt: new Date().toISOString(),
+      createdBy: activeUser.id,
+    }
+
+    setReports((current) => [snapshot, ...current].slice(0, 200))
+  }
+
+  const copyReport = async (title: string, text: string) => {
     await navigator.clipboard.writeText(text)
+    saveReportSnapshot('copy', title, text)
     setReportCopied(true)
     window.setTimeout(() => setReportCopied(false), 1600)
   }
@@ -764,6 +802,7 @@ function App() {
       meetings,
       chatMessages,
       avatars,
+      reports,
     }
     const blob = new Blob([JSON.stringify(backup, null, 2)], {
       type: 'application/json;charset=utf-8',
@@ -806,6 +845,7 @@ function App() {
           Array.isArray(parsed.chatMessages) ? parsed.chatMessages : [],
         )
         setAvatars(parsed.avatars && typeof parsed.avatars === 'object' ? parsed.avatars : {})
+        setReports(Array.isArray(parsed.reports) ? parsed.reports : [])
         setSelectedMemberId(parsed.members?.[0]?.id ?? seedMembers[0].id)
         setActiveUserId(parsed.members?.[0]?.id ?? seedMembers[0].id)
         setBackupMessage('Backup restored.')
@@ -1055,6 +1095,7 @@ function App() {
             isAdmin={isAdmin}
             members={appMembers}
             onCopy={copyReport}
+            onSnapshot={saveReportSnapshot}
             plans={plans}
             projects={visibleProjects}
             summary={summary}
@@ -2387,6 +2428,7 @@ function ReportsView({
   isAdmin,
   members,
   onCopy,
+  onSnapshot,
   plans,
   projects,
   summary,
@@ -2397,7 +2439,12 @@ function ReportsView({
   fundTotals: ReturnType<typeof liveFundTotals>
   isAdmin: boolean
   members: Member[]
-  onCopy: (text: string) => Promise<void>
+  onCopy: (title: string, text: string) => Promise<void>
+  onSnapshot: (
+    action: ReportSnapshot['action'],
+    title: string,
+    body: string,
+  ) => void
   plans: ReturnType<typeof allJulyPlans>
   projects: ProjectRecord[]
   summary: ReturnType<typeof julySummary>
@@ -2434,6 +2481,9 @@ function ReportsView({
     summary,
     transactions,
   })
+  const reportTitle = isAdmin
+    ? 'Auralis Holdings Chairman Report'
+    : `Auralis Holdings Member Report - ${activeUser.fullName}`
   const memberTransactions = transactions.filter(
     (transaction) => transaction.memberId === activeUser.id,
   )
@@ -2468,14 +2518,22 @@ function ReportsView({
           <ReceiptText size={20} />
         </div>
         <div className="report-action-row">
-          <button className="primary-button" onClick={() => void onCopy(reportText)} type="button">
+          <button className="primary-button" onClick={() => void onCopy(reportTitle, reportText)} type="button">
             <ReceiptText size={18} />
             Copy
           </button>
           {isAdmin ? (
             <button
               className="ghost-button"
-              onClick={() => exportReportCsv(plans, members, transactions, projects)}
+              onClick={() => {
+                const csv = buildReportCsv(plans, members, transactions, projects)
+                onSnapshot('csv', 'Auralis Holdings July Report CSV', csv)
+                downloadTextFile(
+                  csv,
+                  `auralis-july-report-${new Date().toISOString().slice(0, 10)}.csv`,
+                  'text/csv;charset=utf-8',
+                )
+              }}
               type="button"
             >
               <ReceiptText size={18} />
@@ -3475,16 +3533,10 @@ function exportJulyCsv(transactions: TransactionRecord[], members: Member[]) {
       row.map((value) => `"${value.replaceAll('"', '""')}"`).join(','),
     )
     .join('\n')
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = 'auralis-july-2026-payments.csv'
-  link.click()
-  URL.revokeObjectURL(url)
+  downloadTextFile(csv, 'auralis-july-2026-payments.csv', 'text/csv;charset=utf-8')
 }
 
-function exportReportCsv(
+function buildReportCsv(
   plans: ReturnType<typeof allJulyPlans>,
   members: Member[],
   transactions: TransactionRecord[],
@@ -3529,11 +3581,16 @@ function exportReportCsv(
       row.map((value) => `"${String(value).replaceAll('"', '""')}"`).join(','),
     )
     .join('\n')
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
+
+  return csv
+}
+
+function downloadTextFile(body: string, filename: string, type: string) {
+  const blob = new Blob([body], { type })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
-  link.download = 'auralis-july-2026-report.csv'
+  link.download = filename
   link.click()
   URL.revokeObjectURL(url)
 }

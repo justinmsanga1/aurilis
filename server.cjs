@@ -216,31 +216,42 @@ async function getStructuredValue(config) {
     backend: 'supabase',
     exists: rows.length > 0,
     updatedAt,
-    value: rows
-      .map((row) => row.data)
-      .sort((a, b) => String(b.createdAt || b.date || '').localeCompare(String(a.createdAt || a.date || ''))),
+    value: rows.map((row) => row.data),
   }
 }
 
 async function setStructuredValue(config, value) {
   const updatedAt = new Date().toISOString()
-  const deleteFilter = `${config.idColumn}=not.is.null`
-  await supabaseRequest(`${config.table}?${deleteFilter}`, {
-    method: 'DELETE',
-  })
-
   const rows = toStructuredRows(config, value, updatedAt)
+  const nextIds = new Set(rows.map((row) => row[config.idColumn]))
+
   if (rows.length > 0) {
-    await supabaseRequest(config.table, {
+    await supabaseRequest(`${config.table}?on_conflict=${config.idColumn}`, {
       body: JSON.stringify(rows),
       headers: {
-        Prefer: 'return=minimal',
+        Prefer: 'resolution=merge-duplicates,return=minimal',
       },
       method: 'POST',
     })
   }
 
+  const existingRows = await supabaseRequest(`${config.table}?select=${config.idColumn}`)
+  const staleIds = existingRows
+    .map((row) => row[config.idColumn])
+    .filter((id) => !nextIds.has(id))
+
+  if (staleIds.length > 0) {
+    await supabaseRequest(
+      `${config.table}?${config.idColumn}=in.(${staleIds.map(formatPostgrestValue).join(',')})`,
+      { method: 'DELETE' },
+    )
+  }
+
   return { backend: 'supabase', updatedAt }
+}
+
+function formatPostgrestValue(value) {
+  return `"${String(value).replaceAll('"', '\\"')}"`
 }
 
 function toStructuredRows(config, value, updatedAt) {
