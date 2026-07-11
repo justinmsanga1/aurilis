@@ -1411,7 +1411,7 @@ function Dashboard({
           <CircleDollarSign size={20} />
         </div>
         <div className="debtor-list">
-          {topDebtors.map(({ member, plan }, index) => {
+          {topDebtors.map(({ member, plan }) => {
             const paidPercent = plan.due > 0 ? Math.min((plan.paid / plan.due) * 100, 100) : 0
 
             return (
@@ -1421,7 +1421,6 @@ function Dashboard({
               onClick={() => openMember(member.id)}
               type="button"
             >
-              <span className="debtor-rank">{index + 1}</span>
               <Avatar
                 avatar={avatars[member.id]}
                 memberName={member.fullName}

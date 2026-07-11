@@ -4713,21 +4713,8 @@ body,
   border-color: rgba(193, 218, 198, 0.72);
   border-radius: 22px;
   box-shadow: 8px 10px 22px rgba(6, 64, 36, 0.1), -6px -6px 16px rgba(255, 255, 255, 0.84);
-  grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
   min-height: 78px;
-}
-
-.debtor-rank {
-  align-items: center;
-  background: #064e2b;
-  border-radius: 14px;
-  color: #fff;
-  display: inline-flex;
-  font-size: 12px;
-  font-weight: 900;
-  height: 32px;
-  justify-content: center;
-  width: 32px;
 }
 
 .debtor-progress {
@@ -5003,15 +4990,7 @@ body,
 }
 
 .debtor-bento-row {
-  grid-template-columns: auto auto minmax(0, 1fr) auto auto;
-}
-
-.debtor-rank {
-  background: #f2b705;
-  border-radius: 12px;
-  color: #241a00;
-  height: 30px;
-  width: 34px;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
 }
 
 .debtor-bento-row .avatar {
@@ -5082,7 +5061,7 @@ body,
 
 @media (max-width: 520px) {
   .debtor-bento-row {
-    grid-template-columns: auto auto minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
   }
 
   .debtor-bento-row .avatar {
