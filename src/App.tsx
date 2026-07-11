@@ -373,9 +373,11 @@ function App() {
       }
     }),
   ].slice(0, 6)
-  const mobileCoreIds: Tab[] = canRecordPayments
+  const mobileCoreIds: Tab[] = isAdmin
     ? ['dashboard', 'members', 'payments', 'projects']
-    : ['dashboard', 'members', 'projects']
+    : canRecordPayments
+      ? ['dashboard', 'members', 'payments', 'chat']
+      : ['dashboard', 'members', 'projects', 'chat']
   const mobileCoreItems = availableNavItems.filter((item) =>
     mobileCoreIds.includes(item.id),
   )
