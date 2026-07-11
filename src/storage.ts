@@ -29,8 +29,8 @@ export function useStoredState<T>(key: string, initialValue: T) {
             method: 'PUT',
           })
         }
-      } catch {
-        // Supabase is the only database. Keep in-memory defaults until API recovers.
+      } catch (error) {
+        console.error(`Auralis storage load failed for ${key}`, error)
       } finally {
         if (!cancelled) hydrated.current = true
       }
@@ -50,8 +50,8 @@ export function useStoredState<T>(key: string, initialValue: T) {
       body: JSON.stringify({ value }),
       headers: { 'Content-Type': 'application/json' },
       method: 'PUT',
-    }).catch(() => {
-      // Supabase is the only database. Failed writes are not stored locally.
+    }).catch((error) => {
+      console.error(`Auralis storage save failed for ${key}`, error)
     })
   }, [key, value])
 

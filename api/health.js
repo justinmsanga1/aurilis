@@ -1,6 +1,9 @@
+import { createRequire } from 'node:module'
+
+const require = createRequire(import.meta.url)
 const { getBackendState, supabaseConfigured } = require('./backend.cjs')
 
-module.exports = async function handler(request, response) {
+export default async function handler(request, response) {
   if (request.method === 'OPTIONS') {
     response.status(204).end()
     return
