@@ -1010,6 +1010,7 @@ function App() {
         {activeTab === 'dashboard' ? (
           <Dashboard
             activeUser={activeUser}
+            avatars={avatars}
             collectionRate={collectionRate}
             debtTotal={debtBookTotal(appMembers)}
             fundTotals={fundTotals}
@@ -1244,6 +1245,7 @@ function App() {
 
 function Dashboard({
   activeUser,
+  avatars,
   collectionRate,
   debtTotal,
   fundTotals,
@@ -1255,6 +1257,7 @@ function Dashboard({
   openMember,
 }: {
   activeUser: Member
+  avatars: AvatarMap
   collectionRate: number
   debtTotal: number
   fundTotals: ReturnType<typeof historicalTotals>
@@ -1419,6 +1422,11 @@ function Dashboard({
               type="button"
             >
               <span className="debtor-rank">{index + 1}</span>
+              <Avatar
+                avatar={avatars[member.id]}
+                memberName={member.fullName}
+                size="small"
+              />
               <div>
                 <strong>{member.fullName}</strong>
                 <span>{plan.status}</span>

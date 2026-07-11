@@ -5003,7 +5003,7 @@ body,
 }
 
 .debtor-bento-row {
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  grid-template-columns: auto auto minmax(0, 1fr) auto auto;
 }
 
 .debtor-rank {
@@ -5015,7 +5015,12 @@ body,
 }
 
 .debtor-bento-row .avatar {
-  display: none;
+  background: linear-gradient(145deg, #ffffff, #e7f4df);
+  border: 1px solid rgba(193, 218, 198, 0.9);
+  box-shadow: 5px 6px 14px rgba(6, 64, 36, 0.12), -4px -4px 12px rgba(255, 255, 255, 0.86);
+  color: #064e2b;
+  height: 42px;
+  width: 42px;
 }
 
 .debtors-bento-card,
@@ -5077,7 +5082,13 @@ body,
 
 @media (max-width: 520px) {
   .debtor-bento-row {
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+  }
+
+  .debtor-bento-row .avatar {
+    display: inline-flex;
+    height: 38px;
+    width: 38px;
   }
 
   .debtor-bento-row > b {
