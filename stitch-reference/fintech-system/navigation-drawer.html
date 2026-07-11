@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Auralis Holdings - Navigation</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..900&display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Claymorphism Utility */
+        .clay-card {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 
+                10px 10px 30px -10px rgba(30, 64, 175, 0.08),
+                inset 2px 2px 4px rgba(255, 255, 255, 0.9),
+                inset -2px -2px 4px rgba(30, 64, 175, 0.05);
+        }
+
+        .clay-button-active {
+            background: #1e40af;
+            box-shadow: 
+                inset 4px 4px 8px rgba(0, 0, 0, 0.2),
+                inset -4px -4px 8px rgba(255, 255, 255, 0.1);
+            transform: translateY(1px);
+        }
+
+        /* Glassmorphism Sidebar */
+        .glass-sidebar {
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            background: rgba(248, 249, 255, 0.85);
+            border-right: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Micro-interactions */
+        .nav-item-transition {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#141d21",
+                        "surface-dim": "#ccdbf3",
+                        "background": "#f8f9ff",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#a8b8ff",
+                        "on-secondary-container": "#5d666b",
+                        "surface": "#f8f9ff",
+                        "surface-tint": "#3755c3",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#dbe4ea",
+                        "tertiary-container": "#494b4c",
+                        "surface-container-highest": "#d5e3fc",
+                        "primary-container": "#1e40af",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#b8c4ff",
+                        "primary-fixed": "#dde1ff",
+                        "surface-container": "#e6eeff",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#444653",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "on-tertiary-container": "#babbbb",
+                        "primary": "#00288e",
+                        "outline-variant": "#c4c5d5",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "tertiary": "#333535",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container-high": "#dce9ff",
+                        "surface-variant": "#d5e3fc",
+                        "on-primary-fixed-variant": "#173bab",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-background": "#0d1c2e",
+                        "secondary": "#576065",
+                        "inverse-surface": "#233144",
+                        "surface-bright": "#f8f9ff",
+                        "primary-fixed-dim": "#b8c4ff",
+                        "secondary-container": "#dbe4ea",
+                        "on-secondary-fixed-variant": "#3f484d",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed": "#001453",
+                        "on-surface": "#0d1c2e",
+                        "tertiary-fixed": "#e2e2e2",
+                        "outline": "#757684",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#bfc8ce"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-gap-md": "16px",
+                        "bento-gutter": "12px",
+                        "stack-gap-sm": "8px",
+                        "stack-gap-lg": "24px",
+                        "container-padding": "20px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["JetBrains Mono"],
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "price-display": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["26px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "price-display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen overflow-hidden font-body-lg">
+<!-- Background Content Layer (Simulating the App Dashboard behind the drawer) -->
+<main class="fixed inset-0 z-0 p-container-padding flex flex-col gap-stack-gap-lg opacity-40 grayscale-[0.2]">
+<div class="h-16 flex items-center justify-between">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest"></div>
+<div class="font-headline-md text-headline-md text-primary">Auralis</div>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest"></div>
+</div>
+<div class="grid grid-cols-2 gap-bento-gutter">
+<div class="col-span-2 h-40 clay-card rounded-xl"></div>
+<div class="h-32 clay-card rounded-xl"></div>
+<div class="h-32 clay-card rounded-xl"></div>
+<div class="col-span-2 h-48 clay-card rounded-xl"></div>
+</div>
+</main>
+<!-- Overlay Backdrop -->
+<div class="fixed inset-0 bg-primary/10 backdrop-blur-sm z-40"></div>
+<!-- Navigation Drawer (Predicted Shared Component: NavigationDrawer) -->
+<aside class="fixed top-0 left-0 z-50 h-full w-80 glass-sidebar rounded-r-xl shadow-2xl flex flex-col transform transition-transform duration-300">
+<!-- Header: User Profile (Mapped from JSON header_type: "profile") -->
+<header class="p-8 pb-6 flex flex-col gap-4">
+<div class="flex items-center gap-4">
+<div class="relative">
+<img class="w-16 h-16 rounded-2xl object-cover shadow-lg border-2 border-white" data-alt="A professional studio portrait of a sophisticated young executive male named Julian, wearing a tailored charcoal suit and a crisp white shirt. The lighting is soft and flattering, highlighting high-end facial features. The background is a blurred luxurious corporate interior with deep blue and gold accents, maintaining a high-net-worth fintech aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSxVWlYZZSSoacEnKeFiCTY8Rjn6Pt9s2KSx0UmNWex-Auhipl_uA3Y3lhtreyT_9FLVMXB5son912dhuEm4DMDFYRiIpM7xTLi9iN62dxncga7jL8YEo9PXEceXdMJ3gmgbLylM8hkN9bTafUOgBfWY381S0_Ln7BrcOPi-c2pRlZH1qC9Lljo6SXH35liI68UQ7coYQKENwhwQ6w3dWKIT7Dm90w-2dUNkmrM7XcFDJkVQVpaE4K"/>
+<div class="absolute -bottom-1 -right-1 bg-primary-container text-white text-[10px] px-2 py-0.5 rounded-full font-label-caps uppercase border-2 border-white">
+                        Admin
+                    </div>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-on-secondary-container">Welcome Back</span>
+<h2 class="font-headline-md text-headline-md text-primary">Julian</h2>
+</div>
+</div>
+</header>
+<!-- Search Bar Micro-interaction -->
+<div class="px-6 mb-6">
+<div class="relative flex items-center bg-white/50 border border-white/40 rounded-xl px-4 py-2 focus-within:bg-white nav-item-transition">
+<span class="material-symbols-outlined text-outline text-lg mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-sm w-full placeholder:text-outline-variant" placeholder="Search resources..." type="text"/>
+</div>
+</div>
+<!-- Navigation Menu List -->
+<nav class="flex-1 px-4 overflow-y-auto space-y-2">
+<!-- Menu Group: Insights -->
+<div class="px-4 py-2">
+<span class="font-label-caps text-[10px] text-on-surface-variant/60 uppercase tracking-widest">Analytics</span>
+</div>
+<!-- Item: Reports -->
+<button class="w-full flex items-center gap-4 px-4 py-3.5 rounded-xl nav-item-transition text-on-surface-variant hover:bg-white/40">
+<span class="material-symbols-outlined text-primary">analytics</span>
+<span class="font-body-lg text-body-lg">Reports</span>
+</button>
+<!-- Item: Chat (Active State Example) -->
+<button class="w-full flex items-center gap-4 px-4 py-3.5 rounded-xl nav-item-transition bg-primary-container text-on-primary clay-button-active">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
+<span class="font-body-lg text-body-lg font-semibold">Chat</span>
+<div class="ml-auto bg-on-primary text-primary text-[10px] px-2 py-0.5 rounded-full font-bold">12</div>
+</button>
+<!-- Item: Notices -->
+<button class="w-full flex items-center gap-4 px-4 py-3.5 rounded-xl nav-item-transition text-on-surface-variant hover:bg-white/40">
+<span class="material-symbols-outlined text-primary">notifications</span>
+<span class="font-body-lg text-body-lg">Notices</span>
+</button>
+<div class="px-4 py-2 mt-4">
+<span class="font-label-caps text-[10px] text-on-surface-variant/60 uppercase tracking-widest">Management</span>
+</div>
+<!-- Item: Meetings -->
+<button class="w-full flex items-center gap-4 px-4 py-3.5 rounded-xl nav-item-transition text-on-surface-variant hover:bg-white/40">
+<span class="material-symbols-outlined text-primary">event</span>
+<span class="font-body-lg text-body-lg">Meetings</span>
+</button>
+<!-- Item: Funds -->
+<button class="w-full flex items-center gap-4 px-4 py-3.5 rounded-xl nav-item-transition text-on-surface-variant hover:bg-white/40">
+<span class="material-symbols-outlined text-primary">account_balance_wallet</span>
+<span class="font-body-lg text-body-lg">Funds</span>
+</button>
+<div class="px-4 py-2 mt-4">
+<span class="font-label-caps text-[10px] text-on-surface-variant/60 uppercase tracking-widest">System</span>
+</div>
+<!-- Item: Settings -->
+<button class="w-full flex items-center gap-4 px-4 py-3.5 rounded-xl nav-item-transition text-on-surface-variant hover:bg-white/40">
+<span class="material-symbols-outlined text-primary">settings</span>
+<span class="font-body-lg text-body-lg">Settings</span>
+</button>
+<!-- Item: Backup -->
+<button class="w-full flex items-center gap-4 px-4 py-3.5 rounded-xl nav-item-transition text-on-surface-variant hover:bg-white/40">
+<span class="material-symbols-outlined text-primary">cloud_upload</span>
+<span class="font-body-lg text-body-lg">Backup</span>
+</button>
+</nav>
+<!-- Footer Section (Logout) -->
+<footer class="p-4 border-t border-white/20">
+<button class="w-full flex items-center gap-4 px-4 py-4 rounded-xl text-error bg-error/5 hover:bg-error/10 nav-item-transition group">
+<span class="material-symbols-outlined group-hover:-translate-x-1 transition-transform">logout</span>
+<span class="font-label-caps text-label-caps">Logout</span>
+<span class="ml-auto text-[10px] font-label-caps text-error/50">v2.4.0</span>
+</button>
+</footer>
+<!-- Bottom "Brand Anchor" -->
+<div class="px-8 pb-8 pt-4">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+<p class="font-label-caps text-[10px] text-primary/60 uppercase tracking-tighter">Auralis Holdings Premium Access</p>
+</div>
+</div>
+</aside>
+<!-- Close Button (Visual only for the drawer interaction) -->
+<button class="fixed top-6 right-6 z-50 w-12 h-12 rounded-full bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center text-white active:scale-90 transition-all">
+<span class="material-symbols-outlined">close</span>
+</button>
+<!-- Interactive Script -->
+<script>
+        // Simple micro-interactions for the drawer
+        document.querySelectorAll('nav button').forEach(button => {
+            button.addEventListener('mousedown', () => {
+                if (!button.classList.contains('clay-button-active')) {
+                    button.style.transform = 'scale(0.98)';
+                }
+            });
+            button.addEventListener('mouseup', () => {
+                button.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body></html>

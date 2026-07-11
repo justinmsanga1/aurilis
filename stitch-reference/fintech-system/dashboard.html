@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Auralis Holdings - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#141d21",
+                    "surface-dim": "#ccdbf3",
+                    "background": "#f8f9ff",
+                    "on-secondary": "#ffffff",
+                    "on-primary-container": "#a8b8ff",
+                    "on-secondary-container": "#5d666b",
+                    "surface": "#f8f9ff",
+                    "surface-tint": "#3755c3",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed": "#dbe4ea",
+                    "tertiary-container": "#494b4c",
+                    "surface-container-highest": "#d5e3fc",
+                    "primary-container": "#1e40af",
+                    "on-error": "#ffffff",
+                    "inverse-primary": "#b8c4ff",
+                    "primary-fixed": "#dde1ff",
+                    "surface-container": "#e6eeff",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "error-container": "#ffdad6",
+                    "on-error-container": "#93000a",
+                    "on-surface-variant": "#444653",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "on-tertiary-container": "#babbbb",
+                    "primary": "#00288e",
+                    "outline-variant": "#c4c5d5",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#454747",
+                    "tertiary": "#333535",
+                    "surface-container-low": "#eff4ff",
+                    "surface-container-high": "#dce9ff",
+                    "surface-variant": "#d5e3fc",
+                    "on-primary-fixed-variant": "#173bab",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-background": "#0d1c2e",
+                    "secondary": "#576065",
+                    "inverse-surface": "#233144",
+                    "surface-bright": "#f8f9ff",
+                    "primary-fixed-dim": "#b8c4ff",
+                    "secondary-container": "#dbe4ea",
+                    "on-secondary-fixed-variant": "#3f484d",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed": "#001453",
+                    "on-surface": "#0d1c2e",
+                    "tertiary-fixed": "#e2e2e2",
+                    "outline": "#757684",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-fixed-dim": "#bfc8ce"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "clay": "24px",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-gap-md": "16px",
+                    "bento-gutter": "12px",
+                    "stack-gap-sm": "8px",
+                    "stack-gap-lg": "24px",
+                    "container-padding": "20px"
+            },
+            "fontFamily": {
+                    "label-caps": ["JetBrains Mono"],
+                    "body-sm": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "price-display": ["Inter"]
+            },
+            "fontSize": {
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["26px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "price-display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .clay-card {
+            background: #ffffff;
+            box-shadow: 
+                0 10px 30px -10px rgba(30, 64, 175, 0.08),
+                inset 2px 2px 0px rgba(255, 255, 255, 1),
+                inset -4px -4px 8px rgba(0, 40, 142, 0.03);
+            border: 1px solid rgba(255,255,255,0.4);
+        }
+        .clay-card-primary {
+            background: linear-gradient(135deg, #1e40af 0%, #00288e 100%);
+            box-shadow: 
+                0 15px 35px -10px rgba(0, 40, 142, 0.3),
+                inset 2px 2px 4px rgba(255, 255, 255, 0.2),
+                inset -4px -4px 10px rgba(0, 0, 0, 0.15);
+        }
+        .glass-effect {
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.7);
+            border: 0.5px solid rgba(255, 255, 255, 0.2);
+        }
+        .active-nav-bg {
+            background: rgba(30, 64, 175, 0.1);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen font-body-lg text-body-lg">
+<!-- TopAppBar Shell -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-white/20 shadow-[0_10px_30px_-10px_rgba(30,64,175,0.08)]">
+<div class="flex justify-between items-center px-container-padding h-16 max-w-lg mx-auto">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/20">
+<img class="w-full h-full object-cover" data-alt="Close-up studio portrait of a sophisticated executive woman with a warm, professional expression. The lighting is soft and cinematic, highlighting her features against a subtle, blurred architectural background. The overall aesthetic is high-end corporate luxury with soft blue and white tonal ranges." src="https://lh3.googleusercontent.com/aida-public/AB6AXuALedbcNLQVdKmdqLnxF0fKcL9QxHm3reRoIYzRmkDKoLVXKAyN58liyKT4MjyduReIT3tGfQ5sza77c44Szp72fOhIqqEAP8QiIK8_vN-NXovekm_d-OcwoIMjZwnwzl_d7mx4iKo6s5t9wBmcD7ec6IY-9i0e1LrgC7n5MCsAa3di1oEhPpaoQOP-wobM2ZPmIPIkO0g1rG3-5zfoIsoZUF59lQbvCJQa5215rxBfPb1_OcKO1ab3"/>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md-mobile text-on-surface">Hello, Admin</h1>
+<p class="font-label-caps text-[10px] text-primary">July 2023 • Active</p>
+</div>
+</div>
+<button class="material-symbols-outlined text-primary hover:opacity-80 transition-opacity active:scale-95 transition-transform">menu</button>
+</div>
+</header>
+<main class="pt-20 pb-28 px-container-padding max-w-lg mx-auto">
+<!-- Bento Grid -->
+<div class="grid grid-cols-2 gap-bento-gutter">
+<!-- Card 1: Large - Total Due -->
+<div class="clay-card-primary col-span-2 p-6 rounded-clay text-white">
+<div class="flex justify-between items-start mb-4">
+<p class="font-label-caps text-on-primary-container">TOTAL DUE THIS MONTH</p>
+<span class="material-symbols-outlined text-on-primary-container">info</span>
+</div>
+<div class="flex items-baseline gap-2 mb-6">
+<span class="text-on-primary-container font-headline-md">AED</span>
+<h2 class="font-headline-lg text-[40px]">370,000</h2>
+</div>
+<div class="space-y-3 bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/10">
+<div class="flex justify-between items-center">
+<span class="font-body-sm opacity-80">Monthly Contribution</span>
+<span class="font-label-caps font-bold">120,000</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-body-sm opacity-80">Debt Installment</span>
+<span class="font-label-caps font-bold">250,000</span>
+</div>
+</div>
+</div>
+<!-- Card 2: Medium - Paid -->
+<div class="clay-card p-5 rounded-clay flex flex-col items-center justify-center text-center">
+<p class="font-label-caps text-secondary mb-4">PAID THIS MONTH</p>
+<div class="relative w-24 h-24 mb-4">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-surface-container-high" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-primary-container" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" stroke-dasharray="251.2" stroke-dashoffset="115.5" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="font-label-caps text-[10px] text-secondary">54%</span>
+</div>
+</div>
+<p class="font-headline-md text-primary">200,000</p>
+</div>
+<!-- Card 3: Medium - Remaining -->
+<div class="clay-card p-5 rounded-clay flex flex-col justify-between bg-surface-container-low border-primary/10">
+<div>
+<p class="font-label-caps text-secondary">REMAINING</p>
+<h3 class="font-headline-md text-primary mt-2">170,000</h3>
+</div>
+<div class="mt-4 pt-4 border-t border-primary/5">
+<div class="flex items-center gap-1 text-error">
+<span class="material-symbols-outlined text-[16px]">priority_high</span>
+<span class="font-label-caps text-[10px]">Action Required</span>
+</div>
+</div>
+</div>
+<!-- Card 4: Small - Debt Installment -->
+<div class="clay-card p-4 rounded-clay">
+<p class="font-label-caps text-secondary text-[10px] mb-2 uppercase">Debt Installment</p>
+<div class="flex items-center justify-between">
+<span class="font-headline-md text-on-surface">2/4</span>
+<div class="flex gap-1">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<div class="w-2 h-2 rounded-full bg-surface-variant"></div>
+<div class="w-2 h-2 rounded-full bg-surface-variant"></div>
+</div>
+</div>
+</div>
+<!-- Card 5: Small - Penalty Status -->
+<div class="clay-card p-4 rounded-clay bg-green-50/50">
+<p class="font-label-caps text-secondary text-[10px] mb-2 uppercase">Penalty Status</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-green-600 text-[18px]">verified</span>
+<span class="font-label-caps text-[10px] text-green-700 font-bold">CLEAR</span>
+</div>
+<p class="text-[9px] text-secondary-fixed-variant mt-1">Before Day 10</p>
+</div>
+<!-- Card 6: Wide - Trends -->
+<div class="clay-card col-span-2 p-5 rounded-clay">
+<div class="flex justify-between items-center mb-6">
+<p class="font-label-caps text-secondary">MONTHLY PAYMENT TRENDS</p>
+<span class="font-label-caps text-[10px] text-primary">Last 6 Months</span>
+</div>
+<div class="flex items-end justify-between h-24 gap-2 px-2">
+<div class="w-full bg-surface-container-high rounded-full relative group">
+<div class="absolute bottom-0 w-full bg-primary-container rounded-full h-[60%] transition-all duration-500 hover:opacity-80"></div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 font-label-caps text-[9px] text-secondary">JAN</span>
+</div>
+<div class="w-full bg-surface-container-high rounded-full relative group">
+<div class="absolute bottom-0 w-full bg-primary-container rounded-full h-[40%] transition-all duration-500 hover:opacity-80"></div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 font-label-caps text-[9px] text-secondary">FEB</span>
+</div>
+<div class="w-full bg-surface-container-high rounded-full relative group">
+<div class="absolute bottom-0 w-full bg-primary-container rounded-full h-[85%] transition-all duration-500 hover:opacity-80"></div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 font-label-caps text-[9px] text-secondary">MAR</span>
+</div>
+<div class="w-full bg-surface-container-high rounded-full relative group">
+<div class="absolute bottom-0 w-full bg-primary-container rounded-full h-[55%] transition-all duration-500 hover:opacity-80"></div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 font-label-caps text-[9px] text-secondary">APR</span>
+</div>
+<div class="w-full bg-surface-container-high rounded-full relative group">
+<div class="absolute bottom-0 w-full bg-primary-container rounded-full h-[70%] transition-all duration-500 hover:opacity-80"></div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 font-label-caps text-[9px] text-secondary">MAY</span>
+</div>
+<div class="w-full bg-surface-container-high rounded-full relative group">
+<div class="absolute bottom-0 w-full bg-primary rounded-full h-[95%] transition-all duration-500 hover:opacity-80"></div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 font-label-caps text-[9px] text-primary font-bold">JUN</span>
+</div>
+</div>
+</div>
+<!-- Card 7: Medium - Quick Actions -->
+<div class="clay-card col-span-2 p-5 rounded-clay">
+<p class="font-label-caps text-secondary mb-4">QUICK ACTIONS</p>
+<div class="grid grid-cols-3 gap-3">
+<button class="flex flex-col items-center justify-center p-3 rounded-xl bg-surface-container-low hover:bg-primary-container/10 active:scale-95 transition-all group">
+<span class="material-symbols-outlined text-primary mb-1 group-hover:scale-110 transition-transform">add_task</span>
+<span class="font-label-caps text-[10px]">Record</span>
+</button>
+<button class="flex flex-col items-center justify-center p-3 rounded-xl bg-surface-container-low hover:bg-primary-container/10 active:scale-95 transition-all group">
+<span class="material-symbols-outlined text-primary mb-1 group-hover:scale-110 transition-transform">assessment</span>
+<span class="font-label-caps text-[10px]">Report</span>
+</button>
+<button class="flex flex-col items-center justify-center p-3 rounded-xl bg-surface-container-low hover:bg-primary-container/10 active:scale-95 transition-all group">
+<span class="material-symbols-outlined text-primary mb-1 group-hover:scale-110 transition-transform">forum</span>
+<span class="font-label-caps text-[10px]">Chat</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar Shell -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface/90 backdrop-blur-xl rounded-t-xl shadow-[0_-10px_30px_rgba(0,40,142,0.08)] border-t border-white/40">
+<div class="flex justify-around items-center h-20 px-4 pb-safe max-w-lg mx-auto">
+<!-- Home (Active) -->
+<a class="flex flex-col items-center justify-center text-primary bg-primary-container/10 rounded-xl px-3 py-1 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-caps text-[10px] mt-0.5">Home</span>
+</a>
+<!-- Members -->
+<a class="flex flex-col items-center justify-center text-secondary hover:text-primary-container active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-caps text-[10px] mt-0.5">Members</span>
+</a>
+<!-- Payments -->
+<a class="flex flex-col items-center justify-center text-secondary hover:text-primary-container active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-caps text-[10px] mt-0.5">Payments</span>
+</a>
+<!-- Projects -->
+<a class="flex flex-col items-center justify-center text-secondary hover:text-primary-container active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="font-label-caps text-[10px] mt-0.5">Projects</span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center justify-center text-secondary hover:text-primary-container active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-caps text-[10px] mt-0.5">Profile</span>
+</a>
+</div>
+</nav>
+<script>
+        // Simple micro-interaction for the bento cards
+        document.querySelectorAll('.clay-card, .clay-card-primary').forEach(card => {
+            card.addEventListener('mousedown', () => {
+                card.style.transform = 'scale(0.98)';
+                card.style.transition = 'transform 0.1s ease-out';
+            });
+            card.addEventListener('mouseup', () => {
+                card.style.transform = 'scale(1)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body></html>

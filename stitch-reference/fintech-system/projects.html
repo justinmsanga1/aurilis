@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#141d21",
+                        "surface-dim": "#ccdbf3",
+                        "background": "#f8f9ff",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#a8b8ff",
+                        "on-secondary-container": "#5d666b",
+                        "surface": "#f8f9ff",
+                        "surface-tint": "#3755c3",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#dbe4ea",
+                        "tertiary-container": "#494b4c",
+                        "surface-container-highest": "#d5e3fc",
+                        "primary-container": "#1e40af",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#b8c4ff",
+                        "primary-fixed": "#dde1ff",
+                        "surface-container": "#e6eeff",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#444653",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "on-tertiary-container": "#babbbb",
+                        "primary": "#00288e",
+                        "outline-variant": "#c4c5d5",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "tertiary": "#333535",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container-high": "#dce9ff",
+                        "surface-variant": "#d5e3fc",
+                        "on-primary-fixed-variant": "#173bab",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-background": "#0d1c2e",
+                        "secondary": "#576065",
+                        "inverse-surface": "#233144",
+                        "surface-bright": "#f8f9ff",
+                        "primary-fixed-dim": "#b8c4ff",
+                        "secondary-container": "#dbe4ea",
+                        "on-secondary-fixed-variant": "#3f484d",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed": "#001453",
+                        "on-surface": "#0d1c2e",
+                        "tertiary-fixed": "#e2e2e2",
+                        "outline": "#757684",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#bfc8ce"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-gap-md": "16px",
+                        "bento-gutter": "12px",
+                        "stack-gap-sm": "8px",
+                        "stack-gap-lg": "24px",
+                        "container-padding": "20px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["JetBrains Mono"],
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "price-display": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["26px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "price-display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        .clay-card {
+            background: #ffffff;
+            box-shadow: 
+                0 10px 30px -10px rgba(30, 64, 175, 0.08),
+                inset 2px 2px 0px rgba(255, 255, 255, 1),
+                inset -4px -4px 8px rgba(30, 64, 175, 0.03);
+            border-radius: 24px;
+        }
+
+        .clay-card-glass {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(12px);
+            border: 0.5px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 
+                0 10px 30px -10px rgba(30, 64, 175, 0.05),
+                inset 1px 1px 0px rgba(255, 255, 255, 0.8);
+            border-radius: 24px;
+        }
+
+        .clay-button {
+            box-shadow: 
+                0 8px 20px -6px rgba(30, 64, 175, 0.25),
+                inset 1px 1px 0px rgba(255, 255, 255, 0.3);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .clay-button:active {
+            transform: scale(0.96);
+            box-shadow: 0 4px 10px -4px rgba(30, 64, 175, 0.2);
+        }
+
+        .clay-progress-bg {
+            background: #eff4ff;
+            box-shadow: inset 1px 1px 4px rgba(0, 40, 142, 0.05);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .clay-progress-fill {
+            background: linear-gradient(90deg, #1e40af, #3755c3);
+            box-shadow: 0 0 12px rgba(30, 64, 175, 0.2);
+            border-radius: 999px;
+        }
+
+        .recessed-surface {
+            background: #f1f5f9;
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.05), inset -2px -2px 5px rgba(255, 255, 255, 0.8);
+            border-radius: 16px;
+        }
+
+        body {
+            background-color: #f8f9ff;
+            min-height: 100vh;
+            padding-bottom: 90px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-lg text-on-surface">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-white/20 shadow-[0_10px_30px_-10px_rgba(30,64,175,0.08)] flex justify-between items-center px-container-padding h-16">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full overflow-hidden bg-primary-container">
+<img class="w-full h-full object-cover" data-alt="A professional high-end headshot of a refined executive in a dark navy tailored suit, positioned against a soft-focus architectural background with cool blue tones and elegant lighting that suggests a premium fintech member profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGzsSadGEMcmhl4R9SB9kl5Ss8ILSS_T7mo66aGXv3tcebFphRHTu5HIF6desMir5hRTW6Ei-wNzBhivlyA734I4I3IJTRG6ykS_llMmnOPQfR_OOYX_gRy7NaD-zFRSNcQ-ir3y1a3iNYH3mOtA_aJQIkhaJlU5fY5iWASAmtHILmg8JNEcKoB3KYEpSwxDm3kVpZBWY0LmWj7fVWtGHQoGv9r2ufB0uHzjc57oGyDPMdAqHnFt0T"/>
+</div>
+<h1 class="font-headline-md text-headline-md-mobile text-primary">October 2023 • Active</h1>
+</div>
+<button class="material-symbols-outlined text-primary hover:opacity-80 transition-opacity active:scale-95">menu</button>
+</header>
+<main class="pt-20 px-container-padding max-w-[390px] mx-auto space-y-stack-gap-lg">
+<!-- Header Bento Grid -->
+<div class="grid grid-cols-2 gap-bento-gutter">
+<!-- Total Wallet Balance Card -->
+<div class="col-span-2 clay-card p-5 space-y-2">
+<div class="flex justify-between items-start">
+<p class="font-label-caps text-label-caps text-on-surface-variant">TOTAL WALLET BALANCE</p>
+<span class="material-symbols-outlined text-primary-container text-[20px]">account_balance_wallet</span>
+</div>
+<div class="flex flex-col">
+<span class="font-price-display text-price-display text-primary">$12,482,900.52</span>
+<div class="flex items-center gap-1 text-[#10b981]">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span class="font-label-caps text-label-caps">+4.2% this month</span>
+</div>
+</div>
+</div>
+<!-- Project Profit/Loss Chart Card -->
+<div class="col-span-2 clay-card-glass p-5 flex flex-col justify-between h-40">
+<div class="flex justify-between items-center">
+<p class="font-label-caps text-label-caps text-on-surface-variant">PORTFOLIO YIELD</p>
+<span class="font-label-caps text-label-caps text-primary bg-primary/10 px-2 py-0.5 rounded-full">REAL-TIME</span>
+</div>
+<!-- Mock Line Chart (Simple SVG) -->
+<div class="h-16 w-full flex items-end">
+<svg class="w-full overflow-visible" viewbox="0 0 300 60">
+<path d="M0,50 Q40,45 60,30 T120,25 T180,45 T240,15 T300,10" fill="none" stroke="#1e40af" stroke-linecap="round" stroke-width="3"></path>
+<circle cx="300" cy="10" fill="#1e40af" r="4"></circle>
+</svg>
+</div>
+<div class="flex justify-between items-end">
+<span class="font-headline-md text-headline-md text-on-surface">+$842.2k</span>
+<div class="flex gap-1">
+<div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+<div class="w-2 h-2 rounded-full bg-primary/20"></div>
+<div class="w-2 h-2 rounded-full bg-primary/20"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Active Projects Header & FAB-style Button -->
+<div class="flex justify-between items-center px-1">
+<h2 class="font-headline-md text-headline-md text-on-surface">Active Projects</h2>
+<button class="clay-button bg-primary text-white p-2 rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+<!-- Projects List -->
+<div class="space-y-stack-gap-md pb-12">
+<!-- Zion Real Estate Project Card -->
+<div class="clay-card p-5 space-y-4">
+<div class="flex justify-between items-start">
+<div class="flex gap-3 items-center">
+<div class="w-12 h-12 rounded-2xl bg-primary-container flex items-center justify-center text-white shadow-lg">
+<span class="material-symbols-outlined text-[28px]">apartment</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Zion Real Estate</h3>
+<span class="font-label-caps text-label-caps text-white bg-primary px-2 py-0.5 rounded-md">STRATEGIC</span>
+</div>
+</div>
+<button class="material-symbols-outlined text-outline">more_vert</button>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="recessed-surface p-3 flex flex-col">
+<span class="font-label-caps text-label-caps text-on-secondary-fixed-variant">MEMBERS</span>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px] text-primary">group</span>
+<span class="font-headline-md text-headline-md">12</span>
+</div>
+</div>
+<div class="recessed-surface p-3 flex flex-col">
+<span class="font-label-caps text-label-caps text-on-secondary-fixed-variant">TARGET</span>
+<div class="flex items-center gap-1">
+<span class="font-headline-md text-headline-md text-primary">$2.4M</span>
+</div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between font-label-caps text-label-caps">
+<span class="text-on-surface-variant">FUNDING PROGRESS</span>
+<span class="text-primary">75%</span>
+</div>
+<div class="clay-progress-bg h-4 w-full">
+<div class="clay-progress-fill h-full w-[75%] transition-all duration-1000 ease-out"></div>
+</div>
+</div>
+</div>
+<!-- Additional Project Mock (Auralis Equity) -->
+<div class="clay-card p-5 space-y-4 opacity-90">
+<div class="flex justify-between items-start">
+<div class="flex gap-3 items-center">
+<div class="w-12 h-12 rounded-2xl bg-secondary-container flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined text-[28px]">account_tree</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Auralis Equity</h3>
+<span class="font-label-caps text-label-caps text-secondary bg-secondary-fixed px-2 py-0.5 rounded-md">MATURE</span>
+</div>
+</div>
+<button class="material-symbols-outlined text-outline">more_vert</button>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="recessed-surface p-3 flex flex-col">
+<span class="font-label-caps text-label-caps text-on-secondary-fixed-variant">MEMBERS</span>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px] text-primary">group</span>
+<span class="font-headline-md text-headline-md">48</span>
+</div>
+</div>
+<div class="recessed-surface p-3 flex flex-col">
+<span class="font-label-caps text-label-caps text-on-secondary-fixed-variant">TARGET</span>
+<div class="flex items-center gap-1">
+<span class="font-headline-md text-headline-md text-primary">$15M</span>
+</div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between font-label-caps text-label-caps">
+<span class="text-on-surface-variant">FUNDING PROGRESS</span>
+<span class="text-primary">100%</span>
+</div>
+<div class="clay-progress-bg h-4 w-full">
+<div class="clay-progress-fill h-full w-full bg-secondary opacity-50"></div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 rounded-t-xl bg-surface/90 backdrop-blur-xl flex justify-around items-center h-20 px-4 pb-safe shadow-[0_-10px_30px_rgba(0,40,142,0.08)]">
+<a class="flex flex-col items-center justify-center text-secondary active:scale-90 transition-all duration-200 hover:text-primary-container" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-caps text-label-caps">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary active:scale-90 transition-all duration-200 hover:text-primary-container" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-caps text-label-caps">Members</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary active:scale-90 transition-all duration-200 hover:text-primary-container" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-caps text-label-caps">Payments</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary bg-primary-container/10 rounded-xl px-3 py-1 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_tree</span>
+<span class="font-label-caps text-label-caps">Projects</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary active:scale-90 transition-all duration-200 hover:text-primary-container" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-caps text-label-caps">Profile</span>
+</a>
+</nav>
+<script>
+        // Micro-interaction for project cards
+        document.querySelectorAll('.clay-card').forEach(card => {
+            card.addEventListener('mousedown', () => {
+                card.style.transform = 'scale(0.985) translateY(2px)';
+                card.style.boxShadow = '0 5px 15px -5px rgba(30, 64, 175, 0.1), inset 1px 1px 0px rgba(255, 255, 255, 1)';
+            });
+            card.addEventListener('mouseup', () => {
+                card.style.transform = 'scale(1) translateY(0)';
+                card.style.boxShadow = '0 10px 30px -10px rgba(30, 64, 175, 0.08), inset 2px 2px 0px rgba(255, 255, 255, 1)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'scale(1) translateY(0)';
+            });
+        });
+
+        // Simple animation for the progress bar on load
+        window.addEventListener('DOMContentLoaded', () => {
+            const fills = document.querySelectorAll('.clay-progress-fill');
+            fills.forEach(fill => {
+                const width = fill.style.width;
+                fill.style.width = '0%';
+                setTimeout(() => {
+                    fill.style.width = width;
+                }, 300);
+            });
+        });
+    </script>
+</body></html>

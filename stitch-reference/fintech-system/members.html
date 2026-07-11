@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Auralis Holdings | Members Roster</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#141d21",
+                        "surface-dim": "#ccdbf3",
+                        "background": "#f8f9ff",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#a8b8ff",
+                        "on-secondary-container": "#5d666b",
+                        "surface": "#f8f9ff",
+                        "surface-tint": "#3755c3",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#dbe4ea",
+                        "tertiary-container": "#494b4c",
+                        "surface-container-highest": "#d5e3fc",
+                        "primary-container": "#1e40af",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#b8c4ff",
+                        "primary-fixed": "#dde1ff",
+                        "surface-container": "#e6eeff",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#444653",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "on-tertiary-container": "#babbbb",
+                        "primary": "#00288e",
+                        "outline-variant": "#c4c5d5",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "tertiary": "#333535",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container-high": "#dce9ff",
+                        "surface-variant": "#d5e3fc",
+                        "on-primary-fixed-variant": "#173bab",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-background": "#0d1c2e",
+                        "secondary": "#576065",
+                        "inverse-surface": "#233144",
+                        "surface-bright": "#f8f9ff",
+                        "primary-fixed-dim": "#b8c4ff",
+                        "secondary-container": "#dbe4ea",
+                        "on-secondary-fixed-variant": "#3f484d",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed": "#001453",
+                        "on-surface": "#0d1c2e",
+                        "tertiary-fixed": "#e2e2e2",
+                        "outline": "#757684",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#bfc8ce"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-gap-md": "16px",
+                        "bento-gutter": "12px",
+                        "stack-gap-sm": "8px",
+                        "stack-gap-lg": "24px",
+                        "container-padding": "20px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["JetBrains Mono"],
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "price-display": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["26px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "price-display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .clay-card {
+            background: #ffffff;
+            box-shadow: 
+                0 10px 30px -10px rgba(30, 64, 175, 0.08),
+                inset 2px 2px 4px rgba(255, 255, 255, 1),
+                inset -4px -4px 8px rgba(30, 64, 175, 0.04);
+            border-radius: 20px;
+        }
+        .clay-button-primary {
+            background: #1e40af;
+            box-shadow: 
+                0 8px 20px -6px rgba(30, 64, 175, 0.4),
+                inset 1px 1px 2px rgba(255, 255, 255, 0.3),
+                inset -2px -2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .clay-button-primary:active {
+            transform: scale(0.96);
+            box-shadow: 0 4px 10px -3px rgba(30, 64, 175, 0.4);
+        }
+        .inner-concave {
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.05), inset -2px -2px 5px rgba(255, 255, 255, 0.8);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-blur {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 0.5px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen font-body-lg">
+<!-- Top App Bar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-white/20 shadow-[0_10px_30px_-10px_rgba(30,64,175,0.08)] flex justify-between items-center px-container-padding h-16">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-white overflow-hidden shadow-inner">
+<img class="w-full h-full object-cover" data-alt="A professional high-resolution profile portrait of an executive male in a minimalist office setting, wearing a bespoke navy suit. The lighting is soft and cinematic, highlighting sophisticated features against a clean, blurred architectural background. The aesthetic is ultra-luxurious, conveying power, calm, and exclusive wealth management identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7h3TdDvD3QY4SI92xDu9GHvsbwFa3YpEm1LGrr8ncVb0P6RAJimQQ-0IQdRuv4thD1MZvcOKQ_MLyJONBBBvQqM3jMqhZvM1QEAYEuEwZKn_RLPzlcVnZp9pJa3Dkt5DuE9IN1ooo7OSvgIIzT7zPHeDfZf6Lqcs9-HYoRTHiEGKHgzNGVeq4VM225TqHqSGPeA8Pnc-dDjmT66-Mv27VFFUsZXhTeqo4ZAjCXgKU98ilMVC1LlPw"/>
+</div>
+<h1 class="font-headline-md text-headline-md-mobile text-on-surface">October 2023 • Active</h1>
+</div>
+<button class="text-primary active:scale-95 transition-transform">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</header>
+<!-- Main Content Area -->
+<main class="pt-20 pb-24 px-container-padding">
+<!-- Header & Action Row -->
+<div class="flex items-center justify-between mb-stack-gap-lg">
+<div class="space-y-1">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Collective</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">24 Active Members</p>
+</div>
+<button class="clay-button-primary text-white py-3 px-5 rounded-xl font-label-caps text-label-caps flex items-center gap-2 transition-all">
+<span class="material-symbols-outlined text-[18px]">person_add</span>
+                Add Member
+            </button>
+</div>
+<!-- Search Bar (Clay style concave) -->
+<div class="relative mb-stack-gap-lg">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full bg-surface-container-low inner-concave border-none rounded-2xl py-3.5 pl-12 pr-4 text-body-sm focus:ring-2 focus:ring-primary/20 placeholder:text-outline-variant" placeholder="Search members..." type="text"/>
+</div>
+<!-- Members Vertical List -->
+<div class="space-y-bento-gutter">
+<!-- Member Card: Chairman -->
+<div class="clay-card p-4 flex flex-col gap-3 group active:scale-[0.98] transition-all">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="relative">
+<div class="w-12 h-12 rounded-full overflow-hidden border-2 border-primary-container/20">
+<img class="w-full h-full object-cover" data-alt="A dignified close-up portrait of an older woman with silver hair, radiating wisdom and authority. She is dressed in a charcoal silk blouse in a minimalist, high-end gallery environment. The lighting is soft-key, creating elegant shadows on a pale blue clay-textured wall behind her, fitting a premium, exclusive fintech member aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC07UpqRyB37oEzSlykwLuBgciNpj25orMwv2hTBS-Uhm7rHD4HLYGsyHp2MvYGC1iXMSOyIwzlWU3QR6mW1S31y-GbU0ykxt4aQh8vwl4u2X8JPqiicKdQWxyQuMB2Umt-tBvJtKeeFT1ZfU-l2Z2IoZBCbjl_M28RsCBFSH7BF39VIgmnJP3X8aALNtttb6kmcNeD8lCH_IJPlryw7ofOyDhC7OESRLpPtooasOS-Ro2rebG7l5wA"/>
+</div>
+<div class="absolute -bottom-1 -right-1 w-5 h-5 bg-primary rounded-full border-2 border-white flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[12px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+<div>
+<p class="font-headline-md text-[16px] text-on-surface">Eleanor Sterling</p>
+<span class="bg-primary-container text-white px-2 py-0.5 rounded-md font-label-caps text-[10px] uppercase">Chairman</span>
+</div>
+</div>
+<div class="text-right">
+<span class="text-primary font-label-caps text-[11px] bg-primary/5 px-2 py-1 rounded-full border border-primary/10">July Paid</span>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<div class="flex justify-between items-center text-[11px] font-label-caps text-on-surface-variant">
+<span>Contribution Progress</span>
+<span>100%</span>
+</div>
+<div class="h-2 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-[100%] shadow-[0_0_8px_rgba(0,40,142,0.3)]"></div>
+</div>
+</div>
+</div>
+<!-- Member Card: Secretary -->
+<div class="clay-card p-4 flex flex-col gap-3 group active:scale-[0.98] transition-all">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-full overflow-hidden border-2 border-primary-container/20">
+<img class="w-full h-full object-cover" data-alt="A high-fashion corporate portrait of a young professional woman with sharp features and analytical eyes. She is in a high-tech boardroom with glass and steel elements. The lighting is cool-toned, with bright highlights that emphasize a glassmorphic aesthetic. The overall mood is precise, efficient, and sophisticated." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuofqqWaNUsXYTuvg4Tb9cwYEw1lXq5_nGB0IU1wYHAwcbzO_u4wBLEtCBUPRcH98YcW9Qe0qSKymg-u7rGrVBWmDD627AuETVUAkeREkKpbnSPGkQA6-O3uNyvwG0fCnWIJL9ZFS0YVb3634_WuV0Y28ZyOzzIfkJe4m7-IozcGagCVp1WCw-jlGnENNInOcMUmSWB1qoPrp1vQ1RR0SQVsbyk81HrKO_O9JvBD1qvqtoNucnR-tf"/>
+</div>
+<div>
+<p class="font-headline-md text-[16px] text-on-surface">Marcus Thorne</p>
+<span class="bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded-md font-label-caps text-[10px] uppercase">Secretary</span>
+</div>
+</div>
+<div class="text-right">
+<span class="text-primary font-label-caps text-[11px] bg-primary/5 px-2 py-1 rounded-full border border-primary/10">July Paid</span>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<div class="flex justify-between items-center text-[11px] font-label-caps text-on-surface-variant">
+<span>Contribution Progress</span>
+<span>85%</span>
+</div>
+<div class="h-2 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-[85%]"></div>
+</div>
+</div>
+</div>
+<!-- Member Card: Member with Debt -->
+<div class="clay-card p-4 flex flex-col gap-3 group active:scale-[0.98] transition-all">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-full overflow-hidden border-2 border-error/20">
+<img class="w-full h-full object-cover" data-alt="A focused studio portrait of a man in his 40s with a thoughtful expression. He is wearing a minimalist navy turtleneck. The background is a soft, out-of-focus abstract pattern in ice-blue and slate-gray. High-end, soft volume studio lighting creates a physical, sculpted look consistent with a claymorphic design system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfCaPfnGx3N1JT8Im5nzMc-_SXfTJgKmkwaOmH6H8PQlnd2pNcNj3ym8rFamlbxjjn7sG2sCHvodIunMbzDdH-MEuWcNV9pBbx8fBIaap8OgTOAiTdgrUtWDOyFWGAlk_7cScbtL_vpUi8J8D45iXQ2gW3gaPwxf19nDGNNRUsW8oodGkmHw5fHOg6bhk8-qM0TfbZ1E1Y2mRVqLViQQwyIfZ6DZhbdaVCLb2t2NyhNCHu4MlwdNok"/>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<p class="font-headline-md text-[16px] text-on-surface">Julian Vane</p>
+<span class="material-symbols-outlined text-error text-[18px]" title="Debt Active">warning</span>
+</div>
+<span class="bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded-md font-label-caps text-[10px] uppercase">Member</span>
+</div>
+</div>
+<div class="text-right">
+<span class="text-error font-label-caps text-[11px] bg-error/5 px-2 py-1 rounded-full border border-error/10">July Pending</span>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<div class="flex justify-between items-center text-[11px] font-label-caps text-on-surface-variant">
+<span>Contribution Progress</span>
+<span>42%</span>
+</div>
+<div class="h-2 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-error rounded-full w-[42%]"></div>
+</div>
+</div>
+</div>
+<!-- Member Card: Member -->
+<div class="clay-card p-4 flex flex-col gap-3 group active:scale-[0.98] transition-all">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-full overflow-hidden border-2 border-primary-container/20">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a middle-eastern male entrepreneur with a friendly yet serious demeanor. He is set against a blurred background of a modern luxury lounge. The aesthetic incorporates glassmorphism and soft shadows, with a color palette of royal blues and crisp whites, echoing a high-net-worth individual's digital workspace." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCofSvrn1pdQscXXp3fC3lvAGVEFG3Xgp3NEtDPOy7hwhtNjBXB_83oK0PsAqfGUoFVSRkMg3u3636fX4_z1Oc5zLSjyURddXXbfhXvetlsn9mC0ilkBTpSitKBy5NMrXHGvOyBbuX3e5M23t8MOnflL1ghjDy2vN7I4A2ofGvQYT94kaufvbFWyQDYRD8XcVtLeePe2Tg5yE8DpyHL9BCzqyGGrIe5E5S16MQjp1JGVnd_JDt8xXQC"/>
+</div>
+<div>
+<p class="font-headline-md text-[16px] text-on-surface">Amara Okafor</p>
+<span class="bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded-md font-label-caps text-[10px] uppercase">Member</span>
+</div>
+</div>
+<div class="text-right">
+<span class="text-primary font-label-caps text-[11px] bg-primary/5 px-2 py-1 rounded-full border border-primary/10">July Paid</span>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<div class="flex justify-between items-center text-[11px] font-label-caps text-on-surface-variant">
+<span>Contribution Progress</span>
+<span>70%</span>
+</div>
+<div class="h-2 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-[70%]"></div>
+</div>
+</div>
+</div>
+<!-- Member Card: Member -->
+<div class="clay-card p-4 flex flex-col gap-3 group active:scale-[0.98] transition-all opacity-80">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-full overflow-hidden border-2 border-primary-container/20 grayscale">
+<img class="w-full h-full object-cover" data-alt="A high-quality minimalist portrait of a woman in her late 30s, looking away from the camera. The style is clean, modern, and clinical, with lighting that emphasizes the smooth surfaces of her attire. The palette is dominated by cool ice-blues and deep navy, reflecting a sophisticated, secure private wealth management branding." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBa_kaNrtjWjAoGE6YB1i-YgmTkxu2nL5KE0m7lTtdO8O2I44BTBfUMkZloJaJSyzir-RpKMYKNuh71oKUH2P167AXVSJFYIi3XamzxF8lZI2U35tvOnWMzlZGVUQRyeKaAsGfFwzjaoXdeTObEXKBYriM72eXWRwQaRvaGEnlYhG9Fz4Tb6M-lrOs-7CbV2GNeh69t0A-0yc9gZpaSNipA62nwAND6yIDnFk1LmiuG_zLVyOO-D2q_"/>
+</div>
+<div>
+<p class="font-headline-md text-[16px] text-on-surface">Silas Thorne</p>
+<span class="bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded-md font-label-caps text-[10px] uppercase">Member</span>
+</div>
+</div>
+<div class="text-right">
+<span class="text-primary font-label-caps text-[11px] bg-primary/5 px-2 py-1 rounded-full border border-primary/10">July Paid</span>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<div class="flex justify-between items-center text-[11px] font-label-caps text-on-surface-variant">
+<span>Contribution Progress</span>
+<span>10%</span>
+</div>
+<div class="h-2 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-[10%]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Pagination/Scroll indicator subtle glass -->
+<div class="mt-stack-gap-lg flex justify-center">
+<div class="glass-blur bg-white/30 px-4 py-2 rounded-full flex gap-2">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<div class="w-2 h-2 rounded-full bg-primary/30"></div>
+<div class="w-2 h-2 rounded-full bg-primary/30"></div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 w-full z-50 rounded-t-xl bg-surface/90 backdrop-blur-xl flex justify-around items-center h-20 px-4 pb-safe shadow-[0_-10px_30px_rgba(0,40,142,0.08)]">
+<!-- Home -->
+<a class="flex flex-col items-center justify-center text-secondary" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-caps text-[10px] mt-1">Home</span>
+</a>
+<!-- Members (ACTIVE) -->
+<a class="flex flex-col items-center justify-center text-primary bg-primary-container/10 rounded-xl px-4 py-1.5 transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-label-caps text-[10px] mt-1">Members</span>
+</a>
+<!-- Payments -->
+<a class="flex flex-col items-center justify-center text-secondary" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-caps text-[10px] mt-1">Payments</span>
+</a>
+<!-- Projects -->
+<a class="flex flex-col items-center justify-center text-secondary" href="#">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="font-label-caps text-[10px] mt-1">Projects</span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center justify-center text-secondary" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-caps text-[10px] mt-1">Profile</span>
+</a>
+</nav>
+<script>
+        // Micro-interactions for list item press
+        document.querySelectorAll('.clay-card').forEach(card => {
+            card.addEventListener('mousedown', () => {
+                card.style.transform = 'scale(0.98)';
+                card.style.boxShadow = 'inset 2px 2px 8px rgba(30, 64, 175, 0.1)';
+            });
+            card.addEventListener('mouseup', () => {
+                card.style.transform = 'scale(1)';
+                card.style.boxShadow = '0 10px 30px -10px rgba(30, 64, 175, 0.08), inset 2px 2px 4px rgba(255, 255, 255, 1), inset -4px -4px 8px rgba(30, 64, 175, 0.04)';
+            });
+        });
+
+        // Search highlight interaction
+        const searchInput = document.querySelector('input');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('ring-2', 'ring-primary/10');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('ring-2', 'ring-primary/10');
+        });
+    </script>
+</body></html>

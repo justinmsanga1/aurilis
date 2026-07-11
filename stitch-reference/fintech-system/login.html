@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#141d21",
+                    "surface-dim": "#ccdbf3",
+                    "background": "#f8f9ff",
+                    "on-secondary": "#ffffff",
+                    "on-primary-container": "#a8b8ff",
+                    "on-secondary-container": "#5d666b",
+                    "surface": "#f8f9ff",
+                    "surface-tint": "#3755c3",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed": "#dbe4ea",
+                    "tertiary-container": "#494b4c",
+                    "surface-container-highest": "#d5e3fc",
+                    "primary-container": "#1e40af",
+                    "on-error": "#ffffff",
+                    "inverse-primary": "#b8c4ff",
+                    "primary-fixed": "#dde1ff",
+                    "surface-container": "#e6eeff",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "error-container": "#ffdad6",
+                    "on-error-container": "#93000a",
+                    "on-surface-variant": "#444653",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "on-tertiary-container": "#babbbb",
+                    "primary": "#00288e",
+                    "outline-variant": "#c4c5d5",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#454747",
+                    "tertiary": "#333535",
+                    "surface-container-low": "#eff4ff",
+                    "surface-container-high": "#dce9ff",
+                    "surface-variant": "#d5e3fc",
+                    "on-primary-fixed-variant": "#173bab",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-background": "#0d1c2e",
+                    "secondary": "#576065",
+                    "inverse-surface": "#233144",
+                    "surface-bright": "#f8f9ff",
+                    "primary-fixed-dim": "#b8c4ff",
+                    "secondary-container": "#dbe4ea",
+                    "on-secondary-fixed-variant": "#3f484d",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed": "#001453",
+                    "on-surface": "#0d1c2e",
+                    "tertiary-fixed": "#e2e2e2",
+                    "outline": "#757684",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-fixed-dim": "#bfc8ce"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "2xl": "1rem",
+                    "3xl": "1.75rem", // 28px
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-gap-md": "16px",
+                    "bento-gutter": "12px",
+                    "stack-gap-sm": "8px",
+                    "stack-gap-lg": "24px",
+                    "container-padding": "20px"
+            },
+            "fontFamily": {
+                    "label-caps": ["JetBrains Mono"],
+                    "body-sm": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "price-display": ["Inter"]
+            },
+            "fontSize": {
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["26px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "price-display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #f0f4fa; /* Pale ice-blue background */
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .clay-card {
+            background: #ffffff;
+            box-shadow: 
+                0 10px 30px -10px rgba(30, 64, 175, 0.08), /* Outer Soft Shadow */
+                inset 2px 2px 4px rgba(255, 255, 255, 0.9), /* Inner Light Highlight */
+                inset -2px -2px 6px rgba(0, 40, 142, 0.05); /* Inner Depth Shadow */
+        }
+
+        .clay-logo {
+            background: #eef2ff;
+            box-shadow: 
+                8px 8px 16px rgba(0, 40, 142, 0.1),
+                -8px -8px 16px rgba(255, 255, 255, 0.8),
+                inset 2px 2px 4px rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+        }
+
+        .clay-input {
+            background: #f8f9ff;
+            box-shadow: 
+                inset 4px 4px 8px rgba(0, 40, 142, 0.06),
+                inset -4px -4px 8px rgba(255, 255, 255, 0.9);
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .clay-input:focus {
+            outline: none;
+            box-shadow: 
+                inset 2px 2px 4px rgba(0, 40, 142, 0.1),
+                inset -2px -2px 4px rgba(255, 255, 255, 0.9),
+                0 0 0 2px rgba(30, 64, 175, 0.1);
+        }
+
+        .clay-button {
+            background: #1e40af; /* Royal Blue */
+            box-shadow: 
+                0 12px 24px -8px rgba(30, 64, 175, 0.4),
+                inset 2px 2px 4px rgba(255, 255, 255, 0.3),
+                inset -2px -2px 4px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .clay-button:active {
+            transform: scale(0.97);
+            box-shadow: 
+                0 4px 8px -2px rgba(30, 64, 175, 0.3),
+                inset 4px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="flex items-center justify-center min-h-screen p-container-padding overflow-hidden">
+<!-- Login Container -->
+<main class="clay-card w-full max-w-[400px] rounded-3xl p-10 flex flex-col items-center gap-stack-gap-lg">
+<!-- Logo Section -->
+<div class="flex flex-col items-center gap-stack-gap-md mb-4">
+<div class="clay-logo w-20 h-20 flex items-center justify-center text-primary overflow-hidden relative group">
+<!-- Abstract Logo Mark -->
+<div class="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-50"></div>
+<span class="material-symbols-outlined text-[40px] relative z-10" data-icon="shield_with_heart" style="font-variation-settings: 'FILL' 1;">shield_with_heart</span>
+</div>
+<div class="text-center">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary tracking-tight">Auralis Holdings</h1>
+<p class="font-body-sm text-body-sm text-secondary mt-1">Institutional Wealth Management</p>
+</div>
+</div>
+<!-- Form Section -->
+<form class="w-full flex flex-col gap-stack-gap-md" onsubmit="return false;">
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant ml-2" for="username">Username</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline" data-icon="person">person</span>
+<input class="clay-input w-full h-14 pl-12 pr-4 rounded-xl font-body-lg text-body-lg text-on-surface placeholder:text-outline/50" id="username" placeholder="Enter your credential" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant ml-2" for="password">Password</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline" data-icon="lock">lock</span>
+<input class="clay-input w-full h-14 pl-12 pr-4 rounded-xl font-body-lg text-body-lg text-on-surface placeholder:text-outline/50" id="password" placeholder="••••••••" type="password"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+</div>
+</div>
+<div class="flex items-center justify-between px-2 py-1">
+<label class="flex items-center gap-2 cursor-pointer group">
+<div class="w-5 h-5 rounded-md clay-input flex items-center justify-center group-hover:scale-105 transition-transform">
+<input class="hidden peer" type="checkbox"/>
+<span class="material-symbols-outlined text-[16px] text-primary opacity-0 peer-checked:opacity-100 transition-opacity" data-icon="check" style="font-variation-settings: 'wght' 700;">check</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Remember device</span>
+</label>
+<a class="font-body-sm text-body-sm text-primary font-semibold hover:underline" href="#">Forgot?</a>
+</div>
+<!-- Login Button -->
+<button class="clay-button w-full h-16 rounded-2xl flex items-center justify-center gap-2 mt-4 active:scale-95 transition-all">
+<span class="font-headline-md text-headline-md text-white">Secure Login</span>
+<span class="material-symbols-outlined text-white" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</form>
+<!-- Footer -->
+<footer class="mt-8 flex flex-col items-center gap-stack-gap-sm opacity-60">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-secondary" data-icon="encrypted">encrypted</span>
+<span class="font-label-caps text-label-caps text-secondary">Secure Access Only</span>
+</div>
+<p class="font-body-sm text-[10px] text-outline text-center">
+                Authorized access only. All activities are monitored and encrypted for compliance under Auralis Holdings Global Governance.
+            </p>
+</footer>
+</main>
+<!-- Background Atmospheric Effects -->
+<div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[100px] -z-10"></div>
+<div class="fixed bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-surface-container-highest rounded-full blur-[80px] -z-10"></div>
+<script>
+        // Subtle micro-interaction for the login button
+        const button = document.querySelector('.clay-button');
+        button.addEventListener('mousemove', (e) => {
+            const rect = button.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            button.style.setProperty('--x', `${x}px`);
+            button.style.setProperty('--y', `${y}px`);
+        });
+
+        // Suppression of global nav logic as per requirements for "Transactional/Login" screens
+        console.log("Navigation shell suppressed for transactional screen flow.");
+    </script>
+</body></html>

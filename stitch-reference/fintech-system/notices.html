@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Notices - Auralis Holdings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#141d21",
+                        "surface-dim": "#ccdbf3",
+                        "background": "#f8f9ff",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#a8b8ff",
+                        "on-secondary-container": "#5d666b",
+                        "surface": "#f8f9ff",
+                        "surface-tint": "#3755c3",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#dbe4ea",
+                        "tertiary-container": "#494b4c",
+                        "surface-container-highest": "#d5e3fc",
+                        "primary-container": "#1e40af",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#b8c4ff",
+                        "primary-fixed": "#dde1ff",
+                        "surface-container": "#e6eeff",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#444653",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "on-tertiary-container": "#babbbb",
+                        "primary": "#00288e",
+                        "outline-variant": "#c4c5d5",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "tertiary": "#333535",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container-high": "#dce9ff",
+                        "surface-variant": "#d5e3fc",
+                        "on-primary-fixed-variant": "#173bab",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-background": "#0d1c2e",
+                        "secondary": "#576065",
+                        "inverse-surface": "#233144",
+                        "surface-bright": "#f8f9ff",
+                        "primary-fixed-dim": "#b8c4ff",
+                        "secondary-container": "#dbe4ea",
+                        "on-secondary-fixed-variant": "#3f484d",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed": "#001453",
+                        "on-surface": "#0d1c2e",
+                        "tertiary-fixed": "#e2e2e2",
+                        "outline": "#757684",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#bfc8ce"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-gap-md": "16px",
+                        "bento-gutter": "12px",
+                        "stack-gap-sm": "8px",
+                        "stack-gap-lg": "24px",
+                        "container-padding": "20px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["JetBrains Mono"],
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "price-display": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["26px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "price-display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        .clay-card {
+            background: #ffffff;
+            box-shadow: 
+                0 10px 30px -10px rgba(30, 64, 175, 0.1),
+                inset 2px 2px 0px rgba(255, 255, 255, 1),
+                inset -4px -4px 8px rgba(30, 64, 175, 0.03);
+            border-radius: 24px;
+        }
+
+        .clay-card-inner {
+            background: #f0f4ff;
+            box-shadow: 
+                inset 2px 2px 5px rgba(0, 0, 0, 0.05),
+                inset -2px -2px 5px rgba(255, 255, 255, 0.8);
+            border-radius: 16px;
+        }
+
+        .clay-button {
+            background: #1e40af;
+            box-shadow: 
+                0 10px 20px -5px rgba(30, 64, 175, 0.3),
+                inset 1px 1px 1px rgba(255, 255, 255, 0.3);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .clay-button:active {
+            transform: scale(0.96);
+            box-shadow: 0 2px 10px -5px rgba(30, 64, 175, 0.3);
+        }
+
+        .glass-header {
+            background: rgba(248, 249, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 glass-header flex justify-between items-center px-container-padding h-16 shadow-[0_10px_30px_-10px_rgba(30,64,175,0.08)]">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center overflow-hidden border border-white/50">
+<img class="w-full h-full object-cover" data-alt="A professional high-fidelity close-up portrait of a wealthy executive in a navy tailored suit, set against a blurred luxury office background with soft blue lighting and glass textures, embodying an exclusive member-only fintech brand aesthetic with calm and fortified luxury." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAn1KyOR4vuV4Jvuz6EUshwpyYZPttugpfS2Z6BGW9yoEeP_EAUjOdCoOsglsUTxQMLvv_h-EqowkZENhfPIiMH22N1f3KcMof3FFtsl1VrWlhhHwIoNDlNOzP4HbdCJpK978Ht2JENWPLBqMB3-YMwnpvMnz7iYNYcS-KzcAPRDPAuhROC6HZku2I-2tNUcb0bgRzCx4GLu5gg4wm9x4gpV7QQ1OLXwOahyTXQewofBVZGcTLEqJrM"/>
+</div>
+<h1 class="font-headline-md text-headline-md-mobile text-on-surface">October 2023 • Active</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-surface-container-high transition-colors active:scale-95">
+<span class="material-symbols-outlined text-primary">menu</span>
+</button>
+</header>
+<main class="pt-20 px-container-padding space-y-stack-gap-lg">
+<!-- Welcome Section -->
+<section class="mt-4">
+<div class="flex items-center justify-between">
+<div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-primary">Notices</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Official updates for Auralis Members</p>
+</div>
+<div class="px-3 py-1 bg-primary/10 rounded-full border border-primary/20">
+<span class="font-label-caps text-label-caps text-primary">Secretary Access</span>
+</div>
+</div>
+</section>
+<!-- Post Notice Composer (Secretary/Admin Only) -->
+<section class="clay-card p-5 space-y-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">edit_note</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Post New Notice</h3>
+</div>
+<div class="space-y-3">
+<input class="w-full clay-card-inner border-none focus:ring-2 focus:ring-primary/20 text-body-lg font-body-lg px-4 py-3 placeholder:text-outline" placeholder="Title of the announcement..." type="text"/>
+<textarea class="w-full clay-card-inner border-none focus:ring-2 focus:ring-primary/20 text-body-lg font-body-lg px-4 py-3 placeholder:text-outline" placeholder="Write your message here..." rows="3"></textarea>
+</div>
+<div class="flex items-center justify-between pt-2">
+<div class="flex gap-2">
+<button class="flex items-center gap-1 px-3 py-2 rounded-xl bg-surface-container-high text-on-surface-variant hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[18px]">priority_high</span>
+<span class="font-label-caps text-label-caps">Priority</span>
+</button>
+<button class="flex items-center gap-1 px-3 py-2 rounded-xl bg-surface-container-high text-on-surface-variant hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[18px]">attach_file</span>
+<span class="font-label-caps text-label-caps">Attach</span>
+</button>
+</div>
+<button class="clay-button px-6 py-2.5 rounded-xl text-on-primary font-headline-md text-body-lg flex items-center gap-2">
+<span>Post</span>
+<span class="material-symbols-outlined text-[20px]">send</span>
+</button>
+</div>
+</section>
+<!-- Notice Feed -->
+<section class="space-y-stack-gap-md">
+<!-- High Priority Notice -->
+<article class="clay-card p-5 border-l-4 border-primary">
+<div class="flex justify-between items-start mb-3">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 bg-primary text-on-primary rounded-md font-label-caps text-[10px]">HIGH PRIORITY</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Oct 12, 2023</span>
+</div>
+<h4 class="font-headline-md text-headline-md text-on-surface">July Contribution Deadline</h4>
+</div>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant line-clamp-3 mb-4">
+                    All executive members are reminded that the final deadline for the July capital contribution phase is approaching. Please ensure all wire transfers are initiated by the end of this business week to maintain...
+                </p>
+<div class="flex items-center justify-between pt-4 border-t border-surface-variant/50">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">shield_person</span>
+</div>
+<span class="font-label-caps text-label-caps text-primary">Admin</span>
+</div>
+<button class="flex items-center gap-1 text-primary hover:opacity-70 transition-opacity">
+<span class="font-label-caps text-label-caps">Read More</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</article>
+<!-- Normal Priority Notice -->
+<article class="clay-card p-5">
+<div class="flex justify-between items-start mb-3">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 bg-surface-container-high text-on-surface-variant rounded-md font-label-caps text-[10px]">NOTICE</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Oct 10, 2023</span>
+</div>
+<h4 class="font-headline-md text-headline-md text-on-surface">Annual General Meeting</h4>
+</div>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant line-clamp-3 mb-4">
+                    The Board of Directors cordially invites all members to the 2023 Annual General Meeting. This session will cover the quarterly dividend distributions, new portfolio acquisitions, and governance votes...
+                </p>
+<div class="flex items-center justify-between pt-4 border-t border-surface-variant/50">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px] text-secondary" style="font-variation-settings: 'FILL' 1;">person</span>
+</div>
+<span class="font-label-caps text-label-caps text-secondary">Secretary</span>
+</div>
+<button class="flex items-center gap-1 text-primary hover:opacity-70 transition-opacity">
+<span class="font-label-caps text-label-caps">Read More</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</article>
+<!-- Quick Stats Bento -->
+<div class="bento-grid">
+<div class="clay-card p-4 flex flex-col items-center justify-center text-center">
+<span class="font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Active</span>
+<span class="font-price-display text-price-display text-primary">12</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-1">Notices</span>
+</div>
+<div class="clay-card p-4 flex flex-col items-center justify-center text-center bg-surface-container-low">
+<span class="font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Unread</span>
+<span class="font-price-display text-price-display text-error">2</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-1">Urgent</span>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface/90 backdrop-blur-xl rounded-t-xl flex justify-around items-center h-20 px-4 pb-safe shadow-[0_-10px_30px_rgba(0,40,142,0.08)]">
+<a class="flex flex-col items-center justify-center text-secondary hover:text-primary-container active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-caps text-label-caps mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary hover:text-primary-container active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-caps text-label-caps mt-1">Members</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary hover:text-primary-container active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-caps text-label-caps mt-1">Payments</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary bg-primary-container/10 rounded-xl px-3 py-1 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_tree</span>
+<span class="font-label-caps text-label-caps mt-1">Projects</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary hover:text-primary-container active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-caps text-label-caps mt-1">Profile</span>
+</a>
+</nav>
+<script>
+        // Micro-interaction for cards
+        document.querySelectorAll('.clay-card').forEach(card => {
+            card.addEventListener('mousedown', () => {
+                card.style.transform = 'scale(0.98)';
+                card.style.transition = 'transform 0.1s ease';
+            });
+            card.addEventListener('mouseup', () => {
+                card.style.transform = 'scale(1)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'scale(1)';
+            });
+        });
+
+        // Simple visibility toggle for role-based composer
+        // (In a real app, this would be server-side driven)
+        console.log("Secretary Access Granted: Post Composer Active.");
+    </script>
+</body></html>

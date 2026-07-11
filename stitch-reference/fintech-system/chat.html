@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Auralis Executive Group Chat</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..900&display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Claymorphism Effects */
+        .clay-card {
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 
+                10px 10px 30px -10px rgba(30, 64, 175, 0.08),
+                inset 2px 2px 4px rgba(255, 255, 255, 0.9),
+                inset -4px -4px 8px rgba(0, 40, 142, 0.03);
+        }
+
+        .clay-button-primary {
+            background: #1e40af;
+            box-shadow: 
+                0 10px 20px -5px rgba(30, 64, 175, 0.3),
+                inset 1px 1px 2px rgba(255, 255, 255, 0.3);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .clay-button-primary:active {
+            transform: scale(0.95);
+            box-shadow: 0 4px 10px -2px rgba(30, 64, 175, 0.3);
+        }
+
+        .clay-input-recessed {
+            background: #eff4ff;
+            box-shadow: 
+                inset 4px 4px 8px rgba(0, 40, 142, 0.06),
+                inset -2px -2px 4px rgba(255, 255, 255, 0.8);
+            border: none;
+        }
+
+        .clay-bubble-user {
+            background: #1e40af;
+            color: white;
+            border-radius: 20px 20px 4px 20px;
+            box-shadow: 
+                8px 8px 20px -5px rgba(30, 64, 175, 0.2),
+                inset 2px 2px 4px rgba(255, 255, 255, 0.2);
+        }
+
+        .clay-bubble-other {
+            background: #ffffff;
+            color: #0d1c2e;
+            border-radius: 20px 20px 20px 4px;
+            box-shadow: 
+                4px 4px 15px rgba(0, 40, 142, 0.05),
+                inset 1px 1px 2px rgba(255, 255, 255, 1);
+        }
+
+        /* Glassmorphism Navigation */
+        .glass-nav {
+            background: rgba(248, 249, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 0.5px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* Custom Scrollbar */
+        .chat-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .chat-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .chat-scroll::-webkit-scrollbar-thumb {
+            background: #d5e3fc;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#141d21",
+                        "surface-dim": "#ccdbf3",
+                        "background": "#f8f9ff",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#a8b8ff",
+                        "on-secondary-container": "#5d666b",
+                        "surface": "#f8f9ff",
+                        "surface-tint": "#3755c3",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#dbe4ea",
+                        "tertiary-container": "#494b4c",
+                        "surface-container-highest": "#d5e3fc",
+                        "primary-container": "#1e40af",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#b8c4ff",
+                        "primary-fixed": "#dde1ff",
+                        "surface-container": "#e6eeff",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#444653",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "on-tertiary-container": "#babbbb",
+                        "primary": "#00288e",
+                        "outline-variant": "#c4c5d5",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "tertiary": "#333535",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container-high": "#dce9ff",
+                        "surface-variant": "#d5e3fc",
+                        "on-primary-fixed-variant": "#173bab",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-background": "#0d1c2e",
+                        "secondary": "#576065",
+                        "inverse-surface": "#233144",
+                        "surface-bright": "#f8f9ff",
+                        "primary-fixed-dim": "#b8c4ff",
+                        "secondary-container": "#dbe4ea",
+                        "on-secondary-fixed-variant": "#3f484d",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed": "#001453",
+                        "on-surface": "#0d1c2e",
+                        "tertiary-fixed": "#e2e2e2",
+                        "outline": "#757684",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#bfc8ce"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-gap-md": "16px",
+                        "bento-gutter": "12px",
+                        "stack-gap-sm": "8px",
+                        "stack-gap-lg": "24px",
+                        "container-padding": "20px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["JetBrains Mono"],
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "price-display": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["26px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "price-display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-lg min-h-screen flex flex-col items-center">
+<!-- Top AppBar (from Shared Components JSON) -->
+<header class="fixed top-0 w-full z-50 glass-nav flex justify-between items-center px-container-padding h-16 shadow-[0_10px_30px_-10px_rgba(30,64,175,0.08)]">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden clay-card flex items-center justify-center bg-primary-container/10">
+<img class="w-full h-full object-cover" data-alt="A professional studio portrait of a high-net-worth individual for a luxury fintech app profile. The lighting is sophisticated and dramatic, emphasizing a clean and authoritative executive look. The color palette is composed of soft blues, crisp whites, and deep navy tones, creating a mood of absolute trust, privacy, and elite status." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrwM4S1Gni8HJhrHcwCeBXl1F5YLunirANRFNQZWDvjf7DiAGT8_RaMDd_IYa9Mrw-RISJq-H_dJznl4pb7bCENj8hn9TIgmDtZbdiObER3587SocyU9CxzzXuhZjAPbTg4O4zPa4xJqwvyy9prZa85bwD8sQ2_FmkkZn4aol4maAbg28OEFMEybbU3OWNL3OFQErwJdZ6CIyMTs3JDHwP1ikYvUfzkxhui-1Y40Gl5_HroQfOtgj0"/>
+</div>
+<div class="flex flex-col">
+<h1 class="font-headline-md text-headline-md-mobile text-primary">Auralis Executive Group</h1>
+<span class="text-[11px] font-label-caps text-secondary uppercase flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    24 active members
+                </span>
+</div>
+</div>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-primary active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+</header>
+<!-- Main Content: Chat Canvas -->
+<main class="flex-1 w-full max-w-[390px] pt-20 pb-24 px-5 overflow-hidden flex flex-col">
+<!-- Chat History -->
+<div class="flex-1 overflow-y-auto space-y-stack-gap-lg py-4 chat-scroll">
+<!-- Date Indicator -->
+<div class="flex justify-center">
+<span class="px-4 py-1 rounded-full bg-surface-container-high/50 text-[10px] font-label-caps text-on-surface-variant uppercase tracking-widest">October 24, 2023</span>
+</div>
+<!-- Left Aligned Message -->
+<div class="flex flex-col items-start max-w-[85%] group">
+<div class="flex items-center gap-2 mb-1 ml-2">
+<span class="text-[11px] font-label-caps text-secondary">John Doe</span>
+<span class="text-[9px] text-outline opacity-0 group-hover:opacity-100 transition-opacity">10:42 AM</span>
+</div>
+<div class="clay-bubble-other px-4 py-3 font-body-lg text-body-lg">
+                    Is the July target met?
+                </div>
+</div>
+<!-- Right Aligned Message (User) -->
+<div class="flex flex-col items-end max-w-[85%] ml-auto group">
+<div class="flex items-center gap-2 mb-1 mr-2">
+<span class="text-[9px] text-outline opacity-0 group-hover:opacity-100 transition-opacity">10:44 AM</span>
+<span class="text-[11px] font-label-caps text-primary">You</span>
+</div>
+<div class="clay-bubble-user px-4 py-3 font-body-lg text-body-lg">
+                    Yes, check the dashboard.
+                </div>
+</div>
+<!-- Another Message -->
+<div class="flex flex-col items-start max-w-[85%] group">
+<div class="flex items-center gap-2 mb-1 ml-2">
+<span class="text-[11px] font-label-caps text-secondary">Sarah Chen</span>
+<span class="text-[9px] text-outline opacity-0 group-hover:opacity-100 transition-opacity">10:45 AM</span>
+</div>
+<div class="clay-bubble-other px-4 py-3 font-body-lg text-body-lg">
+                    Q3 forecasts are looking promising based on the new asset allocation.
+                </div>
+</div>
+<!-- System Message -->
+<div class="flex justify-center py-2">
+<span class="text-[11px] text-secondary/60 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="lock">lock</span>
+                    End-to-end encrypted for Chairman Status
+                </span>
+</div>
+<!-- Right Aligned Message (User) -->
+<div class="flex flex-col items-end max-w-[85%] ml-auto group">
+<div class="flex items-center gap-2 mb-1 mr-2">
+<span class="text-[9px] text-outline opacity-0 group-hover:opacity-100 transition-opacity">10:48 AM</span>
+<span class="text-[11px] font-label-caps text-primary">You</span>
+</div>
+<div class="clay-bubble-user px-4 py-3 font-body-lg text-body-lg">
+                    I've updated the governance docs for the contribution rules too.
+                </div>
+</div>
+</div>
+<!-- Sticky Bottom Input Bar -->
+<div class="fixed bottom-0 w-full max-w-[390px] p-container-padding pb-8 glass-nav">
+<div class="flex items-center gap-bento-gutter">
+<!-- Add Icon -->
+<button class="w-12 h-12 flex-shrink-0 clay-card flex items-center justify-center text-primary active:scale-90 transition-transform">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+<!-- Input Field -->
+<div class="flex-1 relative">
+<input class="w-full h-12 px-5 rounded-full clay-input-recessed font-body-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-primary/20" placeholder="Send a secure message..." type="text"/>
+</div>
+<!-- Send Button -->
+<button class="w-12 h-12 flex-shrink-0 rounded-full clay-button-primary flex items-center justify-center text-white active:scale-90 transition-transform">
+<span class="material-symbols-outlined" data-icon="send">send</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Side Navigation (Simulated Drawer via Hamburguer) -->
+<div class="fixed inset-0 z-[60] bg-on-background/20 backdrop-blur-sm transition-opacity pointer-events-none opacity-0" id="drawer">
+<div class="absolute right-0 h-full w-80 bg-surface-container-low rounded-l-3xl shadow-2xl translate-x-full transition-transform duration-300 p-6 flex flex-col" id="drawer-content">
+<div class="flex justify-between items-center mb-8">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-full clay-card flex items-center justify-center bg-primary text-white">
+<span class="material-symbols-outlined" data-icon="account_balance">account_balance</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Auralis Holdings</h3>
+<p class="text-[11px] font-label-caps text-primary uppercase">Chairman Status</p>
+</div>
+</div>
+<button class="text-secondary" id="close-drawer">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<nav class="space-y-2">
+<a class="flex items-center gap-4 p-4 text-on-surface-variant hover:bg-white/50 rounded-2xl transition-colors" href="#">
+<span class="material-symbols-outlined text-primary" data-icon="gavel">gavel</span>
+<span class="font-body-lg text-body-lg">Governance Docs</span>
+</a>
+<a class="flex items-center gap-4 p-4 text-on-surface-variant hover:bg-white/50 rounded-2xl transition-colors" href="#">
+<span class="material-symbols-outlined text-primary" data-icon="rule">rule</span>
+<span class="font-body-lg text-body-lg">Contribution Rules</span>
+</a>
+<a class="flex items-center gap-4 p-4 text-on-surface-variant hover:bg-white/50 rounded-2xl transition-colors" href="#">
+<span class="material-symbols-outlined text-primary" data-icon="help">help</span>
+<span class="font-body-lg text-body-lg">Help Center</span>
+</a>
+<div class="h-px bg-outline-variant my-4"></div>
+<a class="flex items-center gap-4 p-4 text-error hover:bg-error/5 rounded-2xl transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-body-lg text-body-lg">Logout</span>
+</a>
+</nav>
+<div class="mt-auto p-4 clay-card bg-primary-container/5">
+<p class="text-[10px] font-label-caps text-secondary uppercase mb-2">Account Meta</p>
+<div class="flex items-center justify-between">
+<span class="text-body-sm font-semibold">Premium Account</span>
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom NavBar (From Shared Components JSON - Filtered: Hidden on Chat) -->
+<!-- The instructions state to suppress nav on task-focused screens. However, since the prompt specifies accessible via hamburger, and this is a Chat Screen (Transactional/Focused), I have prioritized the Drawer for navigation and a focused chat experience. I will include the BottomNavBar logic but technically it's a detail screen which often hides global nav for space. -->
+<script>
+        // Simple micro-interactions for the drawer
+        const menuBtn = document.querySelector('header button');
+        const drawer = document.getElementById('drawer');
+        const drawerContent = document.getElementById('drawer-content');
+        const closeBtn = document.getElementById('close-drawer');
+
+        menuBtn.addEventListener('click', () => {
+            drawer.classList.remove('pointer-events-none', 'opacity-0');
+            drawerContent.classList.remove('translate-x-full');
+        });
+
+        const closeDrawer = () => {
+            drawer.classList.add('pointer-events-none', 'opacity-0');
+            drawerContent.classList.add('translate-x-full');
+        };
+
+        closeBtn.addEventListener('click', closeDrawer);
+        drawer.addEventListener('click', (e) => {
+            if (e.target === drawer) closeDrawer();
+        });
+
+        // Auto-scroll chat to bottom
+        const chatContainer = document.querySelector('.chat-scroll');
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
+        // Micro-animation for the send button
+        const sendBtn = document.querySelector('.clay-button-primary');
+        sendBtn.addEventListener('click', () => {
+            const input = document.querySelector('input');
+            if(input.value.trim() !== "") {
+                input.value = "";
+                // Logic to append message would go here
+            }
+        });
+    </script>
+</body></html>

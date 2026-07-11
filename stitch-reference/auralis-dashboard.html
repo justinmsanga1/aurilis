@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Auralis Holdings | Command Center</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;800&amp;family=Geist:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#819986",
+                        "on-surface-variant": "#434843",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#1b1c1a",
+                        "tertiary-container": "#2b2b2b",
+                        "primary-fixed-dim": "#b4cdb8",
+                        "on-tertiary-fixed": "#1c1b1b",
+                        "secondary-container": "#fed65b",
+                        "primary-container": "#1b3022",
+                        "primary": "#061b0e",
+                        "tertiary": "#171717",
+                        "surface-bright": "#fbf9f5",
+                        "surface-variant": "#e4e2de",
+                        "on-secondary-container": "#745c00",
+                        "secondary-fixed": "#ffe088",
+                        "on-tertiary-fixed-variant": "#474646",
+                        "tertiary-fixed": "#e5e2e1",
+                        "inverse-on-surface": "#f2f0ed",
+                        "surface-container": "#efeeea",
+                        "on-error-container": "#93000a",
+                        "surface-container-high": "#eae8e4",
+                        "background": "#fbf9f5",
+                        "surface-dim": "#dbdad6",
+                        "on-tertiary": "#ffffff",
+                        "surface-tint": "#4d6453",
+                        "inverse-surface": "#30312e",
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "surface": "#fbf9f5",
+                        "on-surface": "#1b1c1a",
+                        "on-secondary-fixed": "#241a00",
+                        "primary-fixed": "#d0e9d4",
+                        "tertiary-fixed-dim": "#c8c6c5",
+                        "on-primary": "#ffffff",
+                        "outline-variant": "#c3c8c1",
+                        "on-secondary-fixed-variant": "#574500",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#b4cdb8",
+                        "on-primary-fixed-variant": "#364c3c",
+                        "surface-container-low": "#f5f3ef",
+                        "secondary-fixed-dim": "#e9c349",
+                        "surface-container-highest": "#e4e2de",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#949292",
+                        "on-primary-fixed": "#0b2013",
+                        "outline": "#737973",
+                        "secondary": "#735c00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "48px",
+                        "xs": "8px",
+                        "gutter": "20px",
+                        "xl": "64px",
+                        "sm": "16px",
+                        "base": "4px",
+                        "lg": "40px",
+                        "margin-mobile": "16px",
+                        "md": "24px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Hanken Grotesk"],
+                        "label-md": ["Geist"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "data-mono": ["Geist"],
+                        "display-lg": ["Hanken Grotesk"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-md": ["20px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                        "data-mono": ["13px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #fbf9f5;
+            -webkit-font-smoothing: antialiased;
+        }
+        .bento-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-auto-rows: minmax(100px, auto);
+            gap: 8px;
+            padding: 0 16px 120px 16px;
+        }
+        .glass-nav {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        /* Custom varied radii for the bento feel */
+        .corner-tl { border-top-left-radius: 1.5rem; }
+        .corner-tr { border-top-right-radius: 1.5rem; }
+        .corner-bl { border-bottom-left-radius: 1.5rem; }
+        .corner-br { border-bottom-right-radius: 1.5rem; }
+        .corner-inner { border-radius: 0.5rem; }
+
+        .sparkline-vertical {
+            background: linear-gradient(to top, transparent, #ffe088 50%, #ffe088);
+            width: 2px;
+            height: 80%;
+            position: absolute;
+            right: 12px;
+            bottom: 12px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-on-background">
+<!-- Top App Bar -->
+<header class="w-full top-0 sticky bg-background z-50 flex justify-between items-center px-margin-mobile py-sm">
+<div class="flex items-center gap-xs transition-transform duration-200 active:scale-95 cursor-pointer">
+<span class="material-symbols-outlined text-primary" data-icon="menu">menu</span>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile tracking-tighter text-primary">AURALIS</h1>
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden transition-transform duration-200 active:scale-95 cursor-pointer">
+<img class="w-full h-full object-cover" data-alt="Close-up portrait of a professional African executive in a charcoal grey suit, set against a soft-focus corporate office background with golden hour lighting. The image conveys authority, wealth, and sophisticated leadership, matching the premium fintech brand identity with a clean and sharp focus." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2zjfKkjRpF40KqMYjzhtD2LTftmBT4CBFzjutJdxWSEhBmye3ZOh66JpeF4gOwLZLPfz3iIUO9G3EqGiPW-0WLMYcytkyINMEcLMwvBHThjY1ar_iVY7XvRISnb0iHWTEtiWa-pUuwS3Cl16-UnEzdVCkjwiSYLFDn0NfpFYIzwsUepCT-2VP80ZeVj5hfuEOKOgw9Kop7tI-JxzBRYAD_XLBOje-nYEWkiCVp1FpdziNFliwUQK2"/>
+</div>
+</header>
+<main class="mt-xs">
+<!-- Bento Grid -->
+<div class="bento-container">
+<!-- Left: Large tall card (2x height) -->
+<div class="col-span-1 row-span-2 bg-primary-container text-white p-md relative flex flex-col justify-between corner-tl corner-bl overflow-hidden">
+<div>
+<p class="font-label-md text-label-md text-primary-fixed-dim mb-xs uppercase tracking-widest">Combined Fund</p>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile font-extrabold text-white leading-tight">$42,850.00</h2>
+</div>
+<div class="mt-md">
+<p class="font-data-mono text-data-mono text-primary-fixed-dim opacity-70">+12.4% vs LY</p>
+</div>
+<!-- Vertical Sparkline -->
+<div class="absolute right-4 bottom-4 h-3/4 w-[1px] bg-white/10 overflow-hidden">
+<div class="sparkline-vertical"></div>
+</div>
+<div class="absolute -right-4 -bottom-4 opacity-5">
+<span class="material-symbols-outlined text-[120px]" data-icon="account_balance">account_balance</span>
+</div>
+</div>
+<!-- Right (Top): UTT Balance -->
+<div class="col-span-1 bg-white border border-primary/5 p-md flex flex-col justify-between corner-tr shadow-sm">
+<span class="material-symbols-outlined text-secondary text-md" data-icon="analytics">analytics</span>
+<div class="mt-base">
+<p class="font-label-md text-label-md text-on-surface-variant">UTT Balance</p>
+<p class="font-headline-md text-headline-md text-primary">$12,400</p>
+</div>
+</div>
+<!-- Right (Middle): Mwekeza Balance -->
+<div class="col-span-1 bg-white border border-primary/5 p-md flex flex-col justify-between corner-inner shadow-sm">
+<span class="material-symbols-outlined text-secondary text-md" data-icon="account_balance_wallet">account_balance_wallet</span>
+<div class="mt-base">
+<p class="font-label-md text-label-md text-on-surface-variant">Mwekeza</p>
+<p class="font-headline-md text-headline-md text-primary">$8,150</p>
+</div>
+</div>
+<!-- Below Row: Wide short card -->
+<div class="col-span-2 bg-surface-container-low p-md flex items-center justify-between corner-inner">
+<div class="flex-1">
+<p class="font-label-md text-label-md text-on-surface-variant mb-base">Contribution Trend</p>
+<div class="flex items-end gap-1 h-8 mt-xs">
+<div class="w-1 bg-primary/20 h-2 rounded-full"></div>
+<div class="w-1 bg-primary/40 h-4 rounded-full"></div>
+<div class="w-1 bg-primary/60 h-6 rounded-full"></div>
+<div class="w-1 bg-secondary h-8 rounded-full"></div>
+<div class="w-1 bg-primary h-5 rounded-full"></div>
+<div class="w-1 bg-primary/30 h-3 rounded-full"></div>
+<div class="w-1 bg-primary/10 h-2 rounded-full"></div>
+</div>
+</div>
+<div class="text-right">
+<p class="font-data-mono text-data-mono text-secondary-fixed-dim">STABLE</p>
+<p class="font-headline-md text-headline-md text-primary">High</p>
+</div>
+</div>
+<!-- Row 4: Mini stats -->
+<div class="col-span-1 bg-white p-md flex flex-col items-center justify-center corner-inner shadow-sm relative overflow-hidden">
+<div class="relative w-16 h-16 flex items-center justify-center">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-surface-container" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-width="4"></circle>
+<circle class="text-secondary-fixed-dim" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-dasharray="175.9" stroke-dashoffset="52.7" stroke-width="4"></circle>
+</svg>
+<span class="absolute font-data-mono text-data-mono text-primary font-bold">5/7</span>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant mt-sm">Paid Status</p>
+</div>
+<div class="col-span-1 bg-white p-md flex flex-col items-center justify-center corner-inner shadow-sm border border-secondary/10">
+<div class="w-12 h-12 rounded-full bg-secondary-container/20 flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-secondary" data-icon="hub">hub</span>
+</div>
+<p class="font-headline-md text-headline-md text-primary">12</p>
+<p class="font-label-md text-label-md text-on-surface-variant">Active Projects</p>
+</div>
+<!-- Bottom row: Payment Status Donut -->
+<div class="col-span-2 bg-tertiary-container text-white p-md corner-bl corner-br flex items-center justify-between overflow-hidden relative">
+<div class="z-10">
+<p class="font-label-md text-label-md text-on-tertiary-container mb-sm">Payment Distribution</p>
+<div class="flex flex-col gap-xs">
+<div class="flex items-center gap-sm">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed"></span>
+<span class="font-label-md text-label-md">Equity (65%)</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="w-2 h-2 rounded-full bg-primary-fixed-dim"></span>
+<span class="font-label-md text-label-md">Bond (25%)</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="w-2 h-2 rounded-full bg-on-tertiary-container"></span>
+<span class="font-label-md text-label-md">Cash (10%)</span>
+</div>
+</div>
+</div>
+<div class="relative w-24 h-24 flex items-center justify-center z-10">
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 36 36">
+<path class="text-on-tertiary-container" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="100, 100" stroke-width="3"></path>
+<path class="text-primary-fixed-dim" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="35, 100" stroke-width="3"></path>
+<path class="text-secondary-fixed" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="65, 100" stroke-width="3"></path>
+</svg>
+<span class="material-symbols-outlined absolute text-secondary-fixed text-sm" data-icon="lock_open">lock_open</span>
+</div>
+<!-- Artistic texture -->
+<div class="absolute right-0 bottom-0 top-0 w-1/3 opacity-10 bg-gradient-to-l from-white/20 to-transparent pointer-events-none"></div>
+</div>
+</div>
+</main>
+<!-- Bottom Nav Bar -->
+<nav class="fixed bottom-lg left-1/2 -translate-x-1/2 z-50 flex justify-around items-center px-lg py-sm gap-md bg-black/85 backdrop-blur-xl border border-white/10 shadow-xl w-[calc(100%-48px)] max-w-md rounded-full">
+<button class="flex items-center justify-center text-secondary-fixed scale-110 transition-all duration-300 ease-out active:scale-90 hover:bg-white/10 rounded-full p-2">
+<span class="material-symbols-outlined" data-icon="dashboard" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+</button>
+<button class="flex items-center justify-center text-white transition-all duration-300 ease-out active:scale-90 hover:bg-white/10 rounded-full p-2">
+<span class="material-symbols-outlined" data-icon="insights">insights</span>
+</button>
+<button class="flex items-center justify-center text-white transition-all duration-300 ease-out active:scale-90 hover:bg-white/10 rounded-full p-2">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+</button>
+<button class="flex items-center justify-center text-white transition-all duration-300 ease-out active:scale-90 hover:bg-white/10 rounded-full p-2">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</nav>
+<script>
+        // Micro-interaction for bento cards
+        document.querySelectorAll('.bento-container > div').forEach(card => {
+            card.addEventListener('touchstart', () => {
+                card.style.transform = 'scale(0.98)';
+                card.style.transition = 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            });
+            card.addEventListener('touchend', () => {
+                card.style.transform = 'scale(1)';
+            });
+        });
+
+        // Simple vertical sparkline animation simulation
+        setInterval(() => {
+            const sparkline = document.querySelector('.sparkline-vertical');
+            if (sparkline) {
+                const randomHeight = Math.floor(Math.random() * 40) + 40; // 40% to 80%
+                sparkline.style.height = randomHeight + '%';
+                sparkline.style.transition = 'height 2s ease-in-out';
+            }
+        }, 3000);
+    </script>
+</body></html>

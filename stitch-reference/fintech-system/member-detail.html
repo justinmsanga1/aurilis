@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=JetBrains+Mono:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#141d21",
+                        "surface-dim": "#ccdbf3",
+                        "background": "#f8f9ff",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#a8b8ff",
+                        "on-secondary-container": "#5d666b",
+                        "surface": "#f8f9ff",
+                        "surface-tint": "#3755c3",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#dbe4ea",
+                        "tertiary-container": "#494b4c",
+                        "surface-container-highest": "#d5e3fc",
+                        "primary-container": "#1e40af",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#b8c4ff",
+                        "primary-fixed": "#dde1ff",
+                        "surface-container": "#e6eeff",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#444653",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "on-tertiary-container": "#babbbb",
+                        "primary": "#00288e",
+                        "outline-variant": "#c4c5d5",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "tertiary": "#333535",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container-high": "#dce9ff",
+                        "surface-variant": "#d5e3fc",
+                        "on-primary-fixed-variant": "#173bab",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-background": "#0d1c2e",
+                        "secondary": "#576065",
+                        "inverse-surface": "#233144",
+                        "surface-bright": "#f8f9ff",
+                        "primary-fixed-dim": "#b8c4ff",
+                        "secondary-container": "#dbe4ea",
+                        "on-secondary-fixed-variant": "#3f484d",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed": "#001453",
+                        "on-surface": "#0d1c2e",
+                        "tertiary-fixed": "#e2e2e2",
+                        "outline": "#757684",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#bfc8ce"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-gap-md": "16px",
+                        "bento-gutter": "12px",
+                        "stack-gap-sm": "8px",
+                        "stack-gap-lg": "24px",
+                        "container-padding": "20px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["JetBrains Mono"],
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "price-display": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["26px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "price-display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .clay-card {
+            background: #ffffff;
+            box-shadow: 
+                0 10px 30px -10px rgba(30, 64, 175, 0.08),
+                inset 2px 2px 0px 0px rgba(255, 255, 255, 1),
+                inset -2px -2px 4px 0px rgba(30, 64, 175, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .clay-card-recessed {
+            background: #f1f5ff;
+            box-shadow: 
+                inset 2px 2px 4px 0px rgba(0, 0, 0, 0.05),
+                inset -2px -2px 4px 0px rgba(255, 255, 255, 1);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-icon { font-variation-settings: 'FILL' 1; }
+        
+        body {
+            background-color: #f8f9ff;
+            color: #0d1c2e;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-white/20 shadow-[0_10px_30px_-10px_rgba(30,64,175,0.08)] flex justify-between items-center px-container-padding h-16">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/10">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a sophisticated woman with sharp features, wearing a tailored navy blue blazer. She is set against a minimalist architectural background with soft blue lighting, embodying a high-net-worth executive aesthetic. The image uses a clean, high-key photography style with soft depth of field." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCp5CxUwhhNDjMCuu2xKtRAmVHLtkIlAKRrFJGOTia23UKiuzG3rRBX5Fc-50Z7zF0g-rsFRFIPib5Ywv4ZBbYygjFuHq145YzHRbYZDl7ismn0PPHlocibb0en7Q4sU3TcYUt5YPEqqncdojqn3wunfP-B1V08gsPCpvYuZQKCbov_TryK4EAjUApvWcgV64wNaNM0a54J1IU77FQvMKqsWFbho5thjQEy-nfvTXWSFNMDU9OqfIle"/>
+</div>
+<span class="font-headline-md text-headline-md-mobile text-primary">Eleanor Sterling</span>
+</div>
+<button class="active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-primary">menu</span>
+</button>
+</header>
+<main class="pt-20 px-container-padding space-y-stack-gap-lg">
+<!-- Profile Header Section -->
+<section class="flex flex-col items-center pt-4">
+<div class="relative">
+<div class="w-32 h-32 rounded-full p-1 clay-card bg-gradient-to-br from-white to-surface-container-low">
+<img class="w-full h-full rounded-full object-cover" data-alt="A close-up portrait of Eleanor Sterling, an elegant woman in her early 40s with a confident expression. Her style is minimalist and premium, with polished features. The lighting is soft and cinematic, coming from the top-left, casting gentle shadows that emphasize her professional authority. The background is a soft-focus office with blue and glass elements." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKB_TjgmgrbCHnx6P-gFGby0vjOcUBJP_hMhKXIgtoDXcpgq3-ilNLR_1L95I9OmST7dembcamUcm3iarsEfZ_I5CaBLpPk0g_DmQ9p0f4ahEDZ65E-zS3MOoFrYDiC8YctWeQj458WD_Ah0ztyCMWqro8wJ5CQlUYCZ3rfAICdHiDUtdNTyVRauScl4F4NGKju8cr-GOwFmw0HdA3e5pIRuk3d9r2RMl_jWjS04MJ0xfVpshTA_D7"/>
+</div>
+<div class="absolute -bottom-2 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-white rounded-full shadow-lg">
+<span class="font-label-caps text-label-caps uppercase tracking-wider">Chairman</span>
+</div>
+</div>
+<div class="mt-8 w-full grid grid-cols-3 gap-bento-gutter">
+<div class="clay-card p-3 rounded-xl flex flex-col items-center justify-center">
+<span class="font-label-caps text-[10px] text-secondary uppercase opacity-60">Username</span>
+<span class="font-body-sm font-semibold text-primary">sterling_e</span>
+</div>
+<div class="clay-card p-3 rounded-xl flex flex-col items-center justify-center">
+<span class="font-label-caps text-[10px] text-secondary uppercase opacity-60">Phone</span>
+<span class="font-body-sm font-semibold text-primary">+1 (415) •••</span>
+</div>
+<div class="clay-card p-3 rounded-xl flex flex-col items-center justify-center">
+<span class="font-label-caps text-[10px] text-secondary uppercase opacity-60">Joined</span>
+<span class="font-body-sm font-semibold text-primary">Oct 2021</span>
+</div>
+</div>
+</section>
+<!-- Bento Financial Cards -->
+<section class="grid grid-cols-2 gap-bento-gutter">
+<!-- Total Contributed -->
+<div class="clay-card p-5 rounded-2xl col-span-2 relative overflow-hidden">
+<div class="relative z-10">
+<span class="font-label-caps text-label-caps text-secondary">Total Contributed</span>
+<h2 class="font-price-display text-price-display text-primary mt-1">$4,850,000.00</h2>
+<div class="flex items-center gap-2 mt-2">
+<span class="material-symbols-outlined text-green-500 text-sm">trending_up</span>
+<span class="font-body-sm text-green-600 font-semibold">+12.4% vs last year</span>
+</div>
+</div>
+<div class="absolute top-0 right-0 w-32 h-full opacity-10 pointer-events-none">
+
+</div>
+</div>
+<!-- Debt Status -->
+<div class="clay-card p-5 rounded-2xl flex flex-col">
+<span class="font-label-caps text-label-caps text-secondary">Debt Status</span>
+<div class="flex flex-col items-center justify-center flex-grow py-4">
+<div class="relative w-20 h-20">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-surface-container-high" cx="40" cy="40" fill="transparent" r="36" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-primary" cx="40" cy="40" fill="transparent" r="36" stroke="currentColor" stroke-dasharray="226" stroke-dashoffset="169.5" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="font-headline-md text-primary">1/4</span>
+</div>
+</div>
+<span class="font-body-sm mt-3 text-on-surface-variant">Installments Paid</span>
+</div>
+</div>
+<!-- Active Projects -->
+<div class="clay-card p-5 rounded-2xl flex flex-col gap-3">
+<span class="font-label-caps text-label-caps text-secondary">Active Projects</span>
+<div class="space-y-2">
+<div class="flex items-center gap-2 p-2 clay-card-recessed rounded-lg">
+<span class="material-symbols-outlined text-primary text-sm">apartment</span>
+<span class="font-body-sm font-medium text-on-surface truncate">Real Estate Fund</span>
+</div>
+<div class="flex items-center gap-2 p-2 clay-card-recessed rounded-lg">
+<span class="material-symbols-outlined text-primary text-sm">potted_plant</span>
+<span class="font-body-sm font-medium text-on-surface truncate">Agrotech</span>
+</div>
+</div>
+</div>
+<!-- Recent Payments -->
+<div class="clay-card p-5 rounded-2xl col-span-2">
+<div class="flex justify-between items-center mb-4">
+<span class="font-label-caps text-label-caps text-secondary">Recent Payments</span>
+<button class="text-primary font-semibold text-xs">View All</button>
+</div>
+<div class="space-y-3">
+<div class="flex items-center justify-between border-b border-surface-container pb-2">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-primary-container/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-sm">payments</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-sm font-semibold">Q3 Contribution</span>
+<span class="text-[10px] text-secondary">Aug 14, 2023</span>
+</div>
+</div>
+<span class="font-body-sm font-bold text-primary">+$1.2M</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-primary-container/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-sm">description</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-sm font-semibold">Management Fee</span>
+<span class="text-[10px] text-secondary">Jul 02, 2023</span>
+</div>
+</div>
+<span class="font-body-sm font-bold text-primary">-$15k</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Admin Action Panel -->
+<section class="clay-card p-5 rounded-2xl space-y-4">
+<h3 class="font-headline-md text-on-surface">Admin Controls</h3>
+<div class="grid grid-cols-1 gap-3">
+<button class="flex items-center justify-between w-full p-4 clay-card-recessed rounded-xl active:scale-95 transition-all">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">swap_horiz</span>
+<span class="font-body-lg font-semibold text-primary">Transfer Role</span>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</button>
+<button class="flex items-center justify-between w-full p-4 clay-card-recessed rounded-xl active:scale-95 transition-all">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">assignment_ind</span>
+<span class="font-body-lg font-semibold text-primary">Assign Secretary</span>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</button>
+<button class="flex items-center justify-between w-full p-4 bg-error-container/20 border border-error/20 rounded-xl active:scale-95 transition-all">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-error">person_remove</span>
+<span class="font-body-lg font-semibold text-error">Delete Member</span>
+</div>
+</button>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface/90 backdrop-blur-xl rounded-t-xl shadow-[0_-10px_30px_rgba(0,40,142,0.08)] flex justify-around items-center h-20 px-4 pb-safe">
+<button class="flex flex-col items-center justify-center text-secondary active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-caps text-[10px] mt-1">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-primary bg-primary-container/10 rounded-xl px-4 py-2 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined active-icon">group</span>
+<span class="font-label-caps text-[10px] mt-1">Members</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-caps text-[10px] mt-1">Payments</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="font-label-caps text-[10px] mt-1">Projects</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-caps text-[10px] mt-1">Profile</span>
+</button>
+</nav>
+<script>
+        // Simple micro-interaction for clay cards
+        document.querySelectorAll('.clay-card').forEach(card => {
+            card.addEventListener('touchstart', () => {
+                card.style.transform = 'scale(0.98)';
+                card.style.transition = 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            });
+            card.addEventListener('touchend', () => {
+                card.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body></html>

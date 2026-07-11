@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#141d21",
+                    "surface-dim": "#ccdbf3",
+                    "background": "#f8f9ff",
+                    "on-secondary": "#ffffff",
+                    "on-primary-container": "#a8b8ff",
+                    "on-secondary-container": "#5d666b",
+                    "surface": "#f8f9ff",
+                    "surface-tint": "#3755c3",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed": "#dbe4ea",
+                    "tertiary-container": "#494b4c",
+                    "surface-container-highest": "#d5e3fc",
+                    "primary-container": "#1e40af",
+                    "on-error": "#ffffff",
+                    "inverse-primary": "#b8c4ff",
+                    "primary-fixed": "#dde1ff",
+                    "surface-container": "#e6eeff",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "error-container": "#ffdad6",
+                    "on-error-container": "#93000a",
+                    "on-surface-variant": "#444653",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "on-tertiary-container": "#babbbb",
+                    "primary": "#00288e",
+                    "outline-variant": "#c4c5d5",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#454747",
+                    "tertiary": "#333535",
+                    "surface-container-low": "#eff4ff",
+                    "surface-container-high": "#dce9ff",
+                    "surface-variant": "#d5e3fc",
+                    "on-primary-fixed-variant": "#173bab",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-background": "#0d1c2e",
+                    "secondary": "#576065",
+                    "inverse-surface": "#233144",
+                    "surface-bright": "#f8f9ff",
+                    "primary-fixed-dim": "#b8c4ff",
+                    "secondary-container": "#dbe4ea",
+                    "on-secondary-fixed-variant": "#3f484d",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed": "#001453",
+                    "on-surface": "#0d1c2e",
+                    "tertiary-fixed": "#e2e2e2",
+                    "outline": "#757684",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-fixed-dim": "#bfc8ce"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-gap-md": "16px",
+                    "bento-gutter": "12px",
+                    "stack-gap-sm": "8px",
+                    "stack-gap-lg": "24px",
+                    "container-padding": "20px"
+            },
+            "fontFamily": {
+                    "label-caps": ["JetBrains Mono"],
+                    "body-sm": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "price-display": ["Inter"]
+            },
+            "fontSize": {
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["26px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "price-display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .clay-card {
+            background: #ffffff;
+            box-shadow: 
+                10px 10px 30px -10px rgba(30, 64, 175, 0.08),
+                inset 2px 2px 4px rgba(255, 255, 255, 0.9),
+                inset -2px -2px 4px rgba(30, 64, 175, 0.03);
+            border-radius: 24px;
+        }
+
+        .clay-button-primary {
+            background: #1e40af;
+            box-shadow: 
+                0 10px 20px -5px rgba(30, 64, 175, 0.4),
+                inset 1px 1px 2px rgba(255, 255, 255, 0.3),
+                inset -1px -1px 2px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .clay-button-primary:active {
+            transform: scale(0.96);
+            box-shadow: 
+                0 4px 10px -2px rgba(30, 64, 175, 0.4),
+                inset 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .clay-input-recessed {
+            background: #f0f4ff;
+            box-shadow: 
+                inset 4px 4px 8px rgba(0, 40, 142, 0.05),
+                inset -4px -4px 8px rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .glass-nav {
+            backdrop-filter: blur(16px);
+            background: rgba(255, 255, 255, 0.8);
+            border-top: 0.5px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-lg min-h-screen pb-24">
+<!-- Top App Bar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-white/20 shadow-[0_10px_30px_-10px_rgba(30,64,175,0.08)] flex justify-between items-center px-container-padding h-16">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container/10 flex items-center justify-center overflow-hidden border border-white">
+<img class="w-full h-full object-cover" data-alt="A professional studio portrait of a high-net-worth individual with a clean, confident expression. The lighting is soft and luxurious, against a blurred executive office background with cool blue tones, reflecting a premium fintech membership aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWM6_8nbLmsxqaYExlq2c_OiWYpxEmd5P_fPlMxF13goVLO__19D9DBWVTYvt8M1W2zd5Wffc9NalKubjHs1k6mZwAvBVA6zr2J46n6eKxvgr2vPL2onwkWUWpoSoJym1vQS1CTPk3mRZDcvTcZZ-uoF34teuuwTbZaLI4Ztq4bbf7vsbRvc7nGcV6mTC2edpWhE5go9S0v54vmWFIWabMv0K5mq-1H2RT-1OWiuMHILnuZy4aGHyv"/>
+</div>
+<h1 class="font-headline-md text-headline-md-mobile text-on-surface">October 2023 • Active</h1>
+</div>
+<button class="active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-primary">menu</span>
+</button>
+</header>
+<main class="pt-20 px-container-padding space-y-stack-gap-lg">
+<!-- Member Card (Bento Style) -->
+<section class="clay-card p-5 flex items-center gap-4">
+<div class="relative">
+<div class="w-16 h-16 rounded-2xl bg-surface-container-highest flex items-center justify-center overflow-hidden border-2 border-white shadow-sm">
+<img class="w-full h-full object-cover" data-alt="A sharp, clear close-up profile picture of a male executive named John Doe. He wears a dark navy suit. The image has a crisp, high-end feel with a shallow depth of field, using a palette of whites and deep blues consistent with premium banking interfaces." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAW2fKanRoND-I01HCJEQ3nhBh5DpRGPT8_87U-2IZeoht6o5aGRgXEITUEOMKcxDLnwSytGwa7JcYv6sg3L378fJSKsNEEN2Fqucu2h27fbtrxnnWWavwyZ0EkpxvTxq2OoBC-pF82sb8RS1Gc7X7POMvNCPpUJLAZqIDEEuggzngPiEshlGzZLPY5s2wV4IQiqXYw-6Iw82JLqAgj489TfVYOECy_1FhFGD0OdvsIczmRIFDeyOJ_"/>
+</div>
+<div class="absolute -bottom-1 -right-1 bg-primary text-white text-[10px] font-label-caps px-2 py-0.5 rounded-full border border-white">MEMBER</div>
+</div>
+<div class="flex-1">
+<h2 class="font-headline-md text-on-surface">John Doe</h2>
+<div class="flex items-center justify-between mt-1">
+<p class="text-on-surface-variant font-body-sm">Available Balance</p>
+<p class="font-price-display text-primary">170,000</p>
+</div>
+</div>
+</section>
+<!-- Payment Form -->
+<section class="space-y-stack-gap-md">
+<!-- Amount Input -->
+<div class="clay-card p-6 flex flex-col items-center gap-4">
+<label class="font-label-caps text-on-surface-variant self-start">ENTER AMOUNT</label>
+<div class="w-full relative">
+<input class="clay-input-recessed w-full py-6 px-4 rounded-2xl text-center font-price-display text-[40px] text-primary focus:outline-none focus:ring-2 focus:ring-primary/20" type="text" value="370,000"/>
+<span class="absolute right-6 top-1/2 -translate-y-1/2 font-label-caps text-on-surface-variant">USD</span>
+</div>
+<!-- Quick Amount Chips -->
+<div class="flex gap-bento-gutter w-full overflow-x-auto hide-scrollbar py-2">
+<button class="px-5 py-2.5 rounded-full bg-surface-container-high text-primary font-label-caps whitespace-nowrap active:scale-95 transition-transform border border-white/40">120,000</button>
+<button class="px-5 py-2.5 rounded-full bg-surface-container-high text-primary font-label-caps whitespace-nowrap active:scale-95 transition-transform border border-white/40">250,000</button>
+<button class="px-5 py-2.5 rounded-full bg-primary-container text-white font-label-caps whitespace-nowrap shadow-md">370,000</button>
+</div>
+</div>
+<!-- Breakdown & Summary Bento Grid -->
+<div class="grid grid-cols-2 gap-bento-gutter">
+<div class="clay-card p-4 col-span-2">
+<h3 class="font-label-caps text-on-surface-variant mb-3">BREAKDOWN</h3>
+<div class="space-y-stack-gap-sm">
+<div class="flex justify-between items-center py-2 border-b border-surface-container-highest">
+<span class="text-on-surface font-body-lg">Normal</span>
+<span class="font-price-display text-on-surface text-lg">120,000</span>
+</div>
+<div class="flex justify-between items-center py-2">
+<span class="text-on-surface font-body-lg">Debt Installment</span>
+<span class="font-price-display text-on-surface text-lg">250,000</span>
+</div>
+</div>
+</div>
+<!-- Payment Method -->
+<div class="clay-card p-4 col-span-2">
+<h3 class="font-label-caps text-on-surface-variant mb-4">PAYMENT METHOD</h3>
+<div class="flex bg-surface-container-low p-1 rounded-xl">
+<button class="flex-1 py-3 font-label-caps text-on-surface-variant hover:text-primary transition-colors">BANK</button>
+<button class="flex-1 py-3 font-label-caps bg-white text-primary rounded-lg shadow-sm border border-white/50">CASH</button>
+<button class="flex-1 py-3 font-label-caps text-on-surface-variant hover:text-primary transition-colors">WALLET</button>
+</div>
+</div>
+<!-- Summary -->
+<div class="clay-card p-4 col-span-2 bg-primary/5">
+<div class="grid grid-cols-3 gap-2 text-center">
+<div>
+<p class="font-label-caps text-[10px] text-on-surface-variant">TOTAL DUE</p>
+<p class="font-price-display text-lg text-primary">370,000</p>
+</div>
+<div class="border-x border-primary/10 px-2">
+<p class="font-label-caps text-[10px] text-on-surface-variant">PAID</p>
+<p class="font-price-display text-lg text-secondary">370,000</p>
+</div>
+<div>
+<p class="font-label-caps text-[10px] text-on-surface-variant">REMAINING</p>
+<p class="font-price-display text-lg text-on-surface">0.00</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Confirm Button -->
+<button class="clay-button-primary w-full py-6 rounded-3xl font-headline-md text-white flex items-center justify-center gap-3 mt-4">
+<span class="material-symbols-outlined">verified_user</span>
+                Confirm Payment
+            </button>
+</section>
+<!-- Recent Payments List -->
+<section class="space-y-stack-gap-md">
+<div class="flex justify-between items-center px-1">
+<h3 class="font-label-caps text-on-surface">RECENT PAYMENTS</h3>
+<button class="text-primary font-label-caps text-[11px]">SEE ALL</button>
+</div>
+<div class="space-y-stack-gap-sm">
+<div class="clay-card p-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">payments</span>
+</div>
+<div>
+<p class="font-body-lg text-on-surface">Q3 Membership</p>
+<p class="text-[12px] text-on-surface-variant">Oct 12, 2023</p>
+</div>
+</div>
+<p class="font-price-display text-on-surface">45,000</p>
+</div>
+<div class="clay-card p-4 flex items-center justify-between opacity-80 scale-95">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">account_balance_wallet</span>
+</div>
+<div>
+<p class="font-body-lg text-on-surface">Wealth Fund</p>
+<p class="text-[12px] text-on-surface-variant">Sep 28, 2023</p>
+</div>
+</div>
+<p class="font-price-display text-on-surface">120,000</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 w-full z-50 glass-nav shadow-[0_-10px_30px_rgba(0,40,142,0.08)] flex justify-around items-center h-20 px-4 pb-safe rounded-t-xl">
+<button class="flex flex-col items-center justify-center text-secondary active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-caps text-[10px]">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-caps text-[10px]">Members</span>
+</button>
+<button class="flex flex-col items-center justify-center text-primary bg-primary-container/10 rounded-xl px-4 py-2 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">payments</span>
+<span class="font-label-caps text-[10px]">Payments</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="font-label-caps text-[10px]">Projects</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-caps text-[10px]">Profile</span>
+</button>
+</nav>
+<script>
+        // Simple micro-interaction for quick amount chips
+        document.querySelectorAll('.hide-scrollbar button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Clear active states
+                document.querySelectorAll('.hide-scrollbar button').forEach(b => {
+                    b.classList.remove('bg-primary-container', 'text-white', 'shadow-md');
+                    b.classList.add('bg-surface-container-high', 'text-primary');
+                });
+                // Set this as active
+                this.classList.remove('bg-surface-container-high', 'text-primary');
+                this.classList.add('bg-primary-container', 'text-white', 'shadow-md');
+                
+                // Update input (mock behavior)
+                const amount = this.innerText;
+                document.querySelector('input').value = amount;
+            });
+        });
+    </script>
+</body></html>

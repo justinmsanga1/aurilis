@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Record Payment - Auralis Holdings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Geist:wght@400;500&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Hanken+Grotesk:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#434843",
+                        "on-secondary-fixed": "#241a00",
+                        "secondary": "#735c00",
+                        "primary-fixed-dim": "#b4cdb8",
+                        "surface-bright": "#fbf9f5",
+                        "on-tertiary-container": "#949292",
+                        "inverse-surface": "#30312e",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#474646",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#b4cdb8",
+                        "surface-variant": "#e4e2de",
+                        "tertiary-fixed-dim": "#c8c6c5",
+                        "surface-container": "#efeeea",
+                        "outline": "#737973",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#0b2013",
+                        "error": "#ba1a1a",
+                        "surface-dim": "#dbdad6",
+                        "surface-tint": "#4d6453",
+                        "secondary-container": "#fed65b",
+                        "on-primary-fixed-variant": "#364c3c",
+                        "inverse-on-surface": "#f2f0ed",
+                        "on-surface": "#1b1c1a",
+                        "on-primary-container": "#819986",
+                        "on-error-container": "#93000a",
+                        "surface-container-low": "#f5f3ef",
+                        "surface": "#fbf9f5",
+                        "secondary-fixed": "#ffe088",
+                        "on-tertiary-fixed": "#1c1b1b",
+                        "tertiary-fixed": "#e5e2e1",
+                        "surface-container-high": "#eae8e4",
+                        "secondary-fixed-dim": "#e9c349",
+                        "on-secondary-container": "#745c00",
+                        "primary": "#061b0e",
+                        "on-secondary-fixed-variant": "#574500",
+                        "tertiary": "#171717",
+                        "primary-container": "#1b3022",
+                        "primary-fixed": "#d0e9d4",
+                        "on-background": "#1b1c1a",
+                        "on-tertiary": "#ffffff",
+                        "background": "#fbf9f5",
+                        "tertiary-container": "#2b2b2b",
+                        "outline-variant": "#c3c8c1",
+                        "error-container": "#ffdad6",
+                        "surface-container-highest": "#e4e2de"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "bento": "20px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "48px",
+                        "xl": "64px",
+                        "xs": "8px",
+                        "lg": "40px",
+                        "gutter": "20px",
+                        "margin-mobile": "16px",
+                        "sm": "16px",
+                        "base": "4px",
+                        "md": "24px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Hanken Grotesk"],
+                        "label-md": ["Geist"],
+                        "display-lg": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "data-mono": ["Geist"],
+                        "headline-md": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "data-mono": ["13px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "1.4", "fontWeight": "500"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #fbf9f5;
+            color: #1b1c1a;
+            -webkit-font-smoothing: antialiased;
+        }
+        .bento-card {
+            border-radius: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .bento-inner {
+            border-radius: 8px;
+        }
+        .glass-pill {
+            background: rgba(212, 175, 55, 0.1);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-body-md">
+<!-- Top Navigation Bar -->
+<header class="w-full top-0 sticky bg-background z-40 transition-all duration-200 active:scale-95 flex items-center px-margin-mobile h-16">
+<div class="flex items-center justify-between w-full">
+<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-primary text-[24px]">arrow_back</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary flex-grow text-center">Record Payment</h1>
+<div class="w-10"></div> <!-- Spacer for symmetry -->
+</div>
+</header>
+<main class="max-w-md mx-auto px-margin-mobile pb-32 pt-4 space-y-gutter">
+<!-- Member Selector Card -->
+<section class="bento-card bg-[#0B3D2E] p-md flex items-center justify-between shadow-lg ring-1 ring-white/10">
+<div class="flex items-center gap-sm">
+<div class="relative">
+<div class="w-14 h-14 rounded-full overflow-hidden ring-2 ring-secondary-fixed">
+<img class="w-full h-full object-cover" data-alt="A dignified, close-up portrait of Marcus Thorne, a professional African businessman in his late 40s. He wears a tailored charcoal suit and gold glasses, exuding financial authority and reliability. The background is a blurred high-end corporate office with warm, golden accent lighting. Modern, sharp focus, cinematic lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDqEAGZCXi4XidqlFhQVS5RrV49CCAxmBnLFQCTeYp4Kg1OYPPbaI8Rk6iiTnrZ-9V18LEhoZFh8D1iYlnC0_NSbH669edoCAyxLRpjywiadS1oNBp7upVaztSA3bjkGuESzhgJbfw2OmjHm6v0GTfWcqJXjF3blpZfyqzj95PcEM9RgO3e-OPZnA73fg1SXH35s_MnD5HyqNFE6NyimZcyj-zp7_IP7mRcGY3JsuKUpJ3NZnEOdJn"/>
+</div>
+</div>
+<div>
+<h2 class="text-surface font-headline-md font-bold">Marcus Thorne</h2>
+<p class="text-secondary-fixed font-label-md">Outstanding: TZS 235,000</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary-fixed">expand_more</span>
+</section>
+<!-- Breakdown Card (Bento Style) -->
+<section class="bento-card bg-surface-container-low p-md border border-outline/10 space-y-sm">
+<div class="flex items-center justify-between py-1">
+<div class="flex items-center gap-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">calendar_today</span>
+<span class="font-body-md">Monthly contribution</span>
+</div>
+<span class="font-data-mono font-bold">TZS 120,000</span>
+</div>
+<div class="flex items-center justify-between py-1">
+<div class="flex items-center gap-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">account_balance</span>
+<span class="font-body-md">Debt installment</span>
+</div>
+<span class="font-data-mono font-bold">TZS 115,000</span>
+</div>
+<div class="h-px bg-outline/20 my-base"></div>
+<div class="flex items-center justify-between pt-base">
+<span class="font-headline-md font-bold text-primary">Total due</span>
+<span class="font-headline-md font-extrabold text-primary">TZS 235,000</span>
+</div>
+</section>
+<!-- Input Section -->
+<section class="space-y-sm">
+<div class="flex items-center gap-xs overflow-x-auto no-scrollbar py-2">
+<button class="px-sm py-2 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-md hover:brightness-95 transition-all flex-shrink-0" onclick="updateAmount(235000)">Full amount</button>
+<button class="px-sm py-2 rounded-full bg-surface-container-high border border-secondary-fixed text-secondary font-label-md hover:bg-secondary-fixed/10 transition-all flex-shrink-0" onclick="updateAmount(117500)">Half</button>
+<button class="px-sm py-2 rounded-full bg-surface-container-high text-on-surface-variant font-label-md flex-shrink-0">Custom</button>
+</div>
+<div class="bento-card bg-surface border-2 border-secondary-fixed p-md shadow-inner">
+<label class="block text-secondary font-label-md mb-base uppercase tracking-widest">Amount to Pay</label>
+<div class="flex items-baseline gap-base">
+<span class="text-primary/60 font-display-lg font-normal">TZS</span>
+<input class="w-full bg-transparent border-none p-0 focus:ring-0 font-display-lg text-primary placeholder:text-surface-variant" id="payment-input" placeholder="0" type="number" value="235000"/>
+</div>
+</div>
+</section>
+<!-- Selectors -->
+<section class="grid grid-cols-1 gap-gutter">
+<!-- Date Picker Row -->
+<div class="flex items-center justify-between p-sm bg-surface-container rounded-xl border border-outline/5">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary">event</span>
+<span class="font-body-md text-primary">Today, Oct 24, 2026</span>
+</div>
+<span class="material-symbols-outlined text-secondary">edit_calendar</span>
+</div>
+<!-- Payment Method Segmented Control -->
+<div class="bg-surface-container-high p-1 rounded-xl flex gap-1">
+<button class="payment-method-btn flex-1 py-3 rounded-lg font-label-md transition-all bg-primary text-on-primary" onclick="selectMethod(this)">Cash</button>
+<button class="payment-method-btn flex-1 py-3 rounded-lg font-label-md transition-all text-on-surface-variant hover:bg-surface-variant" onclick="selectMethod(this)">Bank</button>
+<button class="payment-method-btn flex-1 py-3 rounded-lg font-label-md transition-all text-on-surface-variant hover:bg-surface-variant" onclick="selectMethod(this)">Mobile Money</button>
+</div>
+</section>
+<!-- Live Preview -->
+<div class="p-sm bg-primary/5 rounded-xl border border-primary/10 flex items-center justify-center gap-sm" id="live-preview">
+<span class="material-symbols-outlined text-[#2E7D32]">check_circle</span>
+<p class="text-body-md text-[#2E7D32] font-semibold">Remaining after this payment: <span class="font-data-mono">TZS 0</span></p>
+</div>
+</main>
+<!-- Footer Action -->
+<footer class="fixed bottom-0 left-0 right-0 p-margin-mobile bg-gradient-to-t from-background via-background/95 to-transparent z-50">
+<div class="max-w-md mx-auto space-y-sm">
+<button class="w-full py-4 bg-secondary-fixed text-on-secondary-fixed font-headline-md font-bold rounded-full shadow-lg hover:brightness-95 active:scale-[0.98] transition-all uppercase tracking-tight">
+                Record Payment
+            </button>
+<button class="w-full py-2 text-on-surface-variant font-label-md hover:text-primary transition-colors">
+                Cancel
+            </button>
+</div>
+</footer>
+<script>
+        function updateAmount(val) {
+            const input = document.getElementById('payment-input');
+            input.value = val;
+            updatePreview(val);
+        }
+
+        function updatePreview(val) {
+            const preview = document.getElementById('live-preview');
+            const totalDue = 235000;
+            const remaining = Math.max(0, totalDue - val);
+            
+            const previewText = preview.querySelector('p');
+            const icon = preview.querySelector('.material-symbols-outlined');
+            
+            if (remaining === 0) {
+                preview.className = "p-sm bg-primary/5 rounded-xl border border-primary/10 flex items-center justify-center gap-sm";
+                previewText.innerHTML = `Remaining after this payment: <span class="font-data-mono">TZS 0</span>`;
+                previewText.style.color = "#2E7D32";
+                icon.style.color = "#2E7D32";
+                icon.innerText = "check_circle";
+            } else {
+                preview.className = "p-sm bg-secondary/5 rounded-xl border border-secondary/10 flex items-center justify-center gap-sm";
+                previewText.innerHTML = `Remaining after this payment: <span class="font-data-mono">TZS ${remaining.toLocaleString()}</span>`;
+                previewText.style.color = "#735c00";
+                icon.style.color = "#735c00";
+                icon.innerText = "info";
+            }
+        }
+
+        function selectMethod(btn) {
+            document.querySelectorAll('.payment-method-btn').forEach(b => {
+                b.classList.remove('bg-primary', 'text-on-primary');
+                b.classList.add('text-on-surface-variant', 'hover:bg-surface-variant');
+            });
+            btn.classList.add('bg-primary', 'text-on-primary');
+            btn.classList.remove('text-on-surface-variant', 'hover:bg-surface-variant');
+        }
+
+        document.getElementById('payment-input').addEventListener('input', (e) => {
+            updatePreview(e.target.value);
+        });
+
+        // Micro-interaction for currency input
+        const input = document.getElementById('payment-input');
+        input.addEventListener('focus', () => {
+            input.parentElement.parentElement.classList.add('ring-4', 'ring-secondary-fixed/20');
+        });
+        input.addEventListener('blur', () => {
+            input.parentElement.parentElement.classList.remove('ring-4', 'ring-secondary-fixed/20');
+        });
+    </script>
+</body></html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Funds - Auralis Holdings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .clay-card {
+            background: #ffffff;
+            box-shadow: 
+                0 10px 30px -10px rgba(30, 64, 175, 0.08),
+                inset 2px 2px 0 0 rgba(255, 255, 255, 0.8),
+                inset -4px -4px 8px 0 rgba(0, 40, 142, 0.03);
+            border-radius: 24px;
+        }
+        .clay-inset {
+            box-shadow: 
+                inset 2px 2px 5px rgba(0, 40, 142, 0.05),
+                inset -2px -2px 5px rgba(255, 255, 255, 0.8);
+            background: #eff4ff;
+        }
+        .glass-nav {
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            background: rgba(248, 249, 255, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-pill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-lg min-h-screen pb-24">
+<!-- Top App Bar -->
+<header class="fixed top-0 w-full z-50 glass-nav flex justify-between items-center px-container-padding h-16 shadow-[0_10px_30px_-10px_rgba(30,64,175,0.08)]">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a high-net-worth executive member for a premium fintech app. The lighting is soft and cinematic, highlighting a confident expression. The background is a blurred corporate office with deep blue and silver accents, maintaining a luxurious and secure financial atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDK58zWjKJX5ig6fO3EEjR9jCSrpSXppc8EtxePD7nPywrL2U4SwnN9V55KNXv0_qcmkvMCVv2Hccm_kdLSNPfp8OnbnfAddVJw78V3GQhJK7-h5iVYeAMao2cfm9A2ul9JItFWylN8J7cJe8YxXEqyrbckmkaWD_-FLotqqtqoHW7R4gw6xZvpTdyob0cfie57lWb_AWT5BknF7hlW_p9QP7vpTZlNT3KaCJS3_KvwlhBmaaiLuJ9U"/>
+</div>
+<span class="font-headline-md text-headline-md text-primary">October 2023 • Active</span>
+</div>
+<button class="material-symbols-outlined text-primary text-2xl active:scale-95 transition-transform" onclick="toggleDrawer()">menu</button>
+</header>
+<!-- Navigation Drawer (Overlay) -->
+<div class="fixed inset-0 bg-on-background/20 z-[60] hidden backdrop-blur-sm transition-opacity opacity-0" id="drawer-overlay" onclick="toggleDrawer()"></div>
+<aside class="fixed top-0 right-0 h-full w-80 bg-surface-container-low z-[70] translate-x-full transition-transform duration-300 ease-in-out shadow-2xl flex flex-col py-6 rounded-l-xl" id="nav-drawer">
+<div class="px-6 mb-8">
+<h2 class="font-headline-md text-primary">Auralis Holdings</h2>
+<p class="text-body-sm text-secondary">Chairman Status</p>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-4 px-6 py-3 text-on-surface-variant hover:bg-surface-variant rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined">gavel</span>
+<span class="font-body-lg">Governance Docs</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-on-surface-variant hover:bg-surface-variant rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined">rule</span>
+<span class="font-body-lg">Contribution Rules</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-on-surface-variant hover:bg-surface-variant rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-body-lg">Help Center</span>
+</a>
+<hr class="border-outline-variant/30 my-4 mx-6"/>
+<a class="flex items-center gap-4 px-6 py-3 text-error hover:bg-error-container/20 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-body-lg">Logout</span>
+</a>
+</nav>
+</aside>
+<main class="pt-20 px-container-padding">
+<!-- Bento Summary Section -->
+<section class="grid grid-cols-2 gap-bento-gutter mt-6">
+<!-- Large Card: Total Available -->
+<div class="col-span-2 clay-card p-6 flex flex-col justify-between min-h-[160px]">
+<div>
+<span class="font-label-caps text-label-caps text-secondary uppercase tracking-widest">Total Available</span>
+<h1 class="font-price-display text-price-display text-primary mt-1">$2,482,900.00</h1>
+</div>
+<div class="flex items-center gap-2 mt-4">
+<span class="flex items-center text-success text-sm font-semibold bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-sm mr-1">trending_up</span>+4.2%
+                    </span>
+<span class="text-body-sm text-secondary">vs last month</span>
+</div>
+</div>
+<!-- Medium Card: UTT Balance -->
+<div class="clay-card p-5 aspect-square flex flex-col justify-between">
+<div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+</div>
+<div>
+<span class="font-label-caps text-label-caps text-secondary block">UTT Balance</span>
+<span class="font-headline-md text-primary mt-1 block">$842,100</span>
+</div>
+</div>
+<!-- Medium Card: Mwekeza Fund -->
+<div class="clay-card p-5 aspect-square flex flex-col justify-between border-2 border-primary/5">
+<div class="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">pie_chart</span>
+</div>
+<div>
+<span class="font-label-caps text-label-caps text-secondary block">Mwekeza Fund</span>
+<span class="font-headline-md text-primary mt-1 block">$1,640,800</span>
+</div>
+</div>
+</section>
+<!-- Fund Allocation Chart -->
+<section class="mt-stack-gap-lg clay-card p-6">
+<h3 class="font-headline-md text-on-surface mb-6">Fund Allocation</h3>
+<div class="flex flex-col md:flex-row items-center gap-8">
+<!-- Donut Chart Visualization -->
+<div class="relative w-48 h-48">
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 36 36">
+<circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#eff4ff" stroke-width="3"></circle>
+<circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#1e40af" stroke-dasharray="65 35" stroke-linecap="round" stroke-width="3"></circle>
+<circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#00288e" stroke-dasharray="35 65" stroke-dashoffset="-65" stroke-linecap="round" stroke-width="3"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="font-label-caps text-[10px] text-secondary">ACTIVE</span>
+<span class="font-headline-md text-primary">Funds</span>
+</div>
+</div>
+<!-- Legend -->
+<div class="flex-1 space-y-4 w-full">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-3 h-3 rounded-full bg-primary-container"></div>
+<span class="font-body-lg text-on-surface-variant">Liquidity Reserve</span>
+</div>
+<span class="font-label-caps text-primary">65%</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-3 h-3 rounded-full bg-primary"></div>
+<span class="font-body-lg text-on-surface-variant">Growth Portfolio</span>
+</div>
+<span class="font-label-caps text-primary">35%</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Recent Movements -->
+<section class="mt-stack-gap-lg">
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-headline-md text-on-surface">Recent Movements</h3>
+<button class="text-primary font-label-caps text-label-caps hover:underline transition-all">View All</button>
+</div>
+<div class="space-y-stack-gap-sm">
+<!-- Movement Item 1 -->
+<div class="clay-card p-4 flex items-center gap-4 hover:translate-x-1 transition-transform cursor-pointer">
+<div class="w-12 h-12 rounded-2xl clay-inset flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">keyboard_double_arrow_up</span>
+</div>
+<div class="flex-1">
+<p class="font-body-lg text-on-surface font-semibold">Fund Top-up</p>
+<p class="text-body-sm text-secondary">Via External Bank Account</p>
+</div>
+<div class="text-right">
+<p class="font-label-caps text-primary">+$12,500.00</p>
+<p class="text-[10px] text-secondary uppercase">22 Oct</p>
+</div>
+</div>
+<!-- Movement Item 2 -->
+<div class="clay-card p-4 flex items-center gap-4 hover:translate-x-1 transition-transform cursor-pointer">
+<div class="w-12 h-12 rounded-2xl clay-inset flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">swap_horiz</span>
+</div>
+<div class="flex-1">
+<p class="font-body-lg text-on-surface font-semibold">Internal Transfer</p>
+<p class="text-body-sm text-secondary">To Mwekeza Growth Fund</p>
+</div>
+<div class="text-right">
+<p class="font-label-caps text-secondary">-$5,000.00</p>
+<p class="text-[10px] text-secondary uppercase">18 Oct</p>
+</div>
+</div>
+<!-- Movement Item 3 -->
+<div class="clay-card p-4 flex items-center gap-4 hover:translate-x-1 transition-transform cursor-pointer">
+<div class="w-12 h-12 rounded-2xl clay-inset flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<div class="flex-1">
+<p class="font-body-lg text-on-surface font-semibold">Dividend Payout</p>
+<p class="text-body-sm text-secondary">UTT Quarterly Distribution</p>
+</div>
+<div class="text-right">
+<p class="font-label-caps text-primary">+$2,410.50</p>
+<p class="text-[10px] text-secondary uppercase">15 Oct</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 w-full z-50 rounded-t-xl glass-nav flex justify-around items-center h-20 px-4 pb-safe shadow-[0_-10px_30px_rgba(0,40,142,0.08)]">
+<button class="flex flex-col items-center justify-center text-secondary active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-caps text-[10px]">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-caps text-[10px]">Members</span>
+</button>
+<button class="flex flex-col items-center justify-center text-primary bg-primary-container/10 rounded-xl px-3 py-1 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined active-pill">payments</span>
+<span class="font-label-caps text-[10px]">Payments</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="font-label-caps text-[10px]">Projects</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-caps text-[10px]">Profile</span>
+</button>
+</nav>
+<script>
+        function toggleDrawer() {
+            const drawer = document.getElementById('nav-drawer');
+            const overlay = document.getElementById('drawer-overlay');
+            const isOpen = !drawer.classList.contains('translate-x-full');
+
+            if (isOpen) {
+                drawer.classList.add('translate-x-full');
+                overlay.classList.add('hidden');
+                overlay.classList.remove('opacity-100');
+            } else {
+                drawer.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.add('opacity-100'), 10);
+            }
+        }
+    </script>
+</body></html>

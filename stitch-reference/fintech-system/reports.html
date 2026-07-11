@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Financial Reports - Auralis Holdings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#141d21",
+                    "surface-dim": "#ccdbf3",
+                    "background": "#f8f9ff",
+                    "on-secondary": "#ffffff",
+                    "on-primary-container": "#a8b8ff",
+                    "on-secondary-container": "#5d666b",
+                    "surface": "#f8f9ff",
+                    "surface-tint": "#3755c3",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed": "#dbe4ea",
+                    "tertiary-container": "#494b4c",
+                    "surface-container-highest": "#d5e3fc",
+                    "primary-container": "#1e40af",
+                    "on-error": "#ffffff",
+                    "inverse-primary": "#b8c4ff",
+                    "primary-fixed": "#dde1ff",
+                    "surface-container": "#e6eeff",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "error-container": "#ffdad6",
+                    "on-error-container": "#93000a",
+                    "on-surface-variant": "#444653",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "on-tertiary-container": "#babbbb",
+                    "primary": "#00288e",
+                    "outline-variant": "#c4c5d5",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#454747",
+                    "tertiary": "#333535",
+                    "surface-container-low": "#eff4ff",
+                    "surface-container-high": "#dce9ff",
+                    "surface-variant": "#d5e3fc",
+                    "on-primary-fixed-variant": "#173bab",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-background": "#0d1c2e",
+                    "secondary": "#576065",
+                    "inverse-surface": "#233144",
+                    "surface-bright": "#f8f9ff",
+                    "primary-fixed-dim": "#b8c4ff",
+                    "secondary-container": "#dbe4ea",
+                    "on-secondary-fixed-variant": "#3f484d",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed": "#001453",
+                    "on-surface": "#0d1c2e",
+                    "tertiary-fixed": "#e2e2e2",
+                    "outline": "#757684",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-fixed-dim": "#bfc8ce"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-gap-md": "16px",
+                    "bento-gutter": "12px",
+                    "stack-gap-sm": "8px",
+                    "stack-gap-lg": "24px",
+                    "container-padding": "20px"
+            },
+            "fontFamily": {
+                    "label-caps": ["JetBrains Mono"],
+                    "body-sm": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "price-display": ["Inter"]
+            },
+            "fontSize": {
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["26px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "price-display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        .clay-card {
+            background: #ffffff;
+            box-shadow: 
+                0 10px 30px -10px rgba(30, 64, 175, 0.08),
+                inset 2px 2px 0 rgba(255, 255, 255, 1),
+                inset -4px -4px 8px rgba(30, 64, 175, 0.03);
+            border-radius: 24px;
+        }
+
+        .clay-card-recessed {
+            background: #f1f5f9;
+            box-shadow: 
+                inset 4px 4px 8px rgba(0, 0, 0, 0.05),
+                inset -4px -4px 8px rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 0.5px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-lg min-h-screen pb-24">
+<!-- Top Navigation Shell -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-white/20 shadow-[0_10px_30px_-10px_rgba(30,64,175,0.08)] flex justify-between items-center px-container-padding h-16">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-sm" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+</div>
+<h1 class="font-headline-md text-headline-md-mobile dark:text-on-surface">October 2023 • Active</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors" onclick="toggleDrawer()">
+<span class="material-symbols-outlined text-primary">menu</span>
+</button>
+</header>
+<!-- Side Navigation Drawer (Hidden by default) -->
+<div class="fixed inset-0 z-[60] hidden" id="nav-drawer">
+<div class="absolute inset-0 bg-on-background/20 backdrop-blur-sm" onclick="toggleDrawer()"></div>
+<aside class="relative h-full w-80 bg-surface-container-low shadow-2xl flex flex-col py-6 transition-transform -translate-x-full" id="drawer-content">
+<div class="px-6 mb-8 flex flex-col items-start">
+<div class="w-12 h-12 rounded-xl bg-primary mb-4 flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-2xl" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+</div>
+<h2 class="font-headline-md text-primary">Auralis Holdings</h2>
+<p class="font-body-sm text-on-surface-variant">Chairman Status</p>
+<span class="mt-2 px-2 py-0.5 rounded bg-primary-fixed text-on-primary-fixed font-label-caps text-label-caps">Premium Account</span>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-4 px-6 py-3 text-on-surface-variant hover:bg-surface-variant transition-colors" href="#">
+<span class="material-symbols-outlined">gavel</span>
+<span class="font-body-lg">Governance Docs</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-on-surface-variant hover:bg-surface-variant transition-colors" href="#">
+<span class="material-symbols-outlined">rule</span>
+<span class="font-body-lg">Contribution Rules</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-on-surface-variant hover:bg-surface-variant transition-colors" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-body-lg">Help Center</span>
+</a>
+<div class="pt-4 mt-4 border-t border-outline-variant/30">
+<a class="flex items-center gap-4 px-6 py-3 text-error transition-colors" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-body-lg">Logout</span>
+</a>
+</div>
+</nav>
+</aside>
+</div>
+<!-- Main Content Canvas -->
+<main class="pt-20 px-container-padding max-w-md mx-auto">
+<!-- Filter Header Section -->
+<section class="flex flex-col gap-4 mb-8 pt-4">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-background">Financial Reports</h2>
+<div class="flex gap-2">
+<button class="p-2 rounded-xl clay-card text-primary flex items-center justify-center active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-lg">tune</span>
+</button>
+</div>
+</div>
+<!-- Filter Pills -->
+<div class="flex gap-3 overflow-x-auto pb-2 custom-scrollbar">
+<button class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-full font-label-caps text-label-caps shadow-lg active:scale-95 transition-transform shrink-0">
+<span class="material-symbols-outlined text-sm">calendar_month</span>
+                    July 2023
+                </button>
+<button class="flex items-center gap-2 px-4 py-2 clay-card text-on-surface-variant rounded-full font-label-caps text-label-caps active:scale-95 transition-transform shrink-0">
+<span class="material-symbols-outlined text-sm">group</span>
+                    All Members
+                </button>
+<button class="flex items-center gap-2 px-4 py-2 clay-card text-on-surface-variant rounded-full font-label-caps text-label-caps active:scale-95 transition-transform shrink-0">
+<span class="material-symbols-outlined text-sm">add</span>
+                    Region
+                </button>
+</div>
+</section>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-2 gap-bento-gutter">
+<!-- Collection Efficiency (Large Card) -->
+<div class="col-span-2 clay-card p-6 flex flex-col gap-4 relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110"></div>
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Collection Efficiency</span>
+<div class="font-price-display text-price-display text-primary">94.8%</div>
+</div>
+<div class="p-2 rounded-lg bg-surface-container-high">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">trending_up</span>
+</div>
+</div>
+<div class="w-full h-2 bg-surface-container-low rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full transition-all duration-1000" style="width: 94.8%"></div>
+</div>
+<div class="flex justify-between text-xs text-on-surface-variant font-label-caps">
+<span>Target: 98%</span>
+<span class="text-primary font-bold">+2.4% vs LY</span>
+</div>
+</div>
+<!-- Debt Recovery (1:1 Bento) -->
+<div class="clay-card p-5 flex flex-col items-center justify-between text-center min-h-[180px]">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Debt Recovery</span>
+<div class="relative w-24 h-24 flex items-center justify-center">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle class="text-surface-container-high" cx="50" cy="50" fill="transparent" r="40" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-primary progress-ring-circle" cx="50" cy="50" fill="transparent" r="40" stroke="currentColor" stroke-dasharray="251.2" stroke-dashoffset="62.8" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="font-price-display text-lg text-primary">75%</span>
+</div>
+</div>
+<span class="font-label-caps text-xs text-on-surface-variant">$1.2M of $1.6M</span>
+</div>
+<!-- Payment Method Breakdown (1:1 Bento) -->
+<div class="clay-card p-5 flex flex-col justify-between min-h-[180px]">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Methods</span>
+<div class="space-y-2 mt-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="text-xs font-body-sm">Bank</span>
+</div>
+<span class="text-xs font-bold">62%</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-on-primary-container"></span>
+<span class="text-xs font-body-sm">Cash</span>
+</div>
+<span class="text-xs font-bold">24%</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-surface-dim"></span>
+<span class="text-xs font-body-sm">Wallet</span>
+</div>
+<span class="text-xs font-bold">14%</span>
+</div>
+</div>
+<div class="h-1.5 w-full bg-surface-container-low rounded-full flex overflow-hidden mt-2">
+<div class="h-full bg-primary" style="width: 62%"></div>
+<div class="h-full bg-on-primary-container" style="width: 24%"></div>
+<div class="h-full bg-surface-dim" style="width: 14%"></div>
+</div>
+</div>
+<!-- Monthly Contributions (2:1 Bento) -->
+<div class="col-span-2 clay-card p-6 flex flex-col gap-4">
+<div class="flex justify-between items-center">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Monthly Contributions</span>
+<span class="font-price-display text-lg text-on-background">$4,820.00</span>
+</div>
+<!-- Simple Line Chart Visualization -->
+<div class="h-32 w-full flex items-end justify-between gap-1 mt-2">
+<div class="group relative flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary/10 rounded-t-lg transition-all hover:bg-primary/20" style="height: 40%"></div>
+<span class="text-[10px] font-label-caps text-on-surface-variant">JAN</span>
+</div>
+<div class="group relative flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary/10 rounded-t-lg transition-all hover:bg-primary/20" style="height: 60%"></div>
+<span class="text-[10px] font-label-caps text-on-surface-variant">FEB</span>
+</div>
+<div class="group relative flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary/10 rounded-t-lg transition-all hover:bg-primary/20" style="height: 45%"></div>
+<span class="text-[10px] font-label-caps text-on-surface-variant">MAR</span>
+</div>
+<div class="group relative flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary/10 rounded-t-lg transition-all hover:bg-primary/20" style="height: 80%"></div>
+<span class="text-[10px] font-label-caps text-on-surface-variant">APR</span>
+</div>
+<div class="group relative flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary/10 rounded-t-lg transition-all hover:bg-primary/20" style="height: 55%"></div>
+<span class="text-[10px] font-label-caps text-on-surface-variant">MAY</span>
+</div>
+<div class="group relative flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary/10 rounded-t-lg transition-all hover:bg-primary/20" style="height: 70%"></div>
+<span class="text-[10px] font-label-caps text-on-surface-variant">JUN</span>
+</div>
+<div class="group relative flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary rounded-t-lg shadow-[0_-4px_10px_rgba(30,64,175,0.2)]" style="height: 95%"></div>
+<span class="text-[10px] font-label-caps text-primary font-bold">JUL</span>
+</div>
+</div>
+</div>
+<!-- Export Buttons (Bottom section) -->
+<div class="col-span-2 flex gap-bento-gutter mt-2">
+<button class="flex-1 py-4 clay-card bg-primary text-white flex items-center justify-center gap-2 font-label-caps text-label-caps active:scale-95 transition-transform hover:shadow-xl">
+<span class="material-symbols-outlined text-lg">picture_as_pdf</span>
+                    Download PDF
+                </button>
+<button class="flex-1 py-4 clay-card bg-white text-primary flex items-center justify-center gap-2 font-label-caps text-label-caps border border-primary/10 active:scale-95 transition-transform hover:shadow-xl">
+<span class="material-symbols-outlined text-lg">csv</span>
+                    Export CSV
+                </button>
+</div>
+</div>
+<!-- Spacer for nav bar -->
+<div class="h-12"></div>
+</main>
+<!-- Bottom Navigation Shell -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface/90 backdrop-blur-xl rounded-t-xl shadow-[0_-10px_30px_rgba(0,40,142,0.08)] flex justify-around items-center h-20 px-4 pb-safe">
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:text-primary-container active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-caps text-label-caps">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:text-primary-container active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-caps text-label-caps">Members</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:text-primary-container active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-caps text-label-caps">Payments</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim bg-primary-container/10 rounded-xl px-3 py-1 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="font-label-caps text-label-caps">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:text-primary-container active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-caps text-label-caps">Profile</span>
+</a>
+</nav>
+<script>
+        function toggleDrawer() {
+            const drawer = document.getElementById('nav-drawer');
+            const content = document.getElementById('drawer-content');
+            
+            if (drawer.classList.contains('hidden')) {
+                drawer.classList.remove('hidden');
+                setTimeout(() => {
+                    content.classList.remove('-translate-x-full');
+                }, 10);
+            } else {
+                content.classList.add('-translate-x-full');
+                setTimeout(() => {
+                    drawer.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        // Simulating some interactive chart behavior
+        document.querySelectorAll('.clay-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-2px)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body></html>
