@@ -1832,6 +1832,7 @@ function MembersView({
               <Metric label="All-time paid" value={formatTzs(allTimeContributionTotal)} />
               <Metric label="UTT paid" value={formatTzs(allTimeUttTotal)} />
               <Metric label="Mwekeza paid" value={formatTzs(allTimeMwekezaTotal)} />
+              <Metric label="Current debt" value={formatTzs(selectedPlan.remainingStartingDebt)} />
               <Metric label={`UTT due ${currentMonthLabel}`} value={formatTzs(settings.liquidContribution)} />
               <Metric label={`Mwekeza due ${currentMonthLabel}`} value={formatTzs(settings.mwekezaContribution)} />
               <Metric label={`Debt due ${currentMonthLabel}`} value={formatTzs(selectedPlan.installment)} />
