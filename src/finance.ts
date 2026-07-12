@@ -4,6 +4,8 @@ export type PaymentAllocation = {
   liquid: number
   mwekeza: number
   debt: number
+  debtUtt: number
+  debtMwekeza: number
   overpayment: number
 }
 
@@ -65,46 +67,133 @@ export const paidTotalForMonth = (memberId: string, month: string) => {
   return (record?.liquid ?? 0) + (record?.mwekeza ?? 0)
 }
 
+export const paidBreakdownForMonth = (memberId: string, month: string) => {
+  const record = getMemberRecords(memberId).find((item) => item.month === month)
+
+  return {
+    liquid: record?.liquid ?? 0,
+    mwekeza: record?.mwekeza ?? 0,
+  }
+}
+
 export const paidTotalUntil = (memberId: string, endMonthInclusive: string) =>
   getMemberRecords(memberId)
     .filter((record) => record.month <= endMonthInclusive)
     .reduce((sum, record) => sum + record.liquid + record.mwekeza, 0)
 
 export const startingDebtForMember = (memberId: string) => {
+  const debt = startingDebtBreakdownForMember(memberId)
+
+  return debt.utt + debt.mwekeza
+}
+
+export const startingDebtBreakdownForMember = (memberId: string) => {
   const debtBaseMonth = '2026-06'
   const monthsDue = getMemberRecords(memberId).filter(
     (record) => record.month <= debtBaseMonth,
   ).length
-  const expected = monthsDue * settings.monthlyContribution
-  const paid = paidTotalUntil(memberId, debtBaseMonth)
+  const expectedUtt = monthsDue * settings.liquidContribution
+  const expectedMwekeza = monthsDue * settings.mwekezaContribution
+  const paid = getMemberRecords(memberId)
+    .filter((record) => record.month <= debtBaseMonth)
+    .reduce(
+      (totals, record) => ({
+        utt: totals.utt + record.liquid,
+        mwekeza: totals.mwekeza + record.mwekeza,
+      }),
+      { utt: 0, mwekeza: 0 },
+    )
 
-  return Math.max(expected - paid, 0)
+  return {
+    utt: Math.max(expectedUtt - paid.utt, 0),
+    mwekeza: Math.max(expectedMwekeza - paid.mwekeza, 0),
+  }
 }
 
 export const debtInstallmentForMember = (memberId: string) =>
   startingDebtForMember(memberId) / settings.debtInstallmentMonths.length
 
-export type JulyPaymentOverride = Record<string, number>
+export const debtInstallmentBreakdownForMember = (memberId: string) => {
+  const debt = startingDebtBreakdownForMember(memberId)
+
+  return {
+    utt: debt.utt / settings.debtInstallmentMonths.length,
+    mwekeza: debt.mwekeza / settings.debtInstallmentMonths.length,
+  }
+}
+
+export type JulyPaymentOverride = Record<
+  string,
+  PaymentAllocation & {
+    amount: number
+  }
+>
+
+export const emptyPaymentAllocation = (): PaymentAllocation => ({
+  liquid: 0,
+  mwekeza: 0,
+  debt: 0,
+  debtUtt: 0,
+  debtMwekeza: 0,
+  overpayment: 0,
+})
+
+export const normalizeAllocation = (allocation?: Partial<PaymentAllocation>) => {
+  const legacyDebt = allocation?.debt ?? 0
+  const debtUtt = allocation?.debtUtt ?? legacyDebt
+  const debtMwekeza = allocation?.debtMwekeza ?? 0
+
+  return {
+    liquid: allocation?.liquid ?? 0,
+    mwekeza: allocation?.mwekeza ?? 0,
+    debt: debtUtt + debtMwekeza,
+    debtUtt,
+    debtMwekeza,
+    overpayment: allocation?.overpayment ?? 0,
+  }
+}
 
 export const transactionsToOverrides = (transactions: TransactionRecord[]) =>
   transactions.reduce<JulyPaymentOverride>((totals, transaction) => {
-    totals[transaction.memberId] = (totals[transaction.memberId] ?? 0) + transaction.amount
+    const current = totals[transaction.memberId] ?? {
+      ...emptyPaymentAllocation(),
+      amount: 0,
+    }
+    const allocation = normalizeAllocation(transaction.allocation)
+
+    totals[transaction.memberId] = {
+      amount: current.amount + transaction.amount,
+      liquid: current.liquid + allocation.liquid,
+      mwekeza: current.mwekeza + allocation.mwekeza,
+      debt: current.debt + allocation.debt,
+      debtUtt: current.debtUtt + allocation.debtUtt,
+      debtMwekeza: current.debtMwekeza + allocation.debtMwekeza,
+      overpayment: current.overpayment + allocation.overpayment,
+    }
     return totals
   }, {})
 
 export const transactionTotals = (transactions: TransactionRecord[]) =>
   transactions.reduce(
-    (totals, transaction) => ({
-      liquid: totals.liquid + transaction.allocation.liquid,
-      mwekeza: totals.mwekeza + transaction.allocation.mwekeza,
-      debt: totals.debt + transaction.allocation.debt,
-      overpayment: totals.overpayment + transaction.allocation.overpayment,
-      combined: totals.combined + transaction.amount,
-    }),
+    (totals, transaction) => {
+      const allocation = normalizeAllocation(transaction.allocation)
+
+      return {
+        liquid: totals.liquid + allocation.liquid,
+        mwekeza: totals.mwekeza + allocation.mwekeza,
+        debt: totals.debt + allocation.debt,
+        debtUtt: totals.debtUtt + allocation.debtUtt,
+        debtMwekeza: totals.debtMwekeza + allocation.debtMwekeza,
+        overpayment: totals.overpayment + allocation.overpayment,
+        combined: totals.combined + transaction.amount,
+      }
+    },
     {
       liquid: 0,
       mwekeza: 0,
       debt: 0,
+      debtUtt: 0,
+      debtMwekeza: 0,
       overpayment: 0,
       combined: 0,
     },
@@ -116,11 +205,11 @@ export const liveFundTotals = (
 ) => {
   const base = historicalTotals()
   const added = transactionTotals(transactions)
-  const liquidBeforeProjects = base.liquid + added.liquid + added.debt + added.overpayment
+  const liquidBeforeProjects = base.liquid + added.liquid + added.debtUtt + added.overpayment
 
   return {
     liquid: Math.max(liquidBeforeProjects - projectInvestmentTotal, 0),
-    mwekeza: base.mwekeza + added.mwekeza,
+    mwekeza: base.mwekeza + added.mwekeza + added.debtMwekeza,
     combined: Math.max(base.combined + added.combined - projectInvestmentTotal, 0),
     julyCashAdded: added.combined,
     debtRecovered: added.debt,
@@ -143,6 +232,8 @@ export const allocateJulyPayment = (
     liquid: 0,
     mwekeza: 0,
     debt: 0,
+    debtUtt: 0,
+    debtMwekeza: 0,
     overpayment: 0,
   }
   let cursor = alreadyPaid
@@ -160,6 +251,7 @@ export const allocateJulyPayment = (
   }
 
   allocation.overpayment = Math.max(remaining, 0)
+  allocation.debtUtt = allocation.debt
   return allocation
 }
 
@@ -168,15 +260,47 @@ export const julyPlanForMember = (
   paymentOverrides: JulyPaymentOverride,
 ) => {
   const startingDebt = startingDebtForMember(memberId)
+  const startingDebtBreakdown = startingDebtBreakdownForMember(memberId)
+  const debtInstallmentBreakdown = debtInstallmentBreakdownForMember(memberId)
   const installment = debtInstallmentForMember(memberId)
-  const importedPaid = paidTotalForMonth(memberId, '2026-07')
-  const manualPaid = paymentOverrides[memberId] ?? 0
-  const paid = importedPaid + manualPaid
+  const importedPaidBreakdown = paidBreakdownForMonth(memberId, '2026-07')
+  const importedPaid = importedPaidBreakdown.liquid + importedPaidBreakdown.mwekeza
+  const manual = paymentOverrides[memberId] ?? {
+    ...emptyPaymentAllocation(),
+    amount: 0,
+  }
+  const manualPaid = manual.amount
+  const normalContributionPaid =
+    importedPaid + manual.liquid + manual.mwekeza + manual.overpayment
+  const debtPaid = manual.debtUtt + manual.debtMwekeza
+  const paid = normalContributionPaid + debtPaid
+  const liquidRemaining = Math.max(
+    settings.liquidContribution - importedPaidBreakdown.liquid - manual.liquid,
+    0,
+  )
+  const mwekezaRemaining = Math.max(
+    settings.mwekezaContribution - importedPaidBreakdown.mwekeza - manual.mwekeza,
+    0,
+  )
+  const normalRemaining = liquidRemaining + mwekezaRemaining
+  const debtUttRemaining = Math.max(debtInstallmentBreakdown.utt - manual.debtUtt, 0)
+  const debtMwekezaRemaining = Math.max(
+    debtInstallmentBreakdown.mwekeza - manual.debtMwekeza,
+    0,
+  )
+  const remainingStartingDebtUtt = Math.max(
+    startingDebtBreakdown.utt - manual.debtUtt,
+    0,
+  )
+  const remainingStartingDebtMwekeza = Math.max(
+    startingDebtBreakdown.mwekeza - manual.debtMwekeza,
+    0,
+  )
+  const remainingStartingDebt = remainingStartingDebtUtt + remainingStartingDebtMwekeza
   const due = settings.monthlyContribution + installment
-  const remaining = Math.max(due - paid, 0)
-  const debtPaid = Math.max(paid - settings.monthlyContribution, 0)
-  const debtInstallmentRemaining = Math.max(installment - debtPaid, 0)
-  const debtPenaltyBase = debtInstallmentRemaining > 0 ? startingDebt : 0
+  const remaining = normalRemaining + debtUttRemaining + debtMwekezaRemaining
+  const debtInstallmentRemaining = debtUttRemaining + debtMwekezaRemaining
+  const debtPenaltyBase = remaining > 0 ? remainingStartingDebt + normalRemaining : 0
   const penalty = debtPenaltyBase * settings.penaltyRate
   const carryover = remaining > 0 ? remaining + penalty : 0
   const status =
@@ -194,6 +318,14 @@ export const julyPlanForMember = (
     importedPaid,
     manualPaid,
     paid,
+    liquidRemaining,
+    mwekezaRemaining,
+    normalRemaining,
+    debtUttRemaining,
+    debtMwekezaRemaining,
+    remainingStartingDebt,
+    remainingStartingDebtUtt,
+    remainingStartingDebtMwekeza,
     remaining,
     debtInstallmentRemaining,
     debtPenaltyBase,
