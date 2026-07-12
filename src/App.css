@@ -972,6 +972,37 @@ textarea {
   line-height: 1.1;
 }
 
+.metric-pair-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.metric-pair-half {
+  flex: 1 1 50%;
+  min-width: 0;
+}
+
+.metric-pair-half + .metric-pair-half {
+  border-left: 1px solid rgba(6, 78, 43, 0.1);
+  padding-left: 12px;
+  margin-left: 12px;
+}
+
+.metric-pair-half small {
+  color: var(--muted);
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.metric-pair-half strong {
+  font-size: 16px;
+}
+
 .panel {
   animation: card-pop 520ms var(--ease-out) 90ms both;
   padding: 18px;

@@ -1951,12 +1951,27 @@ function MembersView({
               </div>
             ) : null}
             <div className="profile-metrics">
-              <Metric label="All-time paid" value={formatTzs(allTimeContributionTotal)} />
-              <Metric label="All-time expected" value={formatTzs(expectedContributionTotal)} />
-              <Metric label="UTT paid" value={formatTzs(allTimeUttTotal)} />
-              <Metric label="UTT expected" value={formatTzs(expectedUttTotal)} />
-              <Metric label="Mwekeza paid" value={formatTzs(allTimeMwekezaTotal)} />
-              <Metric label="Mwekeza expected" value={formatTzs(expectedMwekezaTotal)} />
+              <MetricPair
+                label="All-time"
+                leftLabel="Paid"
+                leftValue={formatTzs(allTimeContributionTotal)}
+                rightLabel="Expected"
+                rightValue={formatTzs(expectedContributionTotal)}
+              />
+              <MetricPair
+                label="UTT"
+                leftLabel="Paid"
+                leftValue={formatTzs(allTimeUttTotal)}
+                rightLabel="Expected"
+                rightValue={formatTzs(expectedUttTotal)}
+              />
+              <MetricPair
+                label="Mwekeza"
+                leftLabel="Paid"
+                leftValue={formatTzs(allTimeMwekezaTotal)}
+                rightLabel="Expected"
+                rightValue={formatTzs(expectedMwekezaTotal)}
+              />
               <Metric label="Current debt" value={formatTzs(selectedPlan.remainingStartingDebt)} />
               <Metric label={`UTT due ${currentMonthLabel}`} value={formatTzs(settings.liquidContribution)} />
               <Metric label={`Mwekeza due ${currentMonthLabel}`} value={formatTzs(settings.mwekezaContribution)} />
@@ -3918,6 +3933,36 @@ function Metric({ label, value }: { label: string; value: string }) {
     <div className="metric-card">
       <span>{label}</span>
       <strong>{value}</strong>
+    </div>
+  )
+}
+
+function MetricPair({
+  label,
+  leftLabel,
+  leftValue,
+  rightLabel,
+  rightValue,
+}: {
+  label: string
+  leftLabel: string
+  leftValue: string
+  rightLabel: string
+  rightValue: string
+}) {
+  return (
+    <div className="metric-card metric-pair">
+      <span>{label}</span>
+      <div className="metric-pair-row">
+        <div className="metric-pair-half">
+          <small>{leftLabel}</small>
+          <strong>{leftValue}</strong>
+        </div>
+        <div className="metric-pair-half">
+          <small>{rightLabel}</small>
+          <strong>{rightValue}</strong>
+        </div>
+      </div>
     </div>
   )
 }
