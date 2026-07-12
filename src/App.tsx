@@ -2030,7 +2030,18 @@ function MembersView({
             </div>
             <div className="penalty-box">
               <span>Penalty if unpaid after {nextDeadlineLabelForDate(currentDateValue)}</span>
-              <strong>{formatTzs(selectedPlan.penalty)}</strong>
+              <strong>
+                {formatTzs(
+                  Math.round(
+                    selectedPlan.remainingStartingDebt *
+                      Math.pow(
+                        1 + settings.penaltyRate,
+                        penaltyMonthsPassed(currentDateValue) + 1,
+                      ) -
+                      selectedPlan.remainingStartingDebt,
+                  ),
+                )}
+              </strong>
             </div>
             <div className="member-report-section">
               <div className="panel-title">
