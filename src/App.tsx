@@ -754,6 +754,12 @@ function App() {
     )
   }
 
+  const deleteTransaction = (transactionId: string) => {
+    setTransactions((current) =>
+      current.filter((transaction) => transaction.id !== transactionId),
+    )
+  }
+
   const deleteMember = (memberId: string) => {
     if (!activeUser) return
     if (memberId === activeUser.id) return
@@ -1380,6 +1386,7 @@ function App() {
             members={appMembers}
             draft={paymentDraft}
             onDraft={setPaymentDraft}
+            onDeleteTransaction={deleteTransaction}
             onRecord={recordPayment}
             plans={plans}
             transactions={transactions}
@@ -2277,6 +2284,7 @@ function PaymentsView({
   draft,
   members,
   onDraft,
+  onDeleteTransaction,
   onRecord,
   plans,
   transactions,
@@ -2285,6 +2293,7 @@ function PaymentsView({
   draft: PaymentDraft
   members: Member[]
   onDraft: React.Dispatch<React.SetStateAction<PaymentDraft>>
+  onDeleteTransaction: (transactionId: string) => void
   onRecord: (event: React.FormEvent) => void
   plans: ReturnType<typeof allJulyPlans>
   transactions: TransactionRecord[]
@@ -2539,6 +2548,15 @@ function PaymentsView({
                       {formatTzs(normalizeAllocation(transaction.allocation).debtMwekeza)}
                     </small>
                   </div>
+                  {canRecord ? (
+                    <button
+                      className="ghost-button delete-transaction-btn"
+                      onClick={() => onDeleteTransaction(transaction.id)}
+                      type="button"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  ) : null}
                 </div>
               )
             })}

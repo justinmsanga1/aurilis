@@ -3259,6 +3259,18 @@ textarea {
   text-align: right;
 }
 
+.delete-transaction-btn {
+  color: #dc2626;
+  flex-shrink: 0;
+  padding: 6px;
+}
+
+.delete-transaction-btn:hover {
+  background: rgba(220, 38, 38, 0.1);
+  border-color: rgba(220, 38, 38, 0.3);
+  color: #dc2626;
+}
+
 .mini-report {
   align-items: center;
   background: #f8fafc;
