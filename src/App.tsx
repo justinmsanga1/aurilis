@@ -740,6 +740,20 @@ function App() {
     )
   }
 
+  const makeSecretary = (memberId: string) => {
+    setAppMembers((current) =>
+      current.map((member) => ({
+        ...member,
+        role:
+          member.id === memberId
+            ? member.role === 'Secretary'
+              ? 'Member'
+              : 'Secretary'
+            : member.role,
+      })),
+    )
+  }
+
   const deleteMember = (memberId: string) => {
     if (!activeUser) return
     if (memberId === activeUser.id) return
@@ -1347,6 +1361,7 @@ function App() {
             onDraft={setMemberDraft}
             onMakeChairman={makeChairman}
             onMakeCashier={makeCashier}
+            onMakeSecretary={makeSecretary}
             onMemberAdd={addMember}
             onSelect={(memberId) => {
               setSelectedMemberId(memberId)
@@ -1867,6 +1882,7 @@ function MembersView({
   onDraft,
   onMakeCashier,
   onMakeChairman,
+  onMakeSecretary,
   onMemberAdd,
   onSelect,
   plans,
@@ -1885,6 +1901,7 @@ function MembersView({
   onDraft: React.Dispatch<React.SetStateAction<MemberDraft>>
   onMakeCashier: (memberId: string) => void
   onMakeChairman: (memberId: string) => void
+  onMakeSecretary: (memberId: string) => void
   onMemberAdd: (event: React.FormEvent) => void
   onSelect: (memberId: string) => void
   plans: ReturnType<typeof allJulyPlans>
@@ -1975,6 +1992,18 @@ function MembersView({
                     {selectedMember.role === 'Cashier'
                       ? 'Remove Cashier'
                       : 'Make Cashier'}
+                  </button>
+                ) : null}
+                {selectedMember.role !== 'Chairman' ? (
+                  <button
+                    className="ghost-button"
+                    onClick={() => onMakeSecretary(selectedMember.id)}
+                    type="button"
+                  >
+                    <Megaphone size={18} />
+                    {selectedMember.role === 'Secretary'
+                      ? 'Remove Secretary'
+                      : 'Make Secretary'}
                   </button>
                 ) : null}
                 <button
