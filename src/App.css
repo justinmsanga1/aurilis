@@ -2562,7 +2562,6 @@ textarea {
 }
 
 .roster-progress i {
-  background: #0b6b3a;
   display: block;
   height: 100%;
 }
@@ -4050,7 +4049,6 @@ textarea:focus {
 }
 
 .trend-bars i,
-.roster-progress i,
 .profile-progress-line > i b,
 .report-bar b {
   background: linear-gradient(180deg, #0f7f45, #064e2b);
