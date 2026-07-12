@@ -2200,7 +2200,12 @@ function MembersView({
               ]),
             )
 
-            return plans.map(({ member, plan }) => {
+            return [...plans].sort((a, b) => {
+              const aPct = percentMap.get(a.member.id) ?? 0
+              const bPct = percentMap.get(b.member.id) ?? 0
+
+              return bPct - aPct || a.member.fullName.localeCompare(b.member.fullName)
+            }).map(({ member, plan }) => {
               const paidPercent = plan.due > 0 ? Math.min((plan.paid / plan.due) * 100, 100) : 0
               const isSelf = member.id === activeUser.id
               const clear = plan.remaining === 0
