@@ -2435,9 +2435,9 @@ textarea {
 }
 
 .roster-member-card.featured {
-  background: #031f14;
-  border: 2px solid rgba(242, 183, 5, 0.35);
-  color: #fff;
+  background: #fffdf5;
+  border: 2px solid #f2b705;
+  color: var(--ink);
 }
 
 .roster-member-main {
@@ -2491,7 +2491,7 @@ textarea {
 }
 
 .featured .roster-member-copy small {
-  color: rgba(255, 255, 255, 0.58);
+  color: var(--muted);
 }
 
 .roster-role {
@@ -4153,9 +4153,8 @@ textarea:focus {
 }
 
 .roster-member-card.featured {
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.08), transparent 34%),
-    linear-gradient(145deg, #032414, #064e2b 58%, #163322);
+  background: #fffdf5;
+  border-color: #f2b705;
 }
 
 .payment-command-form {
