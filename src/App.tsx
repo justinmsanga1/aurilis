@@ -2041,11 +2041,8 @@ function MembersView({
                 {formatTzs(
                   Math.round(
                     selectedPlan.remainingStartingDebt *
-                      Math.pow(
-                        1 + settings.penaltyRate,
-                        penaltyMonthsPassed(currentDateValue) + 1,
-                      ) -
-                      selectedPlan.remainingStartingDebt,
+                      Math.pow(1 + settings.penaltyRate, penaltyMonthsPassed(currentDateValue)) *
+                      settings.penaltyRate,
                   ),
                 )}
               </strong>
