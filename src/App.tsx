@@ -1880,6 +1880,10 @@ function MembersView({
   const allTimeUttTotal = importedTotals.utt + manualTotals.utt
   const allTimeMwekezaTotal = importedTotals.mwekeza + manualTotals.mwekeza
   const allTimeContributionTotal = allTimeUttTotal + allTimeMwekezaTotal
+  const memberMonthCount = getMemberRecords(selectedMember.id).length
+  const expectedUttTotal = memberMonthCount * settings.liquidContribution
+  const expectedMwekezaTotal = memberMonthCount * settings.mwekezaContribution
+  const expectedContributionTotal = expectedUttTotal + expectedMwekezaTotal
   const roleCount = new Set(plans.map(({ member }) => member.role)).size
 
   if (detailOpen) {
@@ -1948,8 +1952,11 @@ function MembersView({
             ) : null}
             <div className="profile-metrics">
               <Metric label="All-time paid" value={formatTzs(allTimeContributionTotal)} />
+              <Metric label="All-time expected" value={formatTzs(expectedContributionTotal)} />
               <Metric label="UTT paid" value={formatTzs(allTimeUttTotal)} />
+              <Metric label="UTT expected" value={formatTzs(expectedUttTotal)} />
               <Metric label="Mwekeza paid" value={formatTzs(allTimeMwekezaTotal)} />
+              <Metric label="Mwekeza expected" value={formatTzs(expectedMwekezaTotal)} />
               <Metric label="Current debt" value={formatTzs(selectedPlan.remainingStartingDebt)} />
               <Metric label={`UTT due ${currentMonthLabel}`} value={formatTzs(settings.liquidContribution)} />
               <Metric label={`Mwekeza due ${currentMonthLabel}`} value={formatTzs(settings.mwekezaContribution)} />
