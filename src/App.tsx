@@ -1972,10 +1972,12 @@ function MembersView({
                 rightLabel="Expected"
                 rightValue={formatTzs(expectedMwekezaTotal)}
               />
-              <Metric label="Current debt" value={formatTzs(selectedPlan.remainingStartingDebt)} />
-              <Metric
-                label="Debt + penalty"
-                value={formatTzs(
+              <MetricPair
+                label="Current debt"
+                leftLabel="Without penalty"
+                leftValue={formatTzs(selectedPlan.remainingStartingDebt)}
+                rightLabel="With penalty"
+                rightValue={formatTzs(
                   isPastDeadline(currentDateValue)
                     ? selectedPlan.remainingStartingDebt + selectedPlan.penalty
                     : selectedPlan.remainingStartingDebt,
