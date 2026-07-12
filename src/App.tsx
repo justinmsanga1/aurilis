@@ -233,6 +233,26 @@ const formatDateLabel = (dateValue: string) => {
   }).format(date)
 }
 
+const monthLabelForDate = (dateValue: string) => {
+  const date = new Date(`${dateValue}T00:00:00`)
+  const safeDate = Number.isNaN(date.getTime()) ? new Date() : date
+
+  return new Intl.DateTimeFormat('en-GB', {
+    month: 'long',
+    year: 'numeric',
+  }).format(safeDate)
+}
+
+const shortMonthLabelForDate = (dateValue: string) => {
+  const date = new Date(`${dateValue}T00:00:00`)
+  const safeDate = Number.isNaN(date.getTime()) ? new Date() : date
+
+  return new Intl.DateTimeFormat('en-GB', {
+    month: 'short',
+    year: 'numeric',
+  }).format(safeDate)
+}
+
 const deadlineForDate = (dateValue: string) => {
   const date = new Date(`${dateValue}T00:00:00`)
   const safeDate = Number.isNaN(date.getTime()) ? new Date() : date
@@ -255,6 +275,8 @@ const isPastDeadline = (dateValue: string) => {
 }
 
 function App() {
+  const currentDateValue = todayInputValue()
+  const currentMonthLabel = monthLabelForDate(currentDateValue)
   const [appMembers, setAppMembers] = useStoredState<Member[]>(
     'auralis-members-v1',
     seedMembers,
@@ -299,8 +321,8 @@ function App() {
       {
         id: 'notice-july-contribution',
         type: 'Reminder',
-        title: 'July contribution cycle is open',
-        body: 'Members should complete the normal contribution plus debt installment before the day-10 guard.',
+        title: `${currentMonthLabel} contribution cycle is open`,
+        body: 'Members should complete the normal contribution plus current debt due before the day-10 guard.',
         date: '2026-07-01',
         createdBy: 'geoffrey-kapinga',
       },
@@ -314,11 +336,11 @@ function App() {
   const [meetings, setMeetings] = useStoredState<Meeting[]>('auralis-meetings-v1', [
     {
       id: 'meeting-july-review',
-      title: 'July contribution review',
+      title: `${currentMonthLabel} contribution review`,
       date: '2026-07-10',
       time: '19:00',
       location: 'Online',
-      agenda: 'Review July payments, debt installment progress, and penalty guard status.',
+      agenda: 'Review monthly payments, current debt due progress, and penalty guard status.',
       minutes: '',
       actionItems: '',
       attendance: {},
@@ -377,7 +399,7 @@ function App() {
     debtMwekeza: '',
     method: 'Mobile Money',
     date: todayInputValue(),
-    note: 'July contribution received',
+    note: `${currentMonthLabel} contribution received`,
   })
   const [avatars, setAvatars] = useStoredState<AvatarMap>('auralis-avatars-v1', {})
 
@@ -600,7 +622,7 @@ function App() {
       mwekeza: '',
       debtUtt: '',
       debtMwekeza: '',
-      note: 'July contribution received',
+      note: `${monthLabelForDate(current.date)} contribution received`,
     }))
   }
 
@@ -1083,7 +1105,7 @@ function App() {
       <main className="workspace">
         <header className="topbar">
           <div className="topbar-strip">
-            <span>July 2026 cycle</span>
+            <span>{currentMonthLabel} cycle</span>
             <b>{collectionRate}% collected</b>
             <small>{summary.membersAtRisk} at risk</small>
           </div>
@@ -1419,6 +1441,8 @@ function Dashboard({
   topDebtors: ReturnType<typeof allJulyPlans>
   openMember: (memberId: string) => void
 }) {
+  const currentDateValue = todayInputValue()
+  const currentMonthLabel = monthLabelForDate(currentDateValue)
   const cashTotal = Math.max(fundTotals.liquid + fundTotals.mwekeza, 1)
   const paidMembers = Math.max(memberCount - summary.membersAtRisk, 0)
   const mwekezaPercent = Math.round((fundTotals.mwekeza / cashTotal) * 100)
@@ -1498,7 +1522,7 @@ function Dashboard({
         </div>
         <div className="personal-risk-grid">
           <div>
-            <span>Debt installment</span>
+            <span>Debt due {currentMonthLabel}</span>
             <strong>{formatTzs(personalPlan.installment)}</strong>
           </div>
           <div>
@@ -1507,7 +1531,7 @@ function Dashboard({
           </div>
           <div>
             <span>Deadline</span>
-            <strong>{deadlineLabelForDate(todayInputValue())}</strong>
+            <strong>{deadlineLabelForDate(currentDateValue)}</strong>
           </div>
         </div>
         <div className="personal-risk-progress">
@@ -1540,12 +1564,12 @@ function Dashboard({
       <article className="bento-card cycle-progress-card">
         <div className="panel-title">
           <div>
-            <p className="eyebrow">July progress</p>
+            <p className="eyebrow">{currentMonthLabel} progress</p>
             <h2>{collectionRate}% collected</h2>
           </div>
           <ReportRing percent={collectionRate} label={formatTzs(summary.totalPaid)} />
         </div>
-        <div className="cycle-progress-track" aria-label="July member payment progress">
+        <div className="cycle-progress-track" aria-label={`${currentMonthLabel} member payment progress`}>
           {progressRows.map((row) => (
             <i
               className={`cycle-segment ${row.tone}`}
@@ -1612,7 +1636,7 @@ function Dashboard({
         <div className="panel-title">
           <div>
             <p className="eyebrow">Action list</p>
-            <h2>Largest July balances</h2>
+            <h2>Largest {currentMonthLabel} balances</h2>
           </div>
           <CircleDollarSign size={20} />
         </div>
@@ -1662,7 +1686,7 @@ function Dashboard({
           </div>
         </div>
         <p>
-          Starting debt is split across July, August, September, and October,
+          Opening debt is split across July, August, September, and October,
           then added on top of the normal monthly contribution.
         </p>
         <div className="installment-strip">
@@ -1712,6 +1736,8 @@ function MembersView({
   selectedPlan: ReturnType<typeof julyPlanForMember>
   transactions: TransactionRecord[]
 }) {
+  const currentDateValue = todayInputValue()
+  const currentMonthLabel = monthLabelForDate(currentDateValue)
   const selectedTransactions = transactions.filter(
     (transaction) => transaction.memberId === selectedMember.id,
   )
@@ -1806,20 +1832,21 @@ function MembersView({
               <Metric label="All-time paid" value={formatTzs(allTimeContributionTotal)} />
               <Metric label="UTT paid" value={formatTzs(allTimeUttTotal)} />
               <Metric label="Mwekeza paid" value={formatTzs(allTimeMwekezaTotal)} />
-              <Metric label="Starting debt" value={formatTzs(selectedPlan.startingDebt)} />
-              <Metric label="Debt installment" value={formatTzs(selectedPlan.installment)} />
-              <Metric label="July due" value={formatTzs(selectedPlan.due)} />
+              <Metric label={`UTT due ${currentMonthLabel}`} value={formatTzs(settings.liquidContribution)} />
+              <Metric label={`Mwekeza due ${currentMonthLabel}`} value={formatTzs(settings.mwekezaContribution)} />
+              <Metric label={`Debt due ${currentMonthLabel}`} value={formatTzs(selectedPlan.installment)} />
+              <Metric label={`Total due ${currentMonthLabel}`} value={formatTzs(selectedPlan.due)} />
               <Metric label="Remaining" value={formatTzs(selectedPlan.remaining)} />
             </div>
             <div className="penalty-box">
-              <span>Penalty if unpaid after {deadlineLabelForDate(todayInputValue())}</span>
+              <span>Penalty if unpaid after {deadlineLabelForDate(currentDateValue)}</span>
               <strong>{formatTzs(selectedPlan.penalty)}</strong>
             </div>
             <div className="member-report-section">
               <div className="panel-title">
                 <div>
                   <p className="eyebrow">Member report</p>
-                  <h2>History and July entries</h2>
+                  <h2>History and {currentMonthLabel} entries</h2>
                 </div>
                 <ReceiptText size={20} />
               </div>
@@ -1995,6 +2022,7 @@ function PaymentsView({
   transactions: TransactionRecord[]
 }) {
   const active = plans.find((item) => item.member.id === draft.memberId) ?? plans[0]
+  const selectedMonthLabel = monthLabelForDate(draft.date)
   const allocationPreview = {
     liquid: parseMoney(draft.liquid),
     mwekeza: parseMoney(draft.mwekeza),
@@ -2077,23 +2105,23 @@ function PaymentsView({
 
         <article className="payment-breakdown-card">
           <div className="payment-breakdown-row">
-            <span>UTT contribution due</span>
-            <strong>{formatTzs(active.plan.liquidRemaining)}</strong>
+            <span>UTT due {selectedMonthLabel}</span>
+            <strong>{formatTzs(settings.liquidContribution)}</strong>
           </div>
           <div className="payment-breakdown-row">
-            <span>Mwekeza contribution due</span>
-            <strong>{formatTzs(active.plan.mwekezaRemaining)}</strong>
+            <span>Mwekeza due {selectedMonthLabel}</span>
+            <strong>{formatTzs(settings.mwekezaContribution)}</strong>
           </div>
           <div className="payment-breakdown-row">
-            <span>UTT debt installment</span>
+            <span>UTT debt remaining</span>
             <strong>{formatTzs(active.plan.debtUttRemaining)}</strong>
           </div>
           <div className="payment-breakdown-row">
-            <span>Mwekeza debt installment</span>
+            <span>Mwekeza debt remaining</span>
             <strong>{formatTzs(active.plan.debtMwekezaRemaining)}</strong>
           </div>
           <div className="payment-breakdown-total">
-            <span>Total due</span>
+            <span>Total due {selectedMonthLabel}</span>
             <strong>{formatTzs(active.plan.due)}</strong>
           </div>
         </article>
@@ -2215,12 +2243,12 @@ function PaymentsView({
         <div className="panel-title">
           <div>
             <p className="eyebrow">Saved locally</p>
-            <h2>July payment ledger</h2>
+            <h2>{selectedMonthLabel} payment ledger</h2>
           </div>
           <ReceiptText size={20} />
         </div>
         {transactions.length === 0 ? (
-          <p>No July payments recorded yet.</p>
+          <p>No {selectedMonthLabel} payments recorded yet.</p>
         ) : (
           <div className="transaction-list">
             {transactions.map((transaction) => {
@@ -2272,6 +2300,7 @@ function FundsView({
   members: Member[]
   transactions: TransactionRecord[]
 }) {
+  const currentMonthLabel = monthLabelForDate(todayInputValue())
   const added = transactionTotals(transactions)
 
   return (
@@ -2291,7 +2320,7 @@ function FundsView({
         <Metric label="Mwekeza Fund" value={formatTzs(fundTotals.mwekeza)} />
       </div>
       <div className="metric-row">
-        <Metric label="July cash added" value={formatTzs(fundTotals.julyCashAdded)} />
+        <Metric label={`${currentMonthLabel} cash added`} value={formatTzs(fundTotals.julyCashAdded)} />
         <Metric label="Debt recovered" value={formatTzs(fundTotals.debtRecovered)} />
         <Metric label="Manual UTT" value={formatTzs(added.liquid)} />
         <Metric label="Manual Mwekeza" value={formatTzs(added.mwekeza)} />
@@ -2315,7 +2344,7 @@ function FundsView({
           type="button"
         >
           <ReceiptText size={18} />
-          Export July CSV
+          Export {currentMonthLabel} CSV
         </button>
       </article>
     </section>
@@ -2754,6 +2783,8 @@ function ReportsView({
   summary: ReturnType<typeof julySummary>
   transactions: TransactionRecord[]
 }) {
+  const currentMonthLabel = monthLabelForDate(todayInputValue())
+  const currentMonthSlug = currentMonthLabel.toLowerCase().replace(/[^a-z0-9]+/g, '-')
   const activePlan =
     plans.find((item) => item.member.id === activeUser.id) ?? plans[0]
   const reportPlans = isAdmin
@@ -2804,7 +2835,7 @@ function ReportsView({
       <article className="report-hero-card">
         <div>
           <p className="eyebrow">{isAdmin ? 'Chairman report' : 'Member report'}</p>
-          <h2>{isAdmin ? 'July position' : activeUser.fullName}</h2>
+          <h2>{isAdmin ? `${currentMonthLabel} position` : activeUser.fullName}</h2>
           <strong>{formatTzs(paidValue)}</strong>
           <span>
             {formatTzs(remainingValue)} remaining / {collectionPercent}% collected
@@ -2831,10 +2862,10 @@ function ReportsView({
               className="ghost-button"
               onClick={() => {
                 const csv = buildReportCsv(plans, members, transactions, projects)
-                onSnapshot('csv', 'Auralis Holdings July Report CSV', csv)
+                onSnapshot('csv', `Auralis Holdings ${currentMonthLabel} Report CSV`, csv)
                 downloadTextFile(
                   csv,
-                  `auralis-july-report-${new Date().toISOString().slice(0, 10)}.csv`,
+                  `auralis-${currentMonthSlug}-report-${new Date().toISOString().slice(0, 10)}.csv`,
                   'text/csv;charset=utf-8',
                 )
               }}
@@ -3484,13 +3515,15 @@ function ProfileView({
   onLogout: () => void
   onOpenReport: () => void
 }) {
+  const currentMonthLabel = monthLabelForDate(todayInputValue())
+  const shortCurrentMonthLabel = shortMonthLabelForDate(todayInputValue())
   const paid = plan.paid
   const progress =
     plan.due > 0 ? Math.min(Math.round((plan.paid / plan.due) * 100), 100) : 0
   const history = [
     ...transactions.map((transaction) => ({
       id: transaction.id,
-      label: transaction.note || 'July payment',
+      label: transaction.note || `${monthLabelForDate(transaction.date)} payment`,
       date: transaction.date,
       amount: transaction.amount,
       status: 'Cleared',
@@ -3530,7 +3563,7 @@ function ProfileView({
         <section className="profile-stat-grid">
           <div>
             <span>Joined</span>
-            <strong>Jul 2026</strong>
+            <strong>{shortCurrentMonthLabel}</strong>
           </div>
           <div>
             <span>Role</span>
@@ -3548,7 +3581,7 @@ function ProfileView({
               <WalletCards size={18} />
               Financial Summary
             </h3>
-            <span>July 2026</span>
+            <span>{currentMonthLabel}</span>
           </div>
           <div className="profile-finance-grid">
             <div>
@@ -3733,6 +3766,7 @@ function buildReportText({
   summary: ReturnType<typeof julySummary>
   transactions: TransactionRecord[]
 }) {
+  const currentMonthLabel = monthLabelForDate(todayInputValue())
   const projectTotals = projects.reduce(
     (totals, project) => {
       const income = project.entries
@@ -3779,7 +3813,7 @@ function buildReportText({
     title,
     `Generated: ${new Date().toLocaleString('en-GB')}`,
     '',
-    'July 2026 contributions',
+    `${currentMonthLabel} contributions`,
     `Total due: ${formatTzs(summary.totalDue)}`,
     `Total paid: ${formatTzs(summary.totalPaid)}`,
     `Remaining: ${formatTzs(summary.remaining)}`,
@@ -3806,6 +3840,8 @@ function buildReportText({
 }
 
 function exportJulyCsv(transactions: TransactionRecord[], members: Member[]) {
+  const currentMonthLabel = monthLabelForDate(todayInputValue())
+  const currentMonthSlug = currentMonthLabel.toLowerCase().replace(/[^a-z0-9]+/g, '-')
   const header = [
     'Date',
     'Member',
@@ -3842,7 +3878,7 @@ function exportJulyCsv(transactions: TransactionRecord[], members: Member[]) {
       row.map((value) => `"${value.replaceAll('"', '""')}"`).join(','),
     )
     .join('\n')
-  downloadTextFile(csv, 'auralis-july-2026-payments.csv', 'text/csv;charset=utf-8')
+  downloadTextFile(csv, `auralis-${currentMonthSlug}-payments.csv`, 'text/csv;charset=utf-8')
 }
 
 function buildReportCsv(
@@ -3851,11 +3887,12 @@ function buildReportCsv(
   transactions: TransactionRecord[],
   projects: ProjectRecord[],
 ) {
+  const currentMonthLabel = monthLabelForDate(todayInputValue())
   const header = [
     'Member',
     'Role',
-    'July Due',
-    'July Paid',
+    `${currentMonthLabel} Due`,
+    `${currentMonthLabel} Paid`,
     'Remaining',
     'Penalty',
     'Status',
