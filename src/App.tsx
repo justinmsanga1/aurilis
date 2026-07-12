@@ -2024,58 +2024,76 @@ function MembersView({
                 </button>
               </div>
             ) : null}
-            <div className="profile-metrics">
-              <MetricPair
-                label="All-time"
-                leftLabel="Paid"
-                leftValue={formatTzs(allTimeContributionTotal)}
-                rightLabel="Expected"
-                rightValue={formatTzs(expectedContributionTotal)}
-              />
-              <MetricPair
-                label="UTT"
-                leftLabel="Paid"
-                leftValue={formatTzs(allTimeUttTotal)}
-                rightLabel="Expected"
-                rightValue={formatTzs(expectedUttTotal)}
-              />
-              <MetricPair
-                label="Mwekeza"
-                leftLabel="Paid"
-                leftValue={formatTzs(allTimeMwekezaTotal)}
-                rightLabel="Expected"
-                rightValue={formatTzs(expectedMwekezaTotal)}
-              />
-              <MetricPair
-                label="Current debt"
-                leftLabel="Without penalty"
-                leftValue={formatTzs(selectedPlan.remainingStartingDebt)}
-                rightLabel="With penalty"
-                rightValue={formatTzs(
-                  Math.round(
-                    selectedPlan.remainingStartingDebt *
-                      Math.pow(1 + settings.penaltyRate, penaltyMonthsPassed(currentDateValue)),
-                  ),
-                )}
-              />
-              <MetricPair
-                label="Debt breakdown"
-                leftLabel="UTT debt"
-                leftValue={formatTzs(selectedPlan.remainingStartingDebtUtt)}
-                rightLabel="Mwekeza debt"
-                rightValue={formatTzs(selectedPlan.remainingStartingDebtMwekeza)}
-              />
-              <Metric label={`UTT due ${currentMonthLabel}`} value={formatTzs(settings.liquidContribution)} />
-              <Metric label={`Mwekeza due ${currentMonthLabel}`} value={formatTzs(settings.mwekezaContribution)} />
-              <MetricPair
-                label={`Debt due ${currentMonthLabel}`}
-                leftLabel="Total"
-                leftValue={formatTzs(selectedPlan.installment)}
-                rightLabel="UTT / Mwekeza"
-                rightValue={`${formatTzs(selectedPlan.debtUttRemaining)} / ${formatTzs(selectedPlan.debtMwekezaRemaining)}`}
-              />
-              <Metric label={`Total due ${currentMonthLabel}`} value={formatTzs(selectedPlan.due)} />
-              <Metric label="Remaining" value={formatTzs(selectedPlan.remaining)} />
+            <div className="profile-section">
+              <p className="profile-section-label">Summary</p>
+              <div className="profile-metrics">
+                <Metric label={`Total due ${currentMonthLabel}`} value={formatTzs(selectedPlan.due)} />
+                <Metric label="Remaining" value={formatTzs(selectedPlan.remaining)} />
+              </div>
+            </div>
+            <div className="profile-section">
+              <p className="profile-section-label">Debt</p>
+              <div className="profile-metrics">
+                <MetricPair
+                  label="Current debt"
+                  leftLabel="Without penalty"
+                  leftValue={formatTzs(selectedPlan.remainingStartingDebt)}
+                  rightLabel="With penalty"
+                  rightValue={formatTzs(
+                    Math.round(
+                      selectedPlan.remainingStartingDebt *
+                        Math.pow(1 + settings.penaltyRate, penaltyMonthsPassed(currentDateValue)),
+                    ),
+                  )}
+                />
+                <MetricPair
+                  label="Debt breakdown"
+                  leftLabel="UTT debt"
+                  leftValue={formatTzs(selectedPlan.remainingStartingDebtUtt)}
+                  rightLabel="Mwekeza debt"
+                  rightValue={formatTzs(selectedPlan.remainingStartingDebtMwekeza)}
+                />
+              </div>
+            </div>
+            <div className="profile-section">
+              <p className="profile-section-label">This month</p>
+              <div className="profile-metrics">
+                <Metric label={`UTT due ${currentMonthLabel}`} value={formatTzs(settings.liquidContribution)} />
+                <Metric label={`Mwekeza due ${currentMonthLabel}`} value={formatTzs(settings.mwekezaContribution)} />
+              </div>
+            </div>
+            <div className="profile-section">
+              <p className="profile-section-label">Contributions</p>
+              <div className="profile-metrics">
+                <MetricPair
+                  label="All-time"
+                  leftLabel="Paid"
+                  leftValue={formatTzs(allTimeContributionTotal)}
+                  rightLabel="Expected"
+                  rightValue={formatTzs(expectedContributionTotal)}
+                />
+                <MetricPair
+                  label="UTT"
+                  leftLabel="Paid"
+                  leftValue={formatTzs(allTimeUttTotal)}
+                  rightLabel="Expected"
+                  rightValue={formatTzs(expectedUttTotal)}
+                />
+                <MetricPair
+                  label="Mwekeza"
+                  leftLabel="Paid"
+                  leftValue={formatTzs(allTimeMwekezaTotal)}
+                  rightLabel="Expected"
+                  rightValue={formatTzs(expectedMwekezaTotal)}
+                />
+                <MetricPair
+                  label={`Debt due ${currentMonthLabel}`}
+                  leftLabel="Total"
+                  leftValue={formatTzs(selectedPlan.installment)}
+                  rightLabel="UTT / Mwekeza"
+                  rightValue={`${formatTzs(selectedPlan.debtUttRemaining)} / ${formatTzs(selectedPlan.debtMwekezaRemaining)}`}
+                />
+              </div>
             </div>
             <div className="penalty-box">
               <span>Penalty if unpaid after {nextDeadlineLabelForDate(currentDateValue)}</span>
