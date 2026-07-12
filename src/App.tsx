@@ -2048,20 +2048,6 @@ function MembersView({
                   rightLabel="Expected"
                   rightValue={formatTzs(expectedMwekezaTotal)}
                 />
-                <MetricPair
-                  label={`Debt due ${currentMonthLabel}`}
-                  leftLabel="Total"
-                  leftValue={formatTzs(selectedPlan.installment)}
-                  rightLabel="UTT / Mwekeza"
-                  rightValue={`${formatTzs(selectedPlan.debtUttRemaining)} / ${formatTzs(selectedPlan.debtMwekezaRemaining)}`}
-                />
-              </div>
-            </div>
-            <div className="profile-section">
-              <p className="profile-section-label">Summary</p>
-              <div className="profile-metrics">
-                <Metric label={`Total due ${currentMonthLabel}`} value={formatTzs(selectedPlan.due)} />
-                <Metric label="Remaining" value={formatTzs(selectedPlan.remaining)} />
               </div>
             </div>
             <div className="profile-section">
@@ -2086,6 +2072,13 @@ function MembersView({
                   rightLabel="Mwekeza debt"
                   rightValue={formatTzs(selectedPlan.remainingStartingDebtMwekeza)}
                 />
+                <MetricPair
+                  label={`Debt due ${currentMonthLabel}`}
+                  leftLabel="Total"
+                  leftValue={formatTzs(selectedPlan.installment)}
+                  rightLabel="UTT / Mwekeza"
+                  rightValue={`${formatTzs(selectedPlan.debtUttRemaining)} / ${formatTzs(selectedPlan.debtMwekezaRemaining)}`}
+                />
               </div>
             </div>
             <div className="profile-section">
@@ -2093,6 +2086,13 @@ function MembersView({
               <div className="profile-metrics">
                 <Metric label={`UTT due ${currentMonthLabel}`} value={formatTzs(settings.liquidContribution)} />
                 <Metric label={`Mwekeza due ${currentMonthLabel}`} value={formatTzs(settings.mwekezaContribution)} />
+              </div>
+            </div>
+            <div className="profile-section">
+              <p className="profile-section-label">Summary</p>
+              <div className="profile-metrics">
+                <Metric label={`Total due ${currentMonthLabel}`} value={formatTzs(selectedPlan.due)} />
+                <Metric label="Remaining" value={formatTzs(selectedPlan.remaining)} />
               </div>
             </div>
             <div className="penalty-box">
