@@ -2122,7 +2122,9 @@ function MembersView({
                 <ReceiptText size={20} />
               </div>
               <div className="timeline">
-                {getMemberRecords(selectedMember.id).map((record) => (
+                {getMemberRecords(selectedMember.id)
+                  .filter((record) => record.liquid + record.mwekeza > 0)
+                  .map((record) => (
                   <div className="timeline-row" key={record.month}>
                     <span>{record.label}</span>
                     <div>
