@@ -270,12 +270,31 @@ const deadlineForDate = (dateValue: string) => {
   return new Date(safeDate.getFullYear(), safeDate.getMonth(), settings.graceDay)
 }
 
+const nextDeadlineForDate = (dateValue: string) => {
+  const deadline = deadlineForDate(dateValue)
+  const date = new Date(`${dateValue}T00:00:00`)
+  if (Number.isNaN(date.getTime())) return deadline
+
+  if (date.getTime() > deadline.getTime()) {
+    return new Date(deadline.getFullYear(), deadline.getMonth() + 1, settings.graceDay)
+  }
+
+  return deadline
+}
+
 const deadlineLabelForDate = (dateValue: string) =>
   new Intl.DateTimeFormat('en-GB', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
   }).format(deadlineForDate(dateValue))
+
+const nextDeadlineLabelForDate = (dateValue: string) =>
+  new Intl.DateTimeFormat('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  }).format(nextDeadlineForDate(dateValue))
 
 const isPastDeadline = (dateValue: string) => {
   const date = new Date(`${dateValue}T00:00:00`)
@@ -1990,7 +2009,7 @@ function MembersView({
               <Metric label="Remaining" value={formatTzs(selectedPlan.remaining)} />
             </div>
             <div className="penalty-box">
-              <span>Penalty if unpaid after {deadlineLabelForDate(currentDateValue)}</span>
+              <span>Penalty if unpaid after {nextDeadlineLabelForDate(currentDateValue)}</span>
               <strong>{formatTzs(selectedPlan.penalty)}</strong>
             </div>
             <div className="member-report-section">
