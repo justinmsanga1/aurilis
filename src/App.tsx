@@ -2022,6 +2022,13 @@ function MembersView({
                   ),
                 )}
               />
+              <MetricPair
+                label="Debt breakdown"
+                leftLabel="UTT debt"
+                leftValue={formatTzs(selectedPlan.remainingStartingDebtUtt)}
+                rightLabel="Mwekeza debt"
+                rightValue={formatTzs(selectedPlan.remainingStartingDebtMwekeza)}
+              />
               <Metric label={`UTT due ${currentMonthLabel}`} value={formatTzs(settings.liquidContribution)} />
               <Metric label={`Mwekeza due ${currentMonthLabel}`} value={formatTzs(settings.mwekezaContribution)} />
               <Metric label={`Debt due ${currentMonthLabel}`} value={formatTzs(selectedPlan.installment)} />
