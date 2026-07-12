@@ -2122,10 +2122,35 @@ function MembersView({
         </div>
 
         <div className="roster-list">
-          {plans.map(({ member, plan }) => {
-            const paidPercent = plan.due > 0 ? Math.min((plan.paid / plan.due) * 100, 100) : 0
-            const isSelf = member.id === activeUser.id
-            const clear = plan.remaining === 0
+          {(() => {
+            const allTimePaidByMember = plans.map(({ member }) => {
+              const imported = getMemberRecords(member.id).reduce(
+                (sum, r) => sum + r.liquid + r.mwekeza,
+                0,
+              )
+              const manual = transactions
+                .filter((t) => t.memberId === member.id)
+                .reduce((sum, t) => {
+                  const a = normalizeAllocation(t.allocation)
+
+                  return sum + a.liquid + a.mwekeza + a.debtUtt + a.debtMwekeza + a.overpayment
+                }, 0)
+
+              return { memberId: member.id, total: imported + manual }
+            })
+            const grandTotal = allTimePaidByMember.reduce((sum, m) => sum + m.total, 0)
+            const percentMap = new Map(
+              allTimePaidByMember.map((m) => [
+                m.memberId,
+                grandTotal > 0 ? Math.round((m.total / grandTotal) * 100) : 0,
+              ]),
+            )
+
+            return plans.map(({ member, plan }) => {
+              const paidPercent = plan.due > 0 ? Math.min((plan.paid / plan.due) * 100, 100) : 0
+              const isSelf = member.id === activeUser.id
+              const clear = plan.remaining === 0
+              const contributionPercent = percentMap.get(member.id) ?? 0
 
             return (
             <button
@@ -2142,6 +2167,7 @@ function MembersView({
                 <div className="roster-member-copy">
                   <div>
                     <strong>{member.fullName}</strong>
+                    <span className="roster-contribution-badge">{contributionPercent}%</span>
                     <span className={`roster-role ${member.role.toLowerCase()}`}>
                       {member.role}
                     </span>
@@ -2163,7 +2189,9 @@ function MembersView({
                 <i style={{ width: `${paidPercent}%` }} />
               </div>
             </button>
-          )})}
+          )
+          })
+          })()}
         </div>
 
         {isAdmin ? (

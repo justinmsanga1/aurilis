@@ -2517,6 +2517,17 @@ textarea {
   color: #0b6b3a;
 }
 
+.roster-contribution-badge {
+  background: rgba(6, 78, 43, 0.1);
+  border-radius: 999px;
+  color: #064e2b;
+  font-size: 10px;
+  font-weight: 900;
+  margin-left: 6px;
+  padding: 2px 8px;
+  vertical-align: middle;
+}
+
 .roster-balance {
   padding: 0 14px 12px 72px;
   text-align: right;
