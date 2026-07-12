@@ -1,6 +1,7 @@
 import {
   ArrowLeft,
   Bell,
+  Bot,
   Camera,
   CalendarDays,
   ChevronRight,
@@ -53,6 +54,7 @@ type Tab =
   | 'notices'
   | 'meetings'
   | 'chat'
+  | 'assistant'
   | 'profile'
 
 type LoginState = {
@@ -195,6 +197,13 @@ type ReportSnapshot = {
   createdBy: string
 }
 
+type AssistantMessage = {
+  id: string
+  role: 'user' | 'assistant'
+  body: string
+  createdAt: string
+}
+
 const navItems: Array<{ id: Tab; label: string; icon: typeof Home }> = [
   { id: 'dashboard', label: 'Home', icon: Home },
   { id: 'members', label: 'Members', icon: UsersRound },
@@ -203,6 +212,7 @@ const navItems: Array<{ id: Tab; label: string; icon: typeof Home }> = [
   { id: 'profile', label: 'Profile', icon: UserRound },
   { id: 'reports', label: 'Reports', icon: ReceiptText },
   { id: 'chat', label: 'Chat', icon: MessageCircle },
+  { id: 'assistant', label: 'Auralis', icon: Bot },
   { id: 'notices', label: 'Updates', icon: Megaphone },
   { id: 'funds', label: 'Funds', icon: Landmark },
   { id: 'settings', label: 'Settings', icon: Settings },
@@ -366,6 +376,17 @@ function App() {
     ],
   )
   const [chatDraft, setChatDraft] = useState('')
+  const [assistantDraft, setAssistantDraft] = useState('')
+  const [assistantMessages, setAssistantMessages] = useState<AssistantMessage[]>([
+    {
+      id: 'auralis-welcome',
+      role: 'assistant',
+      body: 'I am Auralis, your finance analyst. Ask me about payments, current debt, penalties, funds, members, projects, or reports.',
+      createdAt: new Date().toISOString(),
+    },
+  ])
+  const [assistantLoading, setAssistantLoading] = useState(false)
+  const [assistantError, setAssistantError] = useState('')
   const [reportCopied, setReportCopied] = useState(false)
   const [backupMessage, setBackupMessage] = useState('')
   const [reports, setReports] = useStoredState<ReportSnapshot[]>(
@@ -913,6 +934,91 @@ function App() {
     setChatMessages((current) => current.filter((message) => message.id !== messageId))
   }
 
+  const buildAssistantContext = () => ({
+    activeUser,
+    currentMonth: monthLabelForDate(currentDateValue),
+    settings,
+    mathRules: {
+      monthlyContribution:
+        'Monthly contribution is UTT contribution plus Mwekeza contribution.',
+      debt:
+        'Opening debt is split into UTT debt and Mwekeza debt. Debt paid reduces the individual member debt first in its matching bucket.',
+      funds:
+        'Combined fund includes UTT normal, Mwekeza normal, UTT debt, Mwekeza debt, and overpayments. UTT debt goes to UTT fund. Mwekeza debt goes to Mwekeza fund.',
+      penalty:
+        'When required payment is not fully cleared after the month deadline, penalty risk is 10% of current unpaid debt plus unpaid normal contribution.',
+    },
+    fundTotals,
+    summary,
+    members: appMembers.map((member) => ({
+      ...member,
+      password: undefined,
+      records: getMemberRecords(member.id),
+    })),
+    plans: plans.map(({ member, plan }) => ({
+      memberId: member.id,
+      memberName: member.fullName,
+      role: member.role,
+      plan,
+    })),
+    transactions: transactions.map((transaction) => ({
+      ...transaction,
+      allocation: normalizeAllocation(transaction.allocation),
+    })),
+    projects: visibleProjects,
+    reports: reports.slice(0, 20),
+    announcements,
+    meetings,
+  })
+
+  const sendAssistantMessage = async (event: React.FormEvent) => {
+    event.preventDefault()
+    if (!activeUser || assistantLoading) return
+    const question = assistantDraft.trim()
+
+    if (!question) return
+
+    const userMessage: AssistantMessage = {
+      id: `auralis-user-${Date.now()}`,
+      role: 'user',
+      body: question,
+      createdAt: new Date().toISOString(),
+    }
+
+    setAssistantMessages((current) => [...current, userMessage])
+    setAssistantDraft('')
+    setAssistantError('')
+    setAssistantLoading(true)
+
+    try {
+      const response = await fetch('/api/assistant', {
+        body: JSON.stringify({
+          question,
+          context: buildAssistantContext(),
+        }),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+      })
+
+      const payload = (await response.json()) as { answer?: string; error?: string }
+      if (!response.ok) throw new Error(payload.error || 'Auralis assistant failed')
+
+      setAssistantMessages((current) => [
+        ...current,
+        {
+          id: `auralis-answer-${Date.now()}`,
+          role: 'assistant',
+          body: payload.answer || 'I could not answer that yet.',
+          createdAt: new Date().toISOString(),
+        },
+      ])
+    } catch (error) {
+      setAssistantError(error instanceof Error ? error.message : 'Auralis assistant failed')
+    } finally {
+      setAssistantLoading(false)
+    }
+  }
+
   const saveReportSnapshot = (
     action: ReportSnapshot['action'],
     title: string,
@@ -1311,6 +1417,18 @@ function App() {
             onDelete={deleteChatMessage}
             onDraft={setChatDraft}
             onSend={sendChatMessage}
+          />
+        ) : null}
+
+        {activeTab === 'assistant' ? (
+          <AssistantView
+            draft={assistantDraft}
+            error={assistantError}
+            loading={assistantLoading}
+            messages={assistantMessages}
+            onDraft={setAssistantDraft}
+            onSend={sendAssistantMessage}
+            user={activeUser}
           />
         ) : null}
 
@@ -3486,6 +3604,97 @@ function ChatView({
           />
           <button className="primary-button" type="submit">
             Send
+          </button>
+        </form>
+      </article>
+    </section>
+  )
+}
+
+function AssistantView({
+  draft,
+  error,
+  loading,
+  messages,
+  onDraft,
+  onSend,
+  user,
+}: {
+  draft: string
+  error: string
+  loading: boolean
+  messages: AssistantMessage[]
+  onDraft: React.Dispatch<React.SetStateAction<string>>
+  onSend: (event: React.FormEvent) => void
+  user: Member
+}) {
+  const prompts = [
+    'What is my current debt and penalty risk?',
+    'Who has the largest outstanding balance?',
+    'How much is in UTT and Mwekeza now?',
+    'Explain the penalty math for this month.',
+  ]
+
+  return (
+    <section className="assistant-layout">
+      <article className="panel assistant-panel">
+        <div className="assistant-hero">
+          <div className="assistant-orb">
+            <Bot size={26} />
+          </div>
+          <div>
+            <p className="eyebrow">Auralis analyst</p>
+            <h2>Auralis</h2>
+            <span>Reading the system as {user.fullName}</span>
+          </div>
+        </div>
+
+        <div className="assistant-prompt-row">
+          {prompts.map((prompt) => (
+            <button
+              disabled={loading}
+              key={prompt}
+              onClick={() => onDraft(prompt)}
+              type="button"
+            >
+              {prompt}
+            </button>
+          ))}
+        </div>
+
+        <div className="assistant-thread">
+          {messages.map((message) => (
+            <div
+              className={
+                message.role === 'user'
+                  ? 'assistant-message user'
+                  : 'assistant-message auralis'
+              }
+              key={message.id}
+            >
+              <strong>{message.role === 'user' ? user.fullName : 'Auralis'}</strong>
+              <p>{message.body}</p>
+            </div>
+          ))}
+          {loading ? (
+            <div className="assistant-message auralis thinking">
+              <strong>Auralis</strong>
+              <p>Analysing payments, debt, penalties, and fund records...</p>
+            </div>
+          ) : null}
+        </div>
+
+        {error ? <p className="form-error">{error}</p> : null}
+
+        <form className="assistant-composer" onSubmit={onSend}>
+          <input
+            aria-label="Ask Auralis"
+            placeholder="Ask Auralis about payments, debt, penalties, funds..."
+            value={draft}
+            onChange={(event) => onDraft(event.target.value)}
+          />
+          <button className="primary-button" disabled={loading} type="submit">
+            Ask
           </button>
         </form>
       </article>

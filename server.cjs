@@ -5,13 +5,14 @@ const {
   setBackendValue,
   supabaseConfigured,
 } = require('./api/backend.cjs')
+const { answerWithAuralis } = require('./api/assistant-core.cjs')
 
 const PORT = Number(process.env.AURALIS_API_PORT || 5174)
 
 function sendJson(response, status, payload) {
   response.writeHead(status, {
     'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'GET,PUT,OPTIONS',
+    'Access-Control-Allow-Methods': 'GET,POST,PUT,OPTIONS',
     'Access-Control-Allow-Origin': '*',
     'Content-Type': 'application/json',
   })
@@ -55,6 +56,13 @@ const server = http.createServer(async (request, response) => {
     if (request.method === 'GET' && url.pathname === '/api/state') {
       const store = await getBackendState()
       sendJson(response, 200, store)
+      return
+    }
+
+    if (request.method === 'POST' && url.pathname === '/api/assistant') {
+      const body = await readBody(request)
+      const result = await answerWithAuralis(body)
+      sendJson(response, 200, result)
       return
     }
 

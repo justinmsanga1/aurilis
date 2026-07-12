@@ -425,6 +425,7 @@ textarea {
 .members-directory,
 .member-detail-layout,
 .content-layout,
+.assistant-layout,
 .chat-layout {
   animation: page-in 360ms var(--ease-out) both;
   display: grid;
@@ -1985,6 +1986,128 @@ textarea {
 }
 
 .chat-composer {
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding-top: 14px;
+}
+
+.assistant-layout {
+  max-width: 880px;
+}
+
+.assistant-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.assistant-hero {
+  align-items: center;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(242, 183, 5, 0.18), transparent 32%),
+    linear-gradient(145deg, #032414, #064e2b 58%, #0b6b3a);
+  border-radius: 8px;
+  color: #fff;
+  display: flex;
+  gap: 14px;
+  padding: 18px;
+}
+
+.assistant-hero h2,
+.assistant-hero p,
+.assistant-hero span {
+  color: inherit;
+  margin: 0;
+}
+
+.assistant-hero h2 {
+  font-size: 28px;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.assistant-hero span {
+  color: #c8efd0;
+  display: block;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.assistant-orb {
+  align-items: center;
+  background: #f2b705;
+  border-radius: 999px;
+  box-shadow: 0 18px 32px rgba(0, 0, 0, 0.22);
+  color: #241a00;
+  display: inline-flex;
+  height: 58px;
+  justify-content: center;
+  width: 58px;
+}
+
+.assistant-prompt-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.assistant-prompt-row button {
+  background: #fff;
+  border: 1px solid rgba(193, 218, 198, 0.76);
+  border-radius: 999px;
+  color: #064e2b;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 900;
+  min-height: 38px;
+  padding: 0 12px;
+}
+
+.assistant-thread {
+  display: grid;
+  gap: 12px;
+  max-height: min(58svh, 620px);
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.assistant-message {
+  border-radius: 8px;
+  max-width: 760px;
+  padding: 13px;
+}
+
+.assistant-message strong {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 7px;
+}
+
+.assistant-message p {
+  line-height: 1.55;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.assistant-message.auralis {
+  background: linear-gradient(145deg, #ffffff, #e7f4df);
+  border: 1px solid rgba(193, 218, 198, 0.72);
+  color: #102015;
+}
+
+.assistant-message.user {
+  background: #064e2b;
+  color: #fff;
+  justify-self: end;
+}
+
+.assistant-message.thinking {
+  opacity: 0.78;
+}
+
+.assistant-composer {
   border-top: 1px solid var(--line);
   display: grid;
   gap: 10px;
