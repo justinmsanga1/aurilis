@@ -1676,11 +1676,84 @@ textarea {
   margin-top: 16px;
 }
 
+.report-filter-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1.15fr 0.85fr;
+  margin: 16px 0;
+}
+
+.report-filter-group {
+  display: grid;
+  gap: 8px;
+}
+
+.report-filter-group > span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.report-filter-group select {
+  appearance: none;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(231, 244, 223, 0.78));
+  border: 1px solid rgba(193, 218, 198, 0.9);
+  border-radius: 18px;
+  color: #031f14;
+  font: inherit;
+  font-weight: 900;
+  min-height: 52px;
+  outline: none;
+  padding: 0 14px;
+}
+
+.report-segmented {
+  background: #e7f4df;
+  border: 1px solid rgba(193, 218, 198, 0.85);
+  border-radius: 20px;
+  box-shadow: var(--shadow-pressed);
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 6px;
+}
+
+.report-segmented button {
+  background: transparent;
+  border: 0;
+  border-radius: 15px;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 900;
+  min-height: 40px;
+  transition:
+    background-color 180ms var(--ease-out),
+    box-shadow 180ms var(--ease-out),
+    color 180ms var(--ease-out),
+    transform 180ms var(--ease-out);
+}
+
+.report-segmented button.active {
+  background: #f2b705;
+  box-shadow: 0 10px 22px rgba(117, 88, 0, 0.18);
+  color: #201700;
+}
+
+.report-segmented button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
 .report-card-grid {
   display: grid;
   gap: 12px;
   grid-column: 1 / -1;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 }
 
 .report-chart-card {
@@ -1753,7 +1826,7 @@ textarea {
   border-radius: 8px;
   display: grid;
   gap: 12px;
-  grid-template-columns: minmax(180px, 1.4fr) repeat(3, minmax(112px, 0.7fr)) auto;
+  grid-template-columns: minmax(170px, 1.4fr) repeat(4, minmax(96px, 0.65fr)) auto;
   padding: 12px;
   transition:
     border-color 180ms var(--ease-out),
@@ -1783,6 +1856,14 @@ textarea {
 .report-row small {
   color: var(--muted);
   font-size: 12px;
+}
+
+.report-row > div:first-child strong {
+  font-size: 15px;
+}
+
+.report-row > div:nth-child(2) b {
+  color: #064e2b;
 }
 
 .project-report-grid {
@@ -5704,6 +5785,12 @@ body,
 .mobile-menu-list .nav-badge {
   justify-self: end;
   position: static;
+}
+
+@media (max-width: 760px) {
+  .report-filter-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 

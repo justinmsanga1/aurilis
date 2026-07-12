@@ -188,7 +188,7 @@ type BackupPayload = {
 
 type ReportSnapshot = {
   id: string
-  scope: 'Chairman' | 'Member'
+  scope: 'Chairman' | 'Cashier' | 'Member'
   memberId: string
   action: 'copy' | 'csv'
   title: string
@@ -203,6 +203,9 @@ type AssistantMessage = {
   body: string
   createdAt: string
 }
+
+type ReportScope = 'mine' | 'group'
+type ReportRange = 'month' | 'last3' | 'all'
 
 const navItems: Array<{ id: Tab; label: string; icon: typeof Home }> = [
   { id: 'dashboard', label: 'Home', icon: Home },
@@ -322,6 +325,73 @@ const penaltyMonthsPassed = (dateValue: string): number => {
   return count
 }
 
+const monthKeyFromDateValue = (dateValue: string) => {
+  const date = new Date(`${dateValue}T00:00:00`)
+  const safeDate = Number.isNaN(date.getTime()) ? new Date() : date
+
+  return `${safeDate.getFullYear()}-${String(safeDate.getMonth() + 1).padStart(2, '0')}`
+}
+
+const monthKeysForReportRange = (
+  range: ReportRange,
+  baseDateValue = todayInputValue(),
+) => {
+  if (range === 'all') return null
+
+  const date = new Date(`${baseDateValue}T00:00:00`)
+  const safeDate = Number.isNaN(date.getTime()) ? new Date() : date
+  const monthCount = range === 'last3' ? 3 : 1
+
+  return Array.from({ length: monthCount }, (_, index) => {
+    const target = new Date(safeDate.getFullYear(), safeDate.getMonth() - index, 1)
+
+    return `${target.getFullYear()}-${String(target.getMonth() + 1).padStart(2, '0')}`
+  })
+}
+
+const transactionInReportRange = (
+  transaction: TransactionRecord,
+  range: ReportRange,
+  baseDateValue = todayInputValue(),
+) => {
+  const allowedMonths = monthKeysForReportRange(range, baseDateValue)
+  if (!allowedMonths) return true
+
+  return allowedMonths.includes(monthKeyFromDateValue(transaction.date))
+}
+
+const reportRangeLabel = (range: ReportRange) => {
+  if (range === 'month') return 'This month'
+  if (range === 'last3') return 'Last 3 months'
+
+  return 'All time'
+}
+
+const contributionTotalsForRange = (
+  memberId: string,
+  transactions: TransactionRecord[],
+  range: ReportRange,
+  baseDateValue = todayInputValue(),
+) => {
+  const allowedMonths = monthKeysForReportRange(range, baseDateValue)
+  const imported = getMemberRecords(memberId)
+    .filter((record) => !allowedMonths || allowedMonths.includes(record.month))
+    .reduce((sum, record) => sum + record.liquid + record.mwekeza, 0)
+  const manual = transactions
+    .filter(
+      (transaction) =>
+        transaction.memberId === memberId &&
+        transactionInReportRange(transaction, range, baseDateValue),
+    )
+    .reduce((sum, transaction) => sum + transaction.amount, 0)
+
+  return {
+    imported,
+    manual,
+    total: imported + manual,
+  }
+}
+
 function App() {
   const currentDateValue = todayInputValue()
   const currentMonthLabel = monthLabelForDate(currentDateValue)
@@ -343,6 +413,7 @@ function App() {
     : null
   const isAdmin = activeUser?.role === 'Chairman'
   const canRecordPayments = activeUser?.role === 'Chairman' || activeUser?.role === 'Cashier'
+  const canManageReports = activeUser?.role === 'Cashier'
   const canManageComms = activeUser?.role === 'Chairman' || activeUser?.role === 'Secretary'
   const [activeTab, setActiveTab] = useState<Tab>('dashboard')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -1086,7 +1157,7 @@ function App() {
 
     const snapshot: ReportSnapshot = {
       id: `report-${Date.now()}-${action}`,
-      scope: isAdmin ? 'Chairman' : 'Member',
+      scope: activeUser.role === 'Cashier' ? 'Cashier' : isAdmin ? 'Chairman' : 'Member',
       memberId: activeUser.id,
       action,
       title,
@@ -1424,6 +1495,7 @@ function App() {
         {activeTab === 'reports' ? (
           <ReportsView
             activeUser={activeUser}
+            canManageReports={canManageReports}
             copied={reportCopied}
             fundTotals={fundTotals}
             isAdmin={isAdmin}
@@ -3082,6 +3154,7 @@ function ProjectsView({
 
 function ReportsView({
   activeUser,
+  canManageReports,
   copied,
   fundTotals,
   isAdmin,
@@ -3094,6 +3167,7 @@ function ReportsView({
   transactions,
 }: {
   activeUser: Member
+  canManageReports: boolean
   copied: boolean
   fundTotals: ReturnType<typeof liveFundTotals>
   isAdmin: boolean
@@ -3109,13 +3183,21 @@ function ReportsView({
   summary: ReturnType<typeof julySummary>
   transactions: TransactionRecord[]
 }) {
+  const [reportScope, setReportScope] = useState<ReportScope>('mine')
+  const [reportRange, setReportRange] = useState<ReportRange>('month')
   const currentMonthLabel = monthLabelForDate(todayInputValue())
   const currentMonthSlug = currentMonthLabel.toLowerCase().replace(/[^a-z0-9]+/g, '-')
   const activePlan =
     plans.find((item) => item.member.id === activeUser.id) ?? plans[0]
-  const reportPlans = isAdmin
+  const effectiveScope = canManageReports ? reportScope : 'mine'
+  const reportPlans = effectiveScope === 'group'
     ? plans
     : plans.filter((item) => item.member.id === activeUser.id)
+  const scopedTransactions = transactions.filter(
+    (transaction) =>
+      transactionInReportRange(transaction, reportRange) &&
+      (effectiveScope === 'group' || transaction.memberId === activeUser.id),
+  )
   const projectTotals = projects.reduce(
     (totals, project) => {
       const income = project.entries
@@ -3136,22 +3218,40 @@ function ReportsView({
   const reportText = buildReportText({
     activeUser,
     fundTotals,
-    isAdmin,
+    reportRange,
+    reportScope: effectiveScope,
     plans: reportPlans,
     projects,
     summary,
-    transactions,
+    transactions: scopedTransactions,
   })
-  const reportTitle = isAdmin
-    ? 'Auralis Holdings Chairman Report'
-    : `Auralis Holdings Member Report - ${activeUser.fullName}`
+  const reportTitle =
+    effectiveScope === 'group'
+      ? `Auralis Holdings Group Report - ${reportRangeLabel(reportRange)}`
+      : `Auralis Holdings Member Report - ${activeUser.fullName} - ${reportRangeLabel(reportRange)}`
   const memberTransactions = transactions.filter(
-    (transaction) => transaction.memberId === activeUser.id,
+    (transaction) =>
+      transaction.memberId === activeUser.id &&
+      transactionInReportRange(transaction, reportRange),
   )
-  const paidValue = isAdmin ? summary.totalPaid : activePlan.plan.paid
-  const remainingValue = isAdmin ? summary.remaining : activePlan.plan.remaining
-  const dueValue = isAdmin ? summary.totalDue : activePlan.plan.due
+  const paidValue =
+    effectiveScope === 'group'
+      ? reportPlans.reduce((sum, item) => sum + item.plan.paid, 0)
+      : activePlan.plan.paid
+  const remainingValue =
+    effectiveScope === 'group'
+      ? reportPlans.reduce((sum, item) => sum + item.plan.remaining, 0)
+      : activePlan.plan.remaining
+  const dueValue =
+    effectiveScope === 'group'
+      ? reportPlans.reduce((sum, item) => sum + item.plan.due, 0)
+      : activePlan.plan.due
   const collectionPercent = dueValue > 0 ? Math.round((paidValue / dueValue) * 100) : 0
+  const rangeContributionValue = reportPlans.reduce(
+    (sum, { member }) =>
+      sum + contributionTotalsForRange(member.id, transactions, reportRange).total,
+    0,
+  )
   const projectWallet =
     projectTotals.investment + projectTotals.income - projectTotals.expenses
   const projectProfit = projectTotals.income - projectTotals.expenses
@@ -3160,8 +3260,15 @@ function ReportsView({
     <section className="reports-layout">
       <article className="report-hero-card">
         <div>
-          <p className="eyebrow">{isAdmin ? 'Chairman report' : 'Member report'}</p>
-          <h2>{isAdmin ? `${currentMonthLabel} position` : activeUser.fullName}</h2>
+          <p className="eyebrow">
+            {effectiveScope === 'group' ? 'Group report' : 'My report'} /{' '}
+            {reportRangeLabel(reportRange)}
+          </p>
+          <h2>
+            {effectiveScope === 'group'
+              ? `${currentMonthLabel} position`
+              : activeUser.fullName}
+          </h2>
           <strong>{formatTzs(paidValue)}</strong>
           <span>
             {formatTzs(remainingValue)} remaining / {collectionPercent}% collected
@@ -3174,24 +3281,63 @@ function ReportsView({
         <div className="panel-title">
           <div>
             <p className="eyebrow">Output</p>
-            <h2>{copied ? 'Copied' : 'Share report'}</h2>
+            <h2>{canManageReports ? (copied ? 'Copied' : 'Cashier report') : 'View only'}</h2>
           </div>
           <ReceiptText size={20} />
         </div>
-        <div className="report-action-row">
-          <button className="primary-button" onClick={() => void onCopy(reportTitle, reportText)} type="button">
-            <ReceiptText size={18} />
-            Copy
-          </button>
-          {isAdmin ? (
+        <div className="report-filter-grid">
+          <div className="report-filter-group">
+            <span>Scope</span>
+            <div className="report-segmented">
+              <button
+                className={effectiveScope === 'mine' ? 'active' : ''}
+                onClick={() => setReportScope('mine')}
+                type="button"
+              >
+                My report
+              </button>
+              <button
+                className={effectiveScope === 'group' ? 'active' : ''}
+                disabled={!canManageReports}
+                onClick={() => setReportScope('group')}
+                type="button"
+              >
+                Group
+              </button>
+            </div>
+          </div>
+          <label className="report-filter-group">
+            <span>Time</span>
+            <select
+              onChange={(event) => setReportRange(event.target.value as ReportRange)}
+              value={reportRange}
+            >
+              <option value="month">This month</option>
+              <option value="last3">Last 3 months</option>
+              <option value="all">All time</option>
+            </select>
+          </label>
+        </div>
+        {canManageReports ? (
+          <div className="report-action-row">
+            <button className="primary-button" onClick={() => void onCopy(reportTitle, reportText)} type="button">
+              <ReceiptText size={18} />
+              Copy
+            </button>
             <button
               className="ghost-button"
               onClick={() => {
-                const csv = buildReportCsv(plans, members, transactions, projects)
-                onSnapshot('csv', `Auralis Holdings ${currentMonthLabel} Report CSV`, csv)
+                const csv = buildReportCsv(
+                  reportPlans,
+                  members,
+                  scopedTransactions,
+                  projects,
+                  reportRange,
+                )
+                onSnapshot('csv', `${reportTitle} CSV`, csv)
                 downloadTextFile(
                   csv,
-                  `auralis-${currentMonthSlug}-report-${new Date().toISOString().slice(0, 10)}.csv`,
+                  `auralis-${currentMonthSlug}-${effectiveScope}-${reportRange}-report-${new Date().toISOString().slice(0, 10)}.csv`,
                   'text/csv;charset=utf-8',
                 )
               }}
@@ -3200,8 +3346,13 @@ function ReportsView({
               <ReceiptText size={18} />
               CSV
             </button>
-          ) : null}
-        </div>
+          </div>
+        ) : (
+          <div className="read-only-payment-note">
+            <ShieldCheck size={18} />
+            Only the Cashier can copy or download reports.
+          </div>
+        )}
       </article>
 
       <article className="report-chart-card">
@@ -3215,6 +3366,11 @@ function ReportsView({
         <div className="report-bars">
           <ReportBar label="Paid" value={paidValue} max={Math.max(dueValue, 1)} />
           <ReportBar label="Remaining" value={remainingValue} max={Math.max(dueValue, 1)} />
+          <ReportBar
+            label={reportRangeLabel(reportRange)}
+            value={rangeContributionValue}
+            max={Math.max(rangeContributionValue, dueValue, 1)}
+          />
           <ReportBar label="Main cash" value={fundTotals.combined} max={Math.max(fundTotals.combined + projectWallet, 1)} />
           <ReportBar label="Project wallet" value={projectWallet} max={Math.max(fundTotals.combined + projectWallet, 1)} />
         </div>
@@ -3223,6 +3379,7 @@ function ReportsView({
       <div className="report-card-grid">
         <Metric label="Due" value={formatTzs(dueValue)} />
         <Metric label="Paid" value={formatTzs(paidValue)} />
+        <Metric label={reportRangeLabel(reportRange)} value={formatTzs(rangeContributionValue)} />
         <Metric label="Main cash" value={formatTzs(fundTotals.combined)} />
         <Metric label="Project profit" value={formatTzs(projectProfit)} />
       </div>
@@ -3230,35 +3387,51 @@ function ReportsView({
       <article className="panel report-table-panel">
         <div className="panel-title">
           <div>
-            <p className="eyebrow">{isAdmin ? 'Members' : 'My account'}</p>
-            <h2>{isAdmin ? 'Contribution report' : activeUser.fullName}</h2>
+            <p className="eyebrow">{effectiveScope === 'group' ? 'Members' : 'My account'}</p>
+            <h2>{reportRangeLabel(reportRange)} contributions</h2>
           </div>
           <UsersRound size={20} />
         </div>
         <div className="report-table">
-          {reportPlans.map(({ member, plan }) => (
-            <div className="report-row" key={member.id}>
-              <div>
-                <strong>{member.fullName}</strong>
-                <span>{plan.status}</span>
+          {reportPlans.map(({ member, plan }, index) => {
+            const rangeContribution = contributionTotalsForRange(
+              member.id,
+              transactions,
+              reportRange,
+            )
+
+            return (
+              <div className="report-row" key={member.id}>
+                <div>
+                  <strong>
+                    {index + 1}. {member.fullName}
+                  </strong>
+                  <span>
+                    {member.role} / {plan.status}
+                  </span>
+                </div>
+                <div>
+                  <small>{reportRangeLabel(reportRange)}</small>
+                  <b>{formatTzs(rangeContribution.total)}</b>
+                </div>
+                <div>
+                  <small>Due</small>
+                  <b>{formatTzs(plan.due)}</b>
+                </div>
+                <div>
+                  <small>Paid</small>
+                  <b>{formatTzs(plan.paid)}</b>
+                </div>
+                <div>
+                  <small>Remaining</small>
+                  <b>{formatTzs(plan.remaining)}</b>
+                </div>
+                <StatusPill status={plan.status} />
               </div>
-              <div>
-                <small>Due</small>
-                <b>{formatTzs(plan.due)}</b>
-              </div>
-              <div>
-                <small>Paid</small>
-                <b>{formatTzs(plan.paid)}</b>
-              </div>
-              <div>
-                <small>Remaining</small>
-                <b>{formatTzs(plan.remaining)}</b>
-              </div>
-              <StatusPill status={plan.status} />
-            </div>
-          ))}
+            )
+          })}
         </div>
-        {!isAdmin && memberTransactions.length > 0 ? (
+        {effectiveScope === 'mine' && memberTransactions.length > 0 ? (
           <div className="mini-report">
             <span>Manual entries recorded</span>
             <strong>
@@ -4199,7 +4372,8 @@ function StatusPill({ status }: { status: string }) {
 function buildReportText({
   activeUser,
   fundTotals,
-  isAdmin,
+  reportRange,
+  reportScope,
   plans,
   projects,
   summary,
@@ -4207,13 +4381,19 @@ function buildReportText({
 }: {
   activeUser: Member
   fundTotals: ReturnType<typeof liveFundTotals>
-  isAdmin: boolean
+  reportRange: ReportRange
+  reportScope: ReportScope
   plans: ReturnType<typeof allJulyPlans>
   projects: ProjectRecord[]
   summary: ReturnType<typeof julySummary>
   transactions: TransactionRecord[]
 }) {
   const currentMonthLabel = monthLabelForDate(todayInputValue())
+  const reportLabel = reportRangeLabel(reportRange)
+  const reportTotalDue = plans.reduce((sum, { plan }) => sum + plan.due, 0)
+  const reportTotalPaid = plans.reduce((sum, { plan }) => sum + plan.paid, 0)
+  const reportRemaining = plans.reduce((sum, { plan }) => sum + plan.remaining, 0)
+  const reportPenaltyAtRisk = plans.reduce((sum, { plan }) => sum + plan.penalty, 0)
   const projectTotals = projects.reduce(
     (totals, project) => {
       const income = project.entries
@@ -4231,15 +4411,19 @@ function buildReportText({
     },
     { investment: 0, income: 0, expenses: 0 },
   )
-  const title = isAdmin
-    ? 'Auralis Holdings Chairman Report'
-    : `Auralis Holdings Member Report - ${activeUser.fullName}`
-  const memberLines = plans.map(
-    ({ member, plan }) =>
-      `${member.fullName}: due ${formatTzs(plan.due)}, paid ${formatTzs(
+  const title =
+    reportScope === 'group'
+      ? `Auralis Holdings Group Report - ${reportLabel}`
+      : `Auralis Holdings Member Report - ${activeUser.fullName} - ${reportLabel}`
+  const memberLines = plans.map(({ member, plan }, index) => {
+    const rangeTotals = contributionTotalsForRange(member.id, transactions, reportRange)
+
+    return `${index + 1}. ${member.fullName} (${member.role}): ${reportLabel.toLowerCase()} contribution ${formatTzs(
+      rangeTotals.total,
+    )}, due ${formatTzs(plan.due)}, paid ${formatTzs(
         plan.paid,
-      )}, remaining ${formatTzs(plan.remaining)}, status ${plan.status}`,
-  )
+      )}, remaining ${formatTzs(plan.remaining)}, status ${plan.status}`
+  })
   const projectLines =
     projects.length === 0
       ? ['No project data recorded.']
@@ -4259,12 +4443,15 @@ function buildReportText({
   return [
     title,
     `Generated: ${new Date().toLocaleString('en-GB')}`,
+    `Prepared by: ${activeUser.fullName} (${activeUser.role})`,
+    `Scope: ${reportScope === 'group' ? 'All group members' : 'Own report'}`,
+    `Time range: ${reportLabel}`,
     '',
     `${currentMonthLabel} contributions`,
-    `Total due: ${formatTzs(summary.totalDue)}`,
-    `Total paid: ${formatTzs(summary.totalPaid)}`,
-    `Remaining: ${formatTzs(summary.remaining)}`,
-    `Penalty at risk: ${formatTzs(summary.penaltyAtRisk)}`,
+    `Total due: ${formatTzs(reportTotalDue)}`,
+    `Total paid: ${formatTzs(reportTotalPaid)}`,
+    `Remaining: ${formatTzs(reportRemaining)}`,
+    `Penalty at risk: ${formatTzs(reportPenaltyAtRisk || summary.penaltyAtRisk)}`,
     '',
     'Fund position',
     `Main cash balance: ${formatTzs(fundTotals.combined)}`,
@@ -4333,11 +4520,17 @@ function buildReportCsv(
   members: Member[],
   transactions: TransactionRecord[],
   projects: ProjectRecord[],
+  reportRange: ReportRange,
 ) {
   const currentMonthLabel = monthLabelForDate(todayInputValue())
+  const rangeLabel = reportRangeLabel(reportRange)
   const header = [
+    'Member No',
     'Member',
     'Role',
+    `${rangeLabel} Contribution`,
+    `${rangeLabel} Manual Entries`,
+    `${rangeLabel} Manual Total`,
     `${currentMonthLabel} Due`,
     `${currentMonthLabel} Paid`,
     'Remaining',
@@ -4346,10 +4539,11 @@ function buildReportCsv(
     'Manual Entries',
     'Assigned Projects',
   ]
-  const rows = plans.map(({ member, plan }) => {
+  const rows = plans.map(({ member, plan }, index) => {
     const manualEntries = transactions.filter(
       (transaction) => transaction.memberId === member.id,
     )
+    const rangeTotals = contributionTotalsForRange(member.id, transactions, reportRange)
     const assignedProjects = projects
       .filter((project) =>
         project.members.some((assignment) => assignment.memberId === member.id),
@@ -4358,8 +4552,12 @@ function buildReportCsv(
       .join('; ')
 
     return [
+      index + 1,
       member.fullName,
       members.find((item) => item.id === member.id)?.role ?? member.role,
+      rangeTotals.total,
+      manualEntries.length,
+      manualEntries.reduce((sum, transaction) => sum + transaction.amount, 0),
       plan.due,
       plan.paid,
       plan.remaining,
