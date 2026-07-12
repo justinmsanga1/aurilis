@@ -81,6 +81,30 @@ export const paidTotalUntil = (memberId: string, endMonthInclusive: string) =>
     .filter((record) => record.month <= endMonthInclusive)
     .reduce((sum, record) => sum + record.liquid + record.mwekeza, 0)
 
+const monthKey = (date: Date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+
+const previousMonthKey = (date: Date) =>
+  monthKey(new Date(date.getFullYear(), date.getMonth() - 1, 1))
+
+const monthIndex = (month: string) => {
+  const [year, monthNumber] = month.split('-').map(Number)
+
+  return year * 12 + monthNumber
+}
+
+const monthSpanInclusive = (startMonth: string, endMonth: string) =>
+  Math.max(monthIndex(endMonth) - monthIndex(startMonth) + 1, 0)
+
+export const settledDebtBaseMonth = (date = new Date()) => {
+  const safeDate = Number.isNaN(date.getTime()) ? new Date() : date
+  const currentMonth = monthKey(safeDate)
+
+  if (safeDate.getDate() > settings.graceDay) return currentMonth
+
+  return previousMonthKey(safeDate)
+}
+
 export const startingDebtForMember = (memberId: string) => {
   const debt = startingDebtBreakdownForMember(memberId)
 
@@ -88,13 +112,15 @@ export const startingDebtForMember = (memberId: string) => {
 }
 
 export const startingDebtBreakdownForMember = (memberId: string) => {
-  const debtBaseMonth = '2026-06'
-  const monthsDue = getMemberRecords(memberId).filter(
-    (record) => record.month <= debtBaseMonth,
-  ).length
+  const debtBaseMonth = settledDebtBaseMonth()
+  const records = getMemberRecords(memberId)
+  const firstRecord = records[0]
+  const monthsDue = firstRecord
+    ? monthSpanInclusive(firstRecord.month, debtBaseMonth)
+    : 0
   const expectedUtt = monthsDue * settings.liquidContribution
   const expectedMwekeza = monthsDue * settings.mwekezaContribution
-  const paid = getMemberRecords(memberId)
+  const paid = records
     .filter((record) => record.month <= debtBaseMonth)
     .reduce(
       (totals, record) => ({
