@@ -2100,7 +2100,7 @@ textarea {
 .assistant-thread {
   display: grid;
   gap: 12px;
-  max-height: min(58svh, 620px);
+  max-height: min(68svh, 720px);
   overflow: auto;
   padding-right: 4px;
 }

@@ -419,7 +419,7 @@ function App() {
     {
       id: 'auralis-welcome',
       role: 'assistant',
-      body: 'I am Auralis, your finance analyst. Ask me about payments, current debt, penalties, funds, members, projects, or reports.',
+      body: "Hey! I'm Auralis, your group's finance buddy. I know all the numbers — payments, debts, penalties, funds, you name it. Just ask me anything about the money stuff.",
       createdAt: new Date().toISOString(),
     },
   ])
@@ -3796,10 +3796,10 @@ function AssistantView({
   user: Member
 }) {
   const prompts = [
-    'What is my current debt and penalty risk?',
-    'Who has the largest outstanding balance?',
-    'How much is in UTT and Mwekeza now?',
-    'Explain the penalty math for this month.',
+    'How am I doing with my payments?',
+    'Who still owes the most money?',
+    'What is the total in the funds right now?',
+    'Break down the penalty math for me.',
   ]
 
   return (
@@ -3810,7 +3810,7 @@ function AssistantView({
             <Bot size={26} />
           </div>
           <div>
-            <p className="eyebrow">Auralis analyst</p>
+            <p className="eyebrow">Finance buddy</p>
             <h2>Auralis</h2>
             <span>Reading the system as {user.fullName}</span>
           </div>
@@ -3846,7 +3846,7 @@ function AssistantView({
           {loading ? (
             <div className="assistant-message auralis thinking">
               <strong>Auralis</strong>
-              <p>Analysing payments, debt, penalties, and fund records...</p>
+              <p>Let me check the records real quick...</p>
             </div>
           ) : null}
         </div>
@@ -3856,12 +3856,12 @@ function AssistantView({
         <form className="assistant-composer" onSubmit={onSend}>
           <input
             aria-label="Ask Auralis"
-            placeholder="Ask Auralis about payments, debt, penalties, funds..."
+            placeholder="Ask me anything about the group finances..."
             value={draft}
             onChange={(event) => onDraft(event.target.value)}
           />
           <button className="primary-button" disabled={loading} type="submit">
-            Ask
+            Send
           </button>
         </form>
       </article>
