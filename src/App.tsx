@@ -2033,10 +2033,10 @@ function MembersView({
               <Metric label={`Mwekeza due ${currentMonthLabel}`} value={formatTzs(settings.mwekezaContribution)} />
               <MetricPair
                 label={`Debt due ${currentMonthLabel}`}
-                leftLabel="UTT installment"
-                leftValue={formatTzs(selectedPlan.debtUttRemaining)}
-                rightLabel="Mwekeza installment"
-                rightValue={formatTzs(selectedPlan.debtMwekezaRemaining)}
+                leftLabel="Total"
+                leftValue={formatTzs(selectedPlan.installment)}
+                rightLabel="UTT / Mwekeza"
+                rightValue={`${formatTzs(selectedPlan.debtUttRemaining)} / ${formatTzs(selectedPlan.debtMwekezaRemaining)}`}
               />
               <Metric label={`Total due ${currentMonthLabel}`} value={formatTzs(selectedPlan.due)} />
               <Metric label="Remaining" value={formatTzs(selectedPlan.remaining)} />
