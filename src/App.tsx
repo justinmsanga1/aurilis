@@ -303,6 +303,25 @@ const isPastDeadline = (dateValue: string) => {
   return date.getTime() > deadlineForDate(dateValue).getTime()
 }
 
+const penaltyMonthsPassed = (dateValue: string): number => {
+  const date = new Date(`${dateValue}T00:00:00`)
+  if (Number.isNaN(date.getTime())) return 0
+
+  let count = 0
+
+  for (const month of settings.debtInstallmentMonths) {
+    const deadline = new Date(`${month}-${String(settings.graceDay).padStart(2, '0')}T00:00:00`)
+
+    if (date.getTime() > deadline.getTime()) {
+      count++
+    } else {
+      break
+    }
+  }
+
+  return count
+}
+
 function App() {
   const currentDateValue = todayInputValue()
   const currentMonthLabel = monthLabelForDate(currentDateValue)
@@ -1997,9 +2016,10 @@ function MembersView({
                 leftValue={formatTzs(selectedPlan.remainingStartingDebt)}
                 rightLabel="With penalty"
                 rightValue={formatTzs(
-                  isPastDeadline(currentDateValue)
-                    ? selectedPlan.remainingStartingDebt + selectedPlan.penalty
-                    : selectedPlan.remainingStartingDebt,
+                  Math.round(
+                    selectedPlan.remainingStartingDebt *
+                      Math.pow(1 + settings.penaltyRate, penaltyMonthsPassed(currentDateValue)),
+                  ),
                 )}
               />
               <Metric label={`UTT due ${currentMonthLabel}`} value={formatTzs(settings.liquidContribution)} />
