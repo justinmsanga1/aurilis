@@ -1358,12 +1358,14 @@ function App() {
           <MembersView
             activeUser={activeUser}
             avatars={avatars}
+            canRecord={canRecordPayments}
             detailOpen={memberDetailOpen}
             draft={memberDraft}
             isAdmin={isAdmin}
             onAvatar={handleAvatar}
             onBack={() => setMemberDetailOpen(false)}
             onDelete={deleteMember}
+            onDeleteTransaction={deleteTransaction}
             onDraft={setMemberDraft}
             onMakeChairman={makeChairman}
             onMakeCashier={makeCashier}
@@ -1880,12 +1882,14 @@ function Dashboard({
 function MembersView({
   activeUser,
   avatars,
+  canRecord,
   detailOpen,
   draft,
   isAdmin,
   onAvatar,
   onBack,
   onDelete,
+  onDeleteTransaction,
   onDraft,
   onMakeCashier,
   onMakeChairman,
@@ -1899,12 +1903,14 @@ function MembersView({
 }: {
   activeUser: Member
   avatars: AvatarMap
+  canRecord: boolean
   detailOpen: boolean
   draft: MemberDraft
   isAdmin: boolean
   onAvatar: (memberId: string, event: ChangeEvent<HTMLInputElement>) => void
   onBack: () => void
   onDelete: (memberId: string) => void
+  onDeleteTransaction: (transactionId: string) => void
   onDraft: React.Dispatch<React.SetStateAction<MemberDraft>>
   onMakeCashier: (memberId: string) => void
   onMakeChairman: (memberId: string) => void
@@ -2137,6 +2143,15 @@ function MembersView({
                         {transaction.method} / Debt {formatTzs(normalizeAllocation(transaction.allocation).debt)}
                       </small>
                     </div>
+                    {canRecord ? (
+                      <button
+                        className="ghost-button delete-transaction-btn"
+                        onClick={() => onDeleteTransaction(transaction.id)}
+                        type="button"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    ) : null}
                   </div>
                 ))}
               </div>
