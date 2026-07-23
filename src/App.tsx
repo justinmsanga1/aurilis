@@ -24,7 +24,7 @@ import {
 } from 'lucide-react'
 import { type CSSProperties, type ChangeEvent, useEffect, useMemo, useState } from 'react'
 import './App.css'
-import { type Member, members as seedMembers, settings } from './data'
+import { type FundKey, type Member, members as seedMembers, settings } from './data'
 import {
   allJulyPlans,
   debtBookTotal,
@@ -172,6 +172,24 @@ type ProjectEntryDraft = {
   note: string
 }
 
+type BalanceAdjustment = {
+  id: string
+  fund: FundKey
+  amount: number
+  date: string
+  reason: string
+  adjustedBy: string
+  createdAt: string
+}
+
+type BalanceAdjustmentDraft = {
+  fund: FundKey
+  direction: 'increase' | 'decrease'
+  amount: string
+  date: string
+  reason: string
+}
+
 type BackupPayload = {
   app: 'Auralis Holdings'
   version: 1
@@ -184,6 +202,7 @@ type BackupPayload = {
   chatMessages: ChatMessage[]
   avatars: AvatarMap
   reports?: ReportSnapshot[]
+  balanceAdjustments?: BalanceAdjustment[]
 }
 
 type ReportSnapshot = {
@@ -392,6 +411,35 @@ const contributionTotalsForRange = (
   }
 }
 
+const balanceAdjustmentTotals = (adjustments: BalanceAdjustment[]) =>
+  adjustments.reduce(
+    (totals, adjustment) => ({
+      liquid: totals.liquid + (adjustment.fund === 'liquid' ? adjustment.amount : 0),
+      mwekeza:
+        totals.mwekeza + (adjustment.fund === 'mwekeza' ? adjustment.amount : 0),
+    }),
+    { liquid: 0, mwekeza: 0 },
+  )
+
+const applyBalanceAdjustments = (
+  fundTotals: ReturnType<typeof liveFundTotals>,
+  adjustments: BalanceAdjustment[],
+) => {
+  const adjustmentTotals = balanceAdjustmentTotals(adjustments)
+  const liquid = fundTotals.liquid + adjustmentTotals.liquid
+  const mwekeza = fundTotals.mwekeza + adjustmentTotals.mwekeza
+
+  return {
+    ...fundTotals,
+    liquid,
+    mwekeza,
+    combined: liquid + mwekeza,
+    calculated: fundTotals,
+    adjustments: adjustmentTotals,
+    adjustmentTotal: adjustmentTotals.liquid + adjustmentTotals.mwekeza,
+  }
+}
+
 function App() {
   const currentDateValue = todayInputValue()
   const currentMonthLabel = monthLabelForDate(currentDateValue)
@@ -502,6 +550,17 @@ function App() {
     'auralis-reports-v1',
     [],
   )
+  const [balanceAdjustments, setBalanceAdjustments] = useStoredState<
+    BalanceAdjustment[]
+  >('auralis-balance-adjustments-v1', [])
+  const [balanceAdjustmentDraft, setBalanceAdjustmentDraft] =
+    useState<BalanceAdjustmentDraft>({
+      fund: 'liquid',
+      direction: 'increase',
+      amount: '',
+      date: todayInputValue(),
+      reason: '',
+    })
   const [transactions, setTransactions] = useStoredState<TransactionRecord[]>(
     'auralis-transactions-v1',
     [],
@@ -545,7 +604,8 @@ function App() {
     (sum, project) => sum + project.investmentAmount,
     0,
   )
-  const fundTotals = liveFundTotals(transactions, projectInvestmentTotal)
+  const calculatedFundTotals = liveFundTotals(transactions, projectInvestmentTotal)
+  const fundTotals = applyBalanceAdjustments(calculatedFundTotals, balanceAdjustments)
   const summary = julySummary(appMembers, paymentOverrides)
   const plans = allJulyPlans(appMembers, paymentOverrides)
   const selectedPlan = julyPlanForMember(selectedMember.id, paymentOverrides)
@@ -871,7 +931,7 @@ function App() {
       }))
 
     if (!name || !Number.isFinite(investmentAmount) || investmentAmount <= 0) return
-    if (investmentAmount > fundTotals.combined) return
+    if (investmentAmount > calculatedFundTotals.combined) return
 
     setProjects((current) => [
       {
@@ -1078,6 +1138,8 @@ function App() {
         'When required payment is not fully cleared after the month deadline, penalty risk is 10% of current unpaid debt plus unpaid normal contribution.',
     },
     fundTotals,
+    calculatedFundTotals,
+    balanceAdjustments,
     summary,
     members: appMembers.map((member) => ({
       ...member,
@@ -1176,6 +1238,34 @@ function App() {
     window.setTimeout(() => setReportCopied(false), 1600)
   }
 
+  const recordBalanceAdjustment = (event: React.FormEvent) => {
+    event.preventDefault()
+    if (!activeUser || activeUser.role !== 'Cashier') return
+
+    const amount = parseMoney(balanceAdjustmentDraft.amount)
+    const reason = balanceAdjustmentDraft.reason.trim()
+
+    if (amount <= 0 || !reason) return
+
+    const adjustment: BalanceAdjustment = {
+      id: `balance-adjustment-${Date.now()}`,
+      fund: balanceAdjustmentDraft.fund,
+      amount: balanceAdjustmentDraft.direction === 'decrease' ? -amount : amount,
+      date: balanceAdjustmentDraft.date,
+      reason,
+      adjustedBy: activeUser.id,
+      createdAt: new Date().toISOString(),
+    }
+
+    setBalanceAdjustments((current) => [adjustment, ...current])
+    setBalanceAdjustmentDraft((current) => ({
+      ...current,
+      amount: '',
+      date: todayInputValue(),
+      reason: '',
+    }))
+  }
+
   const exportBackup = () => {
     const backup: BackupPayload = {
       app: 'Auralis Holdings',
@@ -1189,6 +1279,7 @@ function App() {
       chatMessages,
       avatars,
       reports,
+      balanceAdjustments,
     }
     const blob = new Blob([JSON.stringify(backup, null, 2)], {
       type: 'application/json;charset=utf-8',
@@ -1232,6 +1323,11 @@ function App() {
         )
         setAvatars(parsed.avatars && typeof parsed.avatars === 'object' ? parsed.avatars : {})
         setReports(Array.isArray(parsed.reports) ? parsed.reports : [])
+        setBalanceAdjustments(
+          Array.isArray(parsed.balanceAdjustments)
+            ? parsed.balanceAdjustments
+            : [],
+        )
         setSelectedMemberId(parsed.members?.[0]?.id ?? seedMembers[0].id)
         setActiveUserId(parsed.members?.[0]?.id ?? seedMembers[0].id)
         setBackupMessage('Backup restored.')
@@ -1468,8 +1564,14 @@ function App() {
 
         {activeTab === 'funds' ? (
           <FundsView
+            adjustments={balanceAdjustments}
+            activeUser={activeUser}
+            canAdjustBalance={activeUser.role === 'Cashier'}
+            draft={balanceAdjustmentDraft}
             fundTotals={fundTotals}
             members={appMembers}
+            onAdjust={recordBalanceAdjustment}
+            onDraft={setBalanceAdjustmentDraft}
             transactions={transactions}
           />
         ) : null}
@@ -1480,7 +1582,7 @@ function App() {
             canManage={isAdmin}
             draft={projectDraft}
             entryDrafts={projectEntryDrafts}
-            fundTotals={fundTotals}
+            fundTotals={calculatedFundTotals}
             members={appMembers}
             onCreate={createProject}
             onDraft={setProjectDraft}
@@ -2690,27 +2792,41 @@ function PaymentsView({
 }
 
 function FundsView({
+  activeUser,
+  adjustments,
+  canAdjustBalance,
+  draft,
   fundTotals,
   members,
+  onAdjust,
+  onDraft,
   transactions,
 }: {
-  fundTotals: ReturnType<typeof liveFundTotals>
+  activeUser: Member
+  adjustments: BalanceAdjustment[]
+  canAdjustBalance: boolean
+  draft: BalanceAdjustmentDraft
+  fundTotals: ReturnType<typeof applyBalanceAdjustments>
   members: Member[]
+  onAdjust: (event: React.FormEvent) => void
+  onDraft: React.Dispatch<React.SetStateAction<BalanceAdjustmentDraft>>
   transactions: TransactionRecord[]
 }) {
   const currentMonthLabel = monthLabelForDate(todayInputValue())
   const added = transactionTotals(transactions)
+  const recentAdjustments = adjustments.slice(0, 6)
 
   return (
     <section className="funds-layout">
       <article className="hero-balance secondary">
         <div className="hero-topline">
-          <span>Imported Excel cash position</span>
+          <span>Adjusted cash position</span>
           <Landmark size={22} />
         </div>
         <strong>{formatTzs(fundTotals.combined)}</strong>
         <div className="fund-split">
-          <span>Verified from historical sheet</span>
+          <span>Calculated {formatTzs(fundTotals.calculated.combined)}</span>
+          <span>Adjustments {formatTzs(fundTotals.adjustmentTotal)}</span>
         </div>
       </article>
       <div className="metric-row two">
@@ -2723,6 +2839,124 @@ function FundsView({
         <Metric label="Manual UTT" value={formatTzs(added.liquid)} />
         <Metric label="Manual Mwekeza" value={formatTzs(added.mwekeza)} />
       </div>
+      {canAdjustBalance ? (
+        <article className="panel balance-adjustment-card">
+          <div className="panel-title">
+            <div>
+              <p className="eyebrow">Cashier only</p>
+              <h2>Balance adjustment</h2>
+            </div>
+            <ShieldCheck size={20} />
+          </div>
+          <p>
+            This creates a separate reconciliation entry. It does not edit member
+            payments, debts, penalties, or imported records.
+          </p>
+          <form className="balance-adjustment-form" onSubmit={onAdjust}>
+            <label>
+              Fund
+              <select
+                value={draft.fund}
+                onChange={(event) =>
+                  onDraft((current) => ({
+                    ...current,
+                    fund: event.target.value as FundKey,
+                  }))
+                }
+              >
+                <option value="liquid">UTT Liquid</option>
+                <option value="mwekeza">Mwekeza</option>
+              </select>
+            </label>
+            <label>
+              Direction
+              <select
+                value={draft.direction}
+                onChange={(event) =>
+                  onDraft((current) => ({
+                    ...current,
+                    direction: event.target.value as BalanceAdjustmentDraft['direction'],
+                  }))
+                }
+              >
+                <option value="increase">Increase</option>
+                <option value="decrease">Decrease</option>
+              </select>
+            </label>
+            <label>
+              Amount
+              <input
+                inputMode="numeric"
+                placeholder="Amount"
+                value={draft.amount}
+                onChange={(event) =>
+                  onDraft((current) => ({ ...current, amount: event.target.value }))
+                }
+              />
+            </label>
+            <label>
+              Date
+              <input
+                type="date"
+                value={draft.date}
+                onChange={(event) =>
+                  onDraft((current) => ({ ...current, date: event.target.value }))
+                }
+              />
+            </label>
+            <label className="balance-reason-field">
+              Reason
+              <input
+                placeholder="Bank reconciliation, cash correction..."
+                value={draft.reason}
+                onChange={(event) =>
+                  onDraft((current) => ({ ...current, reason: event.target.value }))
+                }
+              />
+            </label>
+            <button className="primary-button" type="submit">
+              <ReceiptText size={18} />
+              Save adjustment
+            </button>
+          </form>
+        </article>
+      ) : null}
+      <article className="panel balance-adjustment-card">
+        <div className="panel-title">
+          <div>
+            <p className="eyebrow">Audit trail</p>
+            <h2>Balance adjustments</h2>
+          </div>
+          <ReceiptText size={20} />
+        </div>
+        {recentAdjustments.length === 0 ? (
+          <p>No balance adjustments recorded yet.</p>
+        ) : (
+          <div className="balance-adjustment-list">
+            {recentAdjustments.map((adjustment) => {
+              const cashier = members.find((member) => member.id === adjustment.adjustedBy)
+
+              return (
+                <div className="balance-adjustment-row" key={adjustment.id}>
+                  <div>
+                    <strong>
+                      {adjustment.fund === 'liquid' ? 'UTT Liquid' : 'Mwekeza'}
+                    </strong>
+                    <span>
+                      {adjustment.date} / {cashier?.fullName ?? activeUser.fullName}
+                    </span>
+                    <small>{adjustment.reason}</small>
+                  </div>
+                  <b className={adjustment.amount >= 0 ? 'positive' : 'negative'}>
+                    {adjustment.amount >= 0 ? '+' : ''}
+                    {formatTzs(adjustment.amount)}
+                  </b>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </article>
       <article className="panel ledger-card">
         <div className="panel-title">
           <div>

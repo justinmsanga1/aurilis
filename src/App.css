@@ -3398,6 +3398,103 @@ textarea {
   max-width: 620px;
 }
 
+.balance-adjustment-card {
+  grid-column: 1 / -1;
+}
+
+.balance-adjustment-form {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 16px;
+}
+
+.balance-adjustment-form label {
+  color: var(--muted);
+  display: grid;
+  font-size: 11px;
+  font-weight: 900;
+  gap: 7px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.balance-adjustment-form input,
+.balance-adjustment-form select {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  min-height: 48px;
+  outline: none;
+  padding: 0 12px;
+}
+
+.balance-adjustment-form input:focus,
+.balance-adjustment-form select:focus {
+  border-color: rgba(6, 78, 43, 0.36);
+  box-shadow: 0 0 0 3px rgba(6, 78, 43, 0.1);
+}
+
+.balance-reason-field {
+  grid-column: span 2;
+}
+
+.balance-adjustment-form .primary-button {
+  align-self: end;
+  min-height: 48px;
+}
+
+.balance-adjustment-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.balance-adjustment-row {
+  align-items: center;
+  background: linear-gradient(145deg, #fff, #f1f8eb);
+  border: 1px solid rgba(193, 218, 198, 0.72);
+  border-radius: 18px;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 13px;
+}
+
+.balance-adjustment-row strong,
+.balance-adjustment-row span,
+.balance-adjustment-row small {
+  display: block;
+}
+
+.balance-adjustment-row strong {
+  color: var(--ink);
+}
+
+.balance-adjustment-row span,
+.balance-adjustment-row small {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+.balance-adjustment-row b {
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.balance-adjustment-row b.positive {
+  color: #064e2b;
+}
+
+.balance-adjustment-row b.negative {
+  color: #b42318;
+}
+
 .report-button {
   margin-top: 16px;
 }
@@ -5790,6 +5887,15 @@ body,
 @media (max-width: 760px) {
   .report-filter-grid {
     grid-template-columns: 1fr;
+  }
+
+  .balance-adjustment-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .balance-reason-field,
+  .balance-adjustment-form .primary-button {
+    grid-column: 1 / -1;
   }
 }
 
