@@ -248,6 +248,13 @@ const todayInputValue = () => {
   return today.toISOString().slice(0, 10)
 }
 
+const dateInputValue = (date: Date) => {
+  const safeDate = Number.isNaN(date.getTime()) ? new Date() : new Date(date)
+  safeDate.setMinutes(safeDate.getMinutes() - safeDate.getTimezoneOffset())
+
+  return safeDate.toISOString().slice(0, 10)
+}
+
 const parseMoney = (value: string) => {
   const amount = Number(value.replace(/,/g, '').trim())
 
@@ -490,7 +497,7 @@ function App() {
         type: 'Reminder',
         title: `${currentMonthLabel} contribution cycle is open`,
         body: 'Members should complete the normal contribution plus current debt due before the day-10 guard.',
-        date: '2026-07-01',
+        date: currentDateValue,
         createdBy: 'geoffrey-kapinga',
       },
     ],
@@ -504,7 +511,7 @@ function App() {
     {
       id: 'meeting-july-review',
       title: `${currentMonthLabel} contribution review`,
-      date: '2026-07-10',
+      date: dateInputValue(deadlineForDate(currentDateValue)),
       time: '19:00',
       location: 'Online',
       agenda: 'Review monthly payments, current debt due progress, and penalty guard status.',
@@ -516,7 +523,7 @@ function App() {
   ])
   const [meetingDraft, setMeetingDraft] = useState<MeetingDraft>({
     title: '',
-    date: '2026-07-10',
+    date: dateInputValue(deadlineForDate(currentDateValue)),
     time: '19:00',
     location: '',
     agenda: '',
@@ -528,7 +535,7 @@ function App() {
         id: 'chat-welcome',
         memberId: 'geoffrey-kapinga',
         body: 'Welcome to the Auralis Holdings group room.',
-        createdAt: '2026-07-01T09:00:00.000Z',
+        createdAt: new Date().toISOString(),
       },
     ],
   )
@@ -572,7 +579,7 @@ function App() {
   const [projectDraft, setProjectDraft] = useState<ProjectDraft>({
     name: '',
     description: '',
-    startDate: '2026-07-01',
+    startDate: currentDateValue,
     investmentAmount: '',
     status: 'Planning',
     memberRoles: {},
@@ -950,7 +957,7 @@ function App() {
     setProjectDraft({
       name: '',
       description: '',
-      startDate: '2026-07-01',
+      startDate: currentDateValue,
       investmentAmount: '',
       status: 'Planning',
       memberRoles: {},
@@ -1065,7 +1072,7 @@ function App() {
     ])
     setMeetingDraft({
       title: '',
-      date: '2026-07-10',
+      date: dateInputValue(deadlineForDate(currentDateValue)),
       time: '19:00',
       location: '',
       agenda: '',

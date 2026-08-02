@@ -84,6 +84,12 @@ export const paidTotalUntil = (memberId: string, endMonthInclusive: string) =>
 const monthKey = (date: Date) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
 
+export const currentCycleMonthKey = (date = new Date()) => {
+  const safeDate = Number.isNaN(date.getTime()) ? new Date() : date
+
+  return monthKey(safeDate)
+}
+
 const previousMonthKey = (date: Date) =>
   monthKey(new Date(date.getFullYear(), date.getMonth() - 1, 1))
 
@@ -179,8 +185,13 @@ export const normalizeAllocation = (allocation?: Partial<PaymentAllocation>) => 
   }
 }
 
-export const transactionsToOverrides = (transactions: TransactionRecord[]) =>
-  transactions.reduce<JulyPaymentOverride>((totals, transaction) => {
+export const transactionsToOverrides = (
+  transactions: TransactionRecord[],
+  cycleMonth = currentCycleMonthKey(),
+) =>
+  transactions
+    .filter((transaction) => transaction.date.slice(0, 7) === cycleMonth)
+    .reduce<JulyPaymentOverride>((totals, transaction) => {
     const current = totals[transaction.memberId] ?? {
       ...emptyPaymentAllocation(),
       amount: 0,
@@ -285,11 +296,17 @@ export const julyPlanForMember = (
   memberId: string,
   paymentOverrides: JulyPaymentOverride,
 ) => {
+  const cycleMonth = currentCycleMonthKey()
   const startingDebt = startingDebtForMember(memberId)
   const startingDebtBreakdown = startingDebtBreakdownForMember(memberId)
-  const debtInstallmentBreakdown = debtInstallmentBreakdownForMember(memberId)
-  const installment = debtInstallmentForMember(memberId)
-  const importedPaidBreakdown = paidBreakdownForMonth(memberId, '2026-07')
+  const isDebtInstallmentMonth = settings.debtInstallmentMonths.includes(cycleMonth)
+  const debtInstallmentBreakdown = isDebtInstallmentMonth
+    ? debtInstallmentBreakdownForMember(memberId)
+    : { utt: 0, mwekeza: 0 }
+  const installment = isDebtInstallmentMonth
+    ? debtInstallmentForMember(memberId)
+    : 0
+  const importedPaidBreakdown = paidBreakdownForMonth(memberId, cycleMonth)
   const importedPaid = importedPaidBreakdown.liquid + importedPaidBreakdown.mwekeza
   const manual = paymentOverrides[memberId] ?? {
     ...emptyPaymentAllocation(),
