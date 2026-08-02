@@ -102,6 +102,15 @@ const monthIndex = (month: string) => {
 const monthSpanInclusive = (startMonth: string, endMonth: string) =>
   Math.max(monthIndex(endMonth) - monthIndex(startMonth) + 1, 0)
 
+export const contributionMonthCountForMember = (
+  memberId: string,
+  endMonth = currentCycleMonthKey(),
+) => {
+  const firstRecord = getMemberRecords(memberId)[0]
+
+  return firstRecord ? monthSpanInclusive(firstRecord.month, endMonth) : 0
+}
+
 export const settledDebtBaseMonth = (date = new Date()) => {
   const safeDate = Number.isNaN(date.getTime()) ? new Date() : date
   const currentMonth = monthKey(safeDate)
@@ -120,10 +129,7 @@ export const startingDebtForMember = (memberId: string) => {
 export const startingDebtBreakdownForMember = (memberId: string) => {
   const debtBaseMonth = settledDebtBaseMonth()
   const records = getMemberRecords(memberId)
-  const firstRecord = records[0]
-  const monthsDue = firstRecord
-    ? monthSpanInclusive(firstRecord.month, debtBaseMonth)
-    : 0
+  const monthsDue = contributionMonthCountForMember(memberId, debtBaseMonth)
   const expectedUtt = monthsDue * settings.liquidContribution
   const expectedMwekeza = monthsDue * settings.mwekezaContribution
   const paid = records

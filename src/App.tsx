@@ -27,6 +27,7 @@ import './App.css'
 import { type FundKey, type Member, members as seedMembers, settings } from './data'
 import {
   allJulyPlans,
+  contributionMonthCountForMember,
   debtBookTotal,
   formatTzs,
   getMemberRecords,
@@ -2129,7 +2130,7 @@ function MembersView({
   const allTimeUttTotal = importedTotals.utt + manualTotals.utt
   const allTimeMwekezaTotal = importedTotals.mwekeza + manualTotals.mwekeza
   const allTimeContributionTotal = allTimeUttTotal + allTimeMwekezaTotal
-  const memberMonthCount = getMemberRecords(selectedMember.id).length
+  const memberMonthCount = contributionMonthCountForMember(selectedMember.id)
   const expectedUttTotal = memberMonthCount * settings.liquidContribution
   const expectedMwekezaTotal = memberMonthCount * settings.mwekezaContribution
   const expectedContributionTotal = expectedUttTotal + expectedMwekezaTotal
