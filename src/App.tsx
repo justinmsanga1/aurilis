@@ -2134,6 +2134,12 @@ function MembersView({
   const expectedUttTotal = memberMonthCount * settings.liquidContribution
   const expectedMwekezaTotal = memberMonthCount * settings.mwekezaContribution
   const expectedContributionTotal = expectedUttTotal + expectedMwekezaTotal
+  const currentDebtWithPenalty = Math.round(
+    selectedPlan.remainingStartingDebt *
+      Math.pow(1 + settings.penaltyRate, penaltyMonthsPassed(currentDateValue)),
+  )
+  const expectedWithDebtAndPenalty =
+    expectedContributionTotal + currentDebtWithPenalty
   const roleCount = new Set(plans.map(({ member }) => member.role)).size
 
   if (detailOpen) {
@@ -2281,6 +2287,10 @@ function MembersView({
               <div className="profile-metrics">
                 <Metric label={`Total due ${currentMonthLabel}`} value={formatTzs(selectedPlan.due)} />
                 <Metric label="Remaining" value={formatTzs(selectedPlan.remaining)} />
+                <Metric
+                  label="Expected with debt + penalty"
+                  value={formatTzs(expectedWithDebtAndPenalty)}
+                />
               </div>
             </div>
             <div className="penalty-box">
