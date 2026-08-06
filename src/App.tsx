@@ -2140,6 +2140,7 @@ function MembersView({
   )
   const expectedWithDebtAndPenalty =
     expectedContributionTotal + currentDebtWithPenalty
+  const currentCycleUnpaid = selectedPlan.normalRemaining + selectedPlan.debtInstallmentRemaining
   const roleCount = new Set(plans.map(({ member }) => member.role)).size
 
   if (detailOpen) {
@@ -2273,6 +2274,13 @@ function MembersView({
                   rightLabel="UTT / Mwekeza"
                   rightValue={`${formatTzs(selectedPlan.debtUttRemaining)} / ${formatTzs(selectedPlan.debtMwekezaRemaining)}`}
                 />
+                <MetricPair
+                  label="Current cycle unpaid"
+                  leftLabel="Contribution"
+                  leftValue={formatTzs(selectedPlan.normalRemaining)}
+                  rightLabel="Debt installment"
+                  rightValue={formatTzs(selectedPlan.debtInstallmentRemaining)}
+                />
               </div>
             </div>
             <div className="profile-section">
@@ -2286,7 +2294,7 @@ function MembersView({
               <p className="profile-section-label">Summary</p>
               <div className="profile-metrics">
                 <Metric label={`Total due ${currentMonthLabel}`} value={formatTzs(selectedPlan.due)} />
-                <Metric label="Remaining" value={formatTzs(selectedPlan.remaining)} />
+                <Metric label="Remaining" value={formatTzs(currentCycleUnpaid)} />
                 <Metric
                   label="Expected with debt + penalty"
                   value={formatTzs(expectedWithDebtAndPenalty)}
