@@ -614,9 +614,9 @@ function App() {
   )
   const calculatedFundTotals = liveFundTotals(transactions, projectInvestmentTotal)
   const fundTotals = applyBalanceAdjustments(calculatedFundTotals, balanceAdjustments)
-  const summary = julySummary(appMembers, paymentOverrides)
-  const plans = allJulyPlans(appMembers, paymentOverrides)
-  const selectedPlan = julyPlanForMember(selectedMember.id, paymentOverrides)
+  const summary = julySummary(appMembers, paymentOverrides, transactions)
+  const plans = allJulyPlans(appMembers, paymentOverrides, transactions)
+  const selectedPlan = julyPlanForMember(selectedMember.id, paymentOverrides, transactions)
   const visibleProjects = projects
   const collectionRate =
     summary.totalDue > 0 ? Math.round((summary.totalPaid / summary.totalDue) * 100) : 0
@@ -1514,10 +1514,10 @@ function App() {
             activeUser={activeUser}
             avatars={avatars}
             collectionRate={collectionRate}
-            debtTotal={debtBookTotal(appMembers)}
+            debtTotal={debtBookTotal(appMembers, transactions)}
             fundTotals={fundTotals}
             memberCount={appMembers.length}
-            personalPlan={julyPlanForMember(activeUser.id, paymentOverrides)}
+            personalPlan={julyPlanForMember(activeUser.id, paymentOverrides, transactions)}
             projectCount={projects.length}
             summary={summary}
             topDebtors={topDebtors}
@@ -1682,7 +1682,7 @@ function App() {
             avatar={avatars[activeUser.id]}
             meetings={meetings}
             user={activeUser}
-            plan={julyPlanForMember(activeUser.id, paymentOverrides)}
+            plan={julyPlanForMember(activeUser.id, paymentOverrides, transactions)}
             projects={visibleProjects}
             transactions={transactions.filter(
               (transaction) => transaction.memberId === activeUser.id,

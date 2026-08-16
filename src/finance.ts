@@ -120,19 +120,52 @@ export const settledDebtBaseMonth = (date = new Date()) => {
   return previousMonthKey(safeDate)
 }
 
-export const startingDebtForMember = (memberId: string) => {
-  const debt = startingDebtBreakdownForMember(memberId)
+export const startingDebtForMember = (
+  memberId: string,
+  transactions: TransactionRecord[] = [],
+) => {
+  const debt = startingDebtBreakdownForMember(memberId, transactions)
 
   return debt.utt + debt.mwekeza
 }
 
-export const startingDebtBreakdownForMember = (memberId: string) => {
+// Live transactions can cover months the frozen historical import (src/data.ts)
+// has no row for, e.g. the current cycle month. Without crediting them here, a
+// member who pays their normal dues in full still shows a phantom "debt"
+// installment + penalty for that month, since the import never learns about it.
+const paidFromTransactionsThrough = (
+  memberId: string,
+  endMonthInclusive: string,
+  transactions: TransactionRecord[],
+) =>
+  transactions
+    .filter(
+      (transaction) =>
+        transaction.memberId === memberId &&
+        transaction.date.slice(0, 7) <= endMonthInclusive,
+    )
+    .reduce(
+      (totals, transaction) => {
+        const allocation = normalizeAllocation(transaction.allocation)
+
+        return {
+          utt: totals.utt + allocation.liquid,
+          mwekeza: totals.mwekeza + allocation.mwekeza,
+        }
+      },
+      { utt: 0, mwekeza: 0 },
+    )
+
+export const startingDebtBreakdownForMember = (
+  memberId: string,
+  transactions: TransactionRecord[] = [],
+) => {
   const debtBaseMonth = settledDebtBaseMonth()
   const records = getMemberRecords(memberId)
   const monthsDue = contributionMonthCountForMember(memberId, debtBaseMonth)
   const expectedUtt = monthsDue * settings.liquidContribution
   const expectedMwekeza = monthsDue * settings.mwekezaContribution
-  const paid = records
+  const importedPaid = records
     .filter((record) => record.month <= debtBaseMonth)
     .reduce(
       (totals, record) => ({
@@ -141,18 +174,24 @@ export const startingDebtBreakdownForMember = (memberId: string) => {
       }),
       { utt: 0, mwekeza: 0 },
     )
+  const livePaid = paidFromTransactionsThrough(memberId, debtBaseMonth, transactions)
 
   return {
-    utt: Math.max(expectedUtt - paid.utt, 0),
-    mwekeza: Math.max(expectedMwekeza - paid.mwekeza, 0),
+    utt: Math.max(expectedUtt - importedPaid.utt - livePaid.utt, 0),
+    mwekeza: Math.max(expectedMwekeza - importedPaid.mwekeza - livePaid.mwekeza, 0),
   }
 }
 
-export const debtInstallmentForMember = (memberId: string) =>
-  startingDebtForMember(memberId) / settings.debtInstallmentMonths.length
+export const debtInstallmentForMember = (
+  memberId: string,
+  transactions: TransactionRecord[] = [],
+) => startingDebtForMember(memberId, transactions) / settings.debtInstallmentMonths.length
 
-export const debtInstallmentBreakdownForMember = (memberId: string) => {
-  const debt = startingDebtBreakdownForMember(memberId)
+export const debtInstallmentBreakdownForMember = (
+  memberId: string,
+  transactions: TransactionRecord[] = [],
+) => {
+  const debt = startingDebtBreakdownForMember(memberId, transactions)
 
   return {
     utt: debt.utt / settings.debtInstallmentMonths.length,
@@ -264,8 +303,9 @@ export const allocateJulyPayment = (
   memberId: string,
   amount: number,
   alreadyPaid: number,
+  transactions: TransactionRecord[] = [],
 ): PaymentAllocation => {
-  const plan = julyPlanForMember(memberId, {})
+  const plan = julyPlanForMember(memberId, {}, transactions)
   const dueParts = [
     { key: 'liquid' as const, amount: settings.liquidContribution },
     { key: 'mwekeza' as const, amount: settings.mwekezaContribution },
@@ -301,16 +341,17 @@ export const allocateJulyPayment = (
 export const julyPlanForMember = (
   memberId: string,
   paymentOverrides: JulyPaymentOverride,
+  transactions: TransactionRecord[] = [],
 ) => {
   const cycleMonth = currentCycleMonthKey()
-  const startingDebt = startingDebtForMember(memberId)
-  const startingDebtBreakdown = startingDebtBreakdownForMember(memberId)
+  const startingDebt = startingDebtForMember(memberId, transactions)
+  const startingDebtBreakdown = startingDebtBreakdownForMember(memberId, transactions)
   const isDebtInstallmentMonth = settings.debtInstallmentMonths.includes(cycleMonth)
   const debtInstallmentBreakdown = isDebtInstallmentMonth
-    ? debtInstallmentBreakdownForMember(memberId)
+    ? debtInstallmentBreakdownForMember(memberId, transactions)
     : { utt: 0, mwekeza: 0 }
   const installment = isDebtInstallmentMonth
-    ? debtInstallmentForMember(memberId)
+    ? debtInstallmentForMember(memberId, transactions)
     : 0
   const importedPaidBreakdown = paidBreakdownForMonth(memberId, cycleMonth)
   const importedPaid = importedPaidBreakdown.liquid + importedPaidBreakdown.mwekeza
@@ -387,17 +428,19 @@ export const julyPlanForMember = (
 export const allJulyPlans = (
   memberList: Member[],
   paymentOverrides: JulyPaymentOverride,
+  transactions: TransactionRecord[] = [],
 ) =>
   memberList.map((member) => ({
     member,
-    plan: julyPlanForMember(member.id, paymentOverrides),
+    plan: julyPlanForMember(member.id, paymentOverrides, transactions),
   }))
 
 export const julySummary = (
   memberList: Member[],
   paymentOverrides: JulyPaymentOverride,
+  transactions: TransactionRecord[] = [],
 ) => {
-  const plans = allJulyPlans(memberList, paymentOverrides)
+  const plans = allJulyPlans(memberList, paymentOverrides, transactions)
   const totalDue = plans.reduce((sum, item) => sum + item.plan.due, 0)
   const totalPaid = plans.reduce((sum, item) => sum + item.plan.paid, 0)
   const remaining = plans.reduce((sum, item) => sum + item.plan.remaining, 0)
@@ -413,5 +456,11 @@ export const julySummary = (
   }
 }
 
-export const debtBookTotal = (memberList: Member[]) =>
-  memberList.reduce((sum, member) => sum + startingDebtForMember(member.id), 0)
+export const debtBookTotal = (
+  memberList: Member[],
+  transactions: TransactionRecord[] = [],
+) =>
+  memberList.reduce(
+    (sum, member) => sum + startingDebtForMember(member.id, transactions),
+    0,
+  )
