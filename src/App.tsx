@@ -2265,10 +2265,14 @@ function MembersView({
                   {shortMonthLabelForDate(`${penaltyProjection.at(-1)?.month}-01`)}.
                 </p>
                 <div className="profile-metrics">
-                  {penaltyProjection.map((step) => (
+                  {penaltyProjection.map((step, index) => (
                     <Metric
                       key={step.month}
-                      label={`If still unpaid by ${shortMonthLabelForDate(`${step.month}-01`)}`}
+                      label={
+                        index === 0
+                          ? `This month (${shortMonthLabelForDate(`${step.month}-01`)})`
+                          : `If still unpaid by ${shortMonthLabelForDate(`${step.month}-01`)}`
+                      }
                       value={formatTzs(step.amountIfStillUnpaid)}
                     />
                   ))}

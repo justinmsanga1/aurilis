@@ -475,11 +475,16 @@ const monthAfter = (month: string) => {
 // still unpaid the following month, it takes ANOTHER 10% on top, and again
 // the month after, all the way through the month after the last debt
 // installment month (Oct 2026 -> compounding continues through Nov 2026).
+// The schedule starts with THIS cycle month (no extra compounding yet, just
+// the carryover as already computed), then compounds forward from there.
 export const compoundingPenaltyMonths = (cycleMonth = currentCycleMonthKey()) => {
   const lastInstallmentMonth =
     settings.debtInstallmentMonths[settings.debtInstallmentMonths.length - 1]
   const finalMonth = monthAfter(lastInstallmentMonth)
-  const months: string[] = []
+
+  if (cycleMonth > finalMonth) return []
+
+  const months: string[] = [cycleMonth]
   let cursor = cycleMonth
 
   while (cursor < finalMonth) {
@@ -501,5 +506,5 @@ export const compoundingPenaltyProjection = (
 ): PenaltyProjectionStep[] =>
   compoundingPenaltyMonths(cycleMonth).map((month, index) => ({
     month,
-    amountIfStillUnpaid: carryover * (1 + settings.penaltyRate) ** (index + 1),
+    amountIfStillUnpaid: carryover * (1 + settings.penaltyRate) ** index,
   }))
