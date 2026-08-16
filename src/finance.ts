@@ -129,28 +129,26 @@ export const startingDebtForMember = (
   return debt.utt + debt.mwekeza
 }
 
-// Live transactions can cover months the frozen historical import (src/data.ts)
-// has no row for, e.g. the current cycle month. Without crediting them here, a
-// member who pays their normal dues in full still shows a phantom "debt"
-// installment + penalty for that month, since the import never learns about it.
-const paidFromTransactionsThrough = (
+// Debt is "all-time expected minus all-time paid": every shilling a member has
+// ever handed over — whether recorded as a normal contribution or as a debt
+// installment, in any month, live or imported — reduces the figure. It must
+// NOT be scoped to "this cycle month" or "through the debt base month only":
+// a debt-installment payment made in July still needs to count in August,
+// September, forever, or it silently reappears as owed the moment the month
+// rolls over.
+const livePaidTotalsForMember = (
   memberId: string,
-  endMonthInclusive: string,
   transactions: TransactionRecord[],
 ) =>
   transactions
-    .filter(
-      (transaction) =>
-        transaction.memberId === memberId &&
-        transaction.date.slice(0, 7) <= endMonthInclusive,
-    )
+    .filter((transaction) => transaction.memberId === memberId)
     .reduce(
       (totals, transaction) => {
         const allocation = normalizeAllocation(transaction.allocation)
 
         return {
-          utt: totals.utt + allocation.liquid,
-          mwekeza: totals.mwekeza + allocation.mwekeza,
+          utt: totals.utt + allocation.liquid + allocation.debtUtt,
+          mwekeza: totals.mwekeza + allocation.mwekeza + allocation.debtMwekeza,
         }
       },
       { utt: 0, mwekeza: 0 },
@@ -174,7 +172,7 @@ export const startingDebtBreakdownForMember = (
       }),
       { utt: 0, mwekeza: 0 },
     )
-  const livePaid = paidFromTransactionsThrough(memberId, debtBaseMonth, transactions)
+  const livePaid = livePaidTotalsForMember(memberId, transactions)
 
   return {
     utt: Math.max(expectedUtt - importedPaid.utt - livePaid.utt, 0),
@@ -373,19 +371,14 @@ export const julyPlanForMember = (
     0,
   )
   const normalRemaining = liquidRemaining + mwekezaRemaining
-  const debtUttRemaining = Math.max(debtInstallmentBreakdown.utt - manual.debtUtt, 0)
-  const debtMwekezaRemaining = Math.max(
-    debtInstallmentBreakdown.mwekeza - manual.debtMwekeza,
-    0,
-  )
-  const remainingStartingDebtUtt = Math.max(
-    startingDebtBreakdown.utt - manual.debtUtt,
-    0,
-  )
-  const remainingStartingDebtMwekeza = Math.max(
-    startingDebtBreakdown.mwekeza - manual.debtMwekeza,
-    0,
-  )
+  // startingDebtBreakdown already nets out every debt payment the member has
+  // ever made (see livePaidTotalsForMember), including one made this cycle
+  // month, so it must NOT be reduced by manual.debtUtt/debtMwekeza again here
+  // — that would subtract the same payment twice.
+  const debtUttRemaining = debtInstallmentBreakdown.utt
+  const debtMwekezaRemaining = debtInstallmentBreakdown.mwekeza
+  const remainingStartingDebtUtt = startingDebtBreakdown.utt
+  const remainingStartingDebtMwekeza = startingDebtBreakdown.mwekeza
   const remainingStartingDebt = remainingStartingDebtUtt + remainingStartingDebtMwekeza
   const due = settings.monthlyContribution + installment
   const remaining = normalRemaining + debtUttRemaining + debtMwekezaRemaining
