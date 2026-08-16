@@ -462,3 +462,44 @@ export const debtBookTotal = (
     (sum, member) => sum + startingDebtForMember(member.id, transactions),
     0,
   )
+
+const monthAfter = (month: string) => {
+  const [year, monthNumber] = month.split('-').map(Number)
+  const nextMonthNumber = monthNumber === 12 ? 1 : monthNumber + 1
+  const nextYear = monthNumber === 12 ? year + 1 : year
+
+  return `${nextYear}-${String(nextMonthNumber).padStart(2, '0')}`
+}
+
+// An unpaid cycle shortfall (carryover) isn't a one-off 10% hit — if it's
+// still unpaid the following month, it takes ANOTHER 10% on top, and again
+// the month after, all the way through the month after the last debt
+// installment month (Oct 2026 -> compounding continues through Nov 2026).
+export const compoundingPenaltyMonths = (cycleMonth = currentCycleMonthKey()) => {
+  const lastInstallmentMonth =
+    settings.debtInstallmentMonths[settings.debtInstallmentMonths.length - 1]
+  const finalMonth = monthAfter(lastInstallmentMonth)
+  const months: string[] = []
+  let cursor = cycleMonth
+
+  while (cursor < finalMonth) {
+    cursor = monthAfter(cursor)
+    months.push(cursor)
+  }
+
+  return months
+}
+
+export type PenaltyProjectionStep = {
+  month: string
+  amountIfStillUnpaid: number
+}
+
+export const compoundingPenaltyProjection = (
+  carryover: number,
+  cycleMonth = currentCycleMonthKey(),
+): PenaltyProjectionStep[] =>
+  compoundingPenaltyMonths(cycleMonth).map((month, index) => ({
+    month,
+    amountIfStillUnpaid: carryover * (1 + settings.penaltyRate) ** (index + 1),
+  }))

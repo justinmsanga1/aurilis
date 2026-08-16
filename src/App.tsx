@@ -27,6 +27,7 @@ import './App.css'
 import { type FundKey, type Member, members as seedMembers, settings } from './data'
 import {
   allJulyPlans,
+  compoundingPenaltyProjection,
   contributionMonthCountForMember,
   debtBookTotal,
   formatTzs,
@@ -2097,6 +2098,7 @@ function MembersView({
   const expectedMwekezaTotal = memberMonthCount * settings.mwekezaContribution
   const expectedContributionTotal = expectedUttTotal + expectedMwekezaTotal
   const expectedWithDebtAndPenalty = expectedContributionTotal + selectedPlan.carryover
+  const penaltyProjection = compoundingPenaltyProjection(selectedPlan.carryover)
   const roleCount = new Set(plans.map(({ member }) => member.role)).size
 
   if (detailOpen) {
@@ -2255,6 +2257,24 @@ function MembersView({
               </span>
               <strong>{formatTzs(selectedPlan.penalty)}</strong>
             </div>
+            {selectedPlan.carryover > 0 && penaltyProjection.length > 0 ? (
+              <div className="profile-section">
+                <p className="profile-section-label">If not paid</p>
+                <p className="profile-section-hint">
+                  Each month this stays unpaid adds another 10% on top, through{' '}
+                  {shortMonthLabelForDate(`${penaltyProjection.at(-1)?.month}-01`)}.
+                </p>
+                <div className="profile-metrics">
+                  {penaltyProjection.map((step) => (
+                    <Metric
+                      key={step.month}
+                      label={`If still unpaid by ${shortMonthLabelForDate(`${step.month}-01`)}`}
+                      value={formatTzs(step.amountIfStillUnpaid)}
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : null}
             <div className="member-report-section">
               <div className="panel-title">
                 <div>

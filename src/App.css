@@ -2695,6 +2695,13 @@ textarea {
   text-transform: uppercase;
 }
 
+.profile-section-hint {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+  margin: -4px 0 12px;
+}
+
 .member-profile {
   overflow: hidden;
 }
