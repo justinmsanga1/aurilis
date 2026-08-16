@@ -381,11 +381,16 @@ export const julyPlanForMember = (
   const remainingStartingDebtMwekeza = startingDebtBreakdown.mwekeza
   const remainingStartingDebt = remainingStartingDebtUtt + remainingStartingDebtMwekeza
   const due = settings.monthlyContribution + installment
-  const remaining = normalRemaining + debtUttRemaining + debtMwekezaRemaining
   const debtInstallmentRemaining = debtUttRemaining + debtMwekezaRemaining
-  const debtPenaltyBase = remaining > 0 ? remainingStartingDebt + normalRemaining : 0
+  // Penalty applies to what's actually overdue THIS cycle — the unpaid slice
+  // of the 25% debt installment plus the unpaid normal contribution — never
+  // to the full outstanding debt book. Paying only this cycle's due amount
+  // must fully clear the penalty risk, regardless of how much debt remains
+  // for future installment months.
+  const remaining = normalRemaining + debtInstallmentRemaining
+  const debtPenaltyBase = remaining
   const penalty = debtPenaltyBase * settings.penaltyRate
-  const carryover = remaining > 0 ? remaining + penalty : 0
+  const carryover = remaining + penalty
   const status =
     remaining === 0
       ? 'Paid On Time'

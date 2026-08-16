@@ -300,18 +300,6 @@ const deadlineForDate = (dateValue: string) => {
   return new Date(safeDate.getFullYear(), safeDate.getMonth(), settings.graceDay)
 }
 
-const nextDeadlineForDate = (dateValue: string) => {
-  const deadline = deadlineForDate(dateValue)
-  const date = new Date(`${dateValue}T00:00:00`)
-  if (Number.isNaN(date.getTime())) return deadline
-
-  if (date.getTime() > deadline.getTime()) {
-    return new Date(deadline.getFullYear(), deadline.getMonth() + 1, settings.graceDay)
-  }
-
-  return deadline
-}
-
 const deadlineLabelForDate = (dateValue: string) =>
   new Intl.DateTimeFormat('en-GB', {
     day: '2-digit',
@@ -319,37 +307,11 @@ const deadlineLabelForDate = (dateValue: string) =>
     year: 'numeric',
   }).format(deadlineForDate(dateValue))
 
-const nextDeadlineLabelForDate = (dateValue: string) =>
-  new Intl.DateTimeFormat('en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  }).format(nextDeadlineForDate(dateValue))
-
 const isPastDeadline = (dateValue: string) => {
   const date = new Date(`${dateValue}T00:00:00`)
   if (Number.isNaN(date.getTime())) return false
 
   return date.getTime() > deadlineForDate(dateValue).getTime()
-}
-
-const penaltyMonthsPassed = (dateValue: string): number => {
-  const date = new Date(`${dateValue}T00:00:00`)
-  if (Number.isNaN(date.getTime())) return 0
-
-  let count = 0
-
-  for (const month of settings.debtInstallmentMonths) {
-    const deadline = new Date(`${month}-${String(settings.graceDay).padStart(2, '0')}T00:00:00`)
-
-    if (date.getTime() > deadline.getTime()) {
-      count++
-    } else {
-      break
-    }
-  }
-
-  return count
 }
 
 const monthKeyFromDateValue = (dateValue: string) => {
@@ -2134,13 +2096,7 @@ function MembersView({
   const expectedUttTotal = memberMonthCount * settings.liquidContribution
   const expectedMwekezaTotal = memberMonthCount * settings.mwekezaContribution
   const expectedContributionTotal = expectedUttTotal + expectedMwekezaTotal
-  const currentDebtWithPenalty = Math.round(
-    selectedPlan.remainingStartingDebt *
-      Math.pow(1 + settings.penaltyRate, penaltyMonthsPassed(currentDateValue)),
-  )
-  const expectedWithDebtAndPenalty =
-    expectedContributionTotal + currentDebtWithPenalty
-  const currentCycleUnpaid = selectedPlan.normalRemaining + selectedPlan.debtInstallmentRemaining
+  const expectedWithDebtAndPenalty = expectedContributionTotal + selectedPlan.carryover
   const roleCount = new Set(plans.map(({ member }) => member.role)).size
 
   if (detailOpen) {
@@ -2248,18 +2204,7 @@ function MembersView({
             <div className="profile-section">
               <p className="profile-section-label">Debt</p>
               <div className="profile-metrics">
-                <MetricPair
-                  label="Current debt"
-                  leftLabel="Without penalty"
-                  leftValue={formatTzs(selectedPlan.remainingStartingDebt)}
-                  rightLabel="With penalty"
-                  rightValue={formatTzs(
-                    Math.round(
-                      selectedPlan.remainingStartingDebt *
-                        Math.pow(1 + settings.penaltyRate, penaltyMonthsPassed(currentDateValue)),
-                    ),
-                  )}
-                />
+                <Metric label="Real debt owed" value={formatTzs(selectedPlan.remainingStartingDebt)} />
                 <MetricPair
                   label="Debt breakdown"
                   leftLabel="UTT debt"
@@ -2268,18 +2213,19 @@ function MembersView({
                   rightValue={formatTzs(selectedPlan.remainingStartingDebtMwekeza)}
                 />
                 <MetricPair
-                  label={`Debt due ${currentMonthLabel}`}
-                  leftLabel="Total"
+                  label={`Due ${currentMonthLabel}`}
+                  leftLabel="25% debt installment"
                   leftValue={formatTzs(selectedPlan.installment)}
-                  rightLabel="UTT / Mwekeza"
-                  rightValue={`${formatTzs(selectedPlan.debtUttRemaining)} / ${formatTzs(selectedPlan.debtMwekezaRemaining)}`}
+                  rightLabel="+ Normal payment"
+                  rightValue={formatTzs(selectedPlan.normalContribution)}
                 />
+                <Metric label={`Total due ${currentMonthLabel}`} value={formatTzs(selectedPlan.due)} />
                 <MetricPair
-                  label="Current cycle unpaid"
-                  leftLabel="Contribution"
-                  leftValue={formatTzs(selectedPlan.normalRemaining)}
-                  rightLabel="Debt installment"
-                  rightValue={formatTzs(selectedPlan.debtInstallmentRemaining)}
+                  label="Unpaid this cycle"
+                  leftLabel="Debt installment"
+                  leftValue={formatTzs(selectedPlan.debtInstallmentRemaining)}
+                  rightLabel="Normal contribution"
+                  rightValue={formatTzs(selectedPlan.normalRemaining)}
                 />
               </div>
             </div>
@@ -2293,8 +2239,8 @@ function MembersView({
             <div className="profile-section">
               <p className="profile-section-label">Summary</p>
               <div className="profile-metrics">
-                <Metric label={`Total due ${currentMonthLabel}`} value={formatTzs(selectedPlan.due)} />
-                <Metric label="Remaining" value={formatTzs(currentCycleUnpaid)} />
+                <Metric label="Remaining this cycle" value={formatTzs(selectedPlan.remaining)} />
+                <Metric label="Debt with penalty" value={formatTzs(selectedPlan.carryover)} />
                 <Metric
                   label="Expected with debt + penalty"
                   value={formatTzs(expectedWithDebtAndPenalty)}
@@ -2302,16 +2248,12 @@ function MembersView({
               </div>
             </div>
             <div className="penalty-box">
-              <span>Penalty if unpaid after {nextDeadlineLabelForDate(currentDateValue)}</span>
-              <strong>
-                {formatTzs(
-                  Math.round(
-                    selectedPlan.remainingStartingDebt *
-                      Math.pow(1 + settings.penaltyRate, penaltyMonthsPassed(currentDateValue)) *
-                      settings.penaltyRate,
-                  ),
-                )}
-              </strong>
+              <span>
+                {selectedPlan.remaining > 0
+                  ? '10% penalty on unpaid this cycle'
+                  : 'No penalty — fully paid this cycle'}
+              </span>
+              <strong>{formatTzs(selectedPlan.penalty)}</strong>
             </div>
             <div className="member-report-section">
               <div className="panel-title">
@@ -2558,7 +2500,7 @@ function PaymentsView({
   )
   const remainingAfterDraft = Math.max(active.plan.remaining - draftAmount, 0)
   const penaltyAfterDraft = remainingAfterDraft > 0
-    ? (Math.max(active.plan.remainingStartingDebt - draftDebtTotal, 0) +
+    ? (Math.max(active.plan.debtInstallmentRemaining - draftDebtTotal, 0) +
         Math.max(active.plan.normalRemaining - allocationPreview.liquid - allocationPreview.mwekeza, 0)) *
       settings.penaltyRate
     : 0
