@@ -27,6 +27,7 @@ import './App.css'
 import { type FundKey, type Member, members as seedMembers, settings } from './data'
 import {
   allJulyPlans,
+  allocatePaymentAmount,
   compoundingPenaltyProjection,
   contributionMonthCountForMember,
   debtBookTotal,
@@ -75,10 +76,7 @@ type MemberDraft = {
 
 type PaymentDraft = {
   memberId: string
-  liquid: string
-  mwekeza: string
-  debtUtt: string
-  debtMwekeza: string
+  amount: string
   method: PaymentMethod
   date: string
   note: string
@@ -553,10 +551,7 @@ function App() {
   >({})
   const [paymentDraft, setPaymentDraft] = useState<PaymentDraft>({
     memberId: fallbackUser.id,
-    liquid: '100000',
-    mwekeza: '20000',
-    debtUtt: '',
-    debtMwekeza: '',
+    amount: '',
     method: 'Mobile Money',
     date: todayInputValue(),
     note: `${currentMonthLabel} contribution received`,
@@ -744,20 +739,11 @@ function App() {
   const recordPayment = (event: React.FormEvent) => {
     event.preventDefault()
     if (!activeUser) return
-    const allocation = {
-      liquid: parseMoney(paymentDraft.liquid),
-      mwekeza: parseMoney(paymentDraft.mwekeza),
-      debtUtt: parseMoney(paymentDraft.debtUtt),
-      debtMwekeza: parseMoney(paymentDraft.debtMwekeza),
-      overpayment: 0,
-    }
-    const amount =
-      allocation.liquid +
-      allocation.mwekeza +
-      allocation.debtUtt +
-      allocation.debtMwekeza
+    const amount = parseMoney(paymentDraft.amount)
 
     if (!Number.isFinite(amount) || amount <= 0) return
+
+    const allocation = allocatePaymentAmount(paymentDraft.memberId, amount, transactions)
 
     const transaction: TransactionRecord = {
       id: `txn-${Date.now()}`,
@@ -767,10 +753,7 @@ function App() {
       method: paymentDraft.method,
       note: paymentDraft.note,
       recordedBy: activeUser.id,
-      allocation: {
-        ...allocation,
-        debt: allocation.debtUtt + allocation.debtMwekeza,
-      },
+      allocation,
     }
 
     setTransactions((current) => [transaction, ...current])
@@ -779,10 +762,7 @@ function App() {
     setActiveTab('members')
     setPaymentDraft((current) => ({
       ...current,
-      liquid: '',
-      mwekeza: '',
-      debtUtt: '',
-      debtMwekeza: '',
+      amount: '',
       note: `${monthLabelForDate(current.date)} contribution received`,
     }))
   }
@@ -2249,36 +2229,28 @@ function MembersView({
                 />
               </div>
             </div>
-            <div className="penalty-box">
-              <span>
-                {selectedPlan.remaining > 0
-                  ? '10% penalty on unpaid this cycle'
-                  : 'No penalty — fully paid this cycle'}
-              </span>
-              <strong>{formatTzs(selectedPlan.penalty)}</strong>
+            <div className="penalty-card">
+              <p className="penalty-card-label">Penalty</p>
+              {selectedPlan.penaltyRemaining > 0 ? (
+                <>
+                  <div className="penalty-card-row">
+                    <span>Penalty this cycle</span>
+                    <strong>{formatTzs(selectedPlan.penaltyRemaining)}</strong>
+                  </div>
+                  {penaltyProjection.length > 1 ? (
+                    <div className="penalty-card-row muted">
+                      <span>
+                        Total owed if still unpaid by{' '}
+                        {shortMonthLabelForDate(`${penaltyProjection[1].month}-01`)}
+                      </span>
+                      <strong>{formatTzs(penaltyProjection[1].amountIfStillUnpaid)}</strong>
+                    </div>
+                  ) : null}
+                </>
+              ) : (
+                <p className="penalty-card-clear">No penalty — fully paid this cycle</p>
+              )}
             </div>
-            {selectedPlan.carryover > 0 && penaltyProjection.length > 0 ? (
-              <div className="profile-section">
-                <p className="profile-section-label">If not paid</p>
-                <p className="profile-section-hint">
-                  Each month this stays unpaid adds another 10% on top, through{' '}
-                  {shortMonthLabelForDate(`${penaltyProjection.at(-1)?.month}-01`)}.
-                </p>
-                <div className="profile-metrics">
-                  {penaltyProjection.map((step, index) => (
-                    <Metric
-                      key={step.month}
-                      label={
-                        index === 0
-                          ? `This month (${shortMonthLabelForDate(`${step.month}-01`)})`
-                          : `If still unpaid by ${shortMonthLabelForDate(`${step.month}-01`)}`
-                      }
-                      value={formatTzs(step.amountIfStillUnpaid)}
-                    />
-                  ))}
-                </div>
-              </div>
-            ) : null}
             <div className="member-report-section">
               <div className="panel-title">
                 <div>
@@ -2506,55 +2478,27 @@ function PaymentsView({
 }) {
   const active = plans.find((item) => item.member.id === draft.memberId) ?? plans[0]
   const selectedMonthLabel = monthLabelForDate(draft.date)
-  const allocationPreview = {
-    liquid: parseMoney(draft.liquid),
-    mwekeza: parseMoney(draft.mwekeza),
-    debtUtt: parseMoney(draft.debtUtt),
-    debtMwekeza: parseMoney(draft.debtMwekeza),
-    overpayment: 0,
-  }
-  const draftAmount =
-    allocationPreview.liquid +
-    allocationPreview.mwekeza +
-    allocationPreview.debtUtt +
-    allocationPreview.debtMwekeza
-  const draftDebtTotal = allocationPreview.debtUtt + allocationPreview.debtMwekeza
+  const draftAmount = parseMoney(draft.amount)
+  // Live preview: exactly how this single amount would be split if recorded
+  // right now, in the fixed order penalty -> debt UTT -> debt Mwekeza ->
+  // Mwekeza -> UTT.
+  const allocationPreview = allocatePaymentAmount(active.member.id, draftAmount, transactions)
   const memberTransactions = transactions.filter(
     (transaction) => transaction.memberId === active.member.id,
   )
-  const remainingAfterDraft = Math.max(active.plan.remaining - draftAmount, 0)
-  const penaltyAfterDraft = remainingAfterDraft > 0
-    ? (Math.max(active.plan.debtInstallmentRemaining - draftDebtTotal, 0) +
-        Math.max(active.plan.normalRemaining - allocationPreview.liquid - allocationPreview.mwekeza, 0)) *
-      settings.penaltyRate
-    : 0
+  const principalCovered =
+    allocationPreview.debtUtt +
+    allocationPreview.debtMwekeza +
+    allocationPreview.mwekeza +
+    allocationPreview.liquid
+  const remainingAfterDraft = Math.max(active.plan.remaining - principalCovered, 0)
+  const penaltyAfterDraft = Math.max(active.plan.penaltyRemaining - allocationPreview.penalty, 0)
   const paymentDateIsLate = isPastDeadline(draft.date)
-  const setBuckets = (values: Partial<PaymentDraft>) => {
-    onDraft((current) => ({ ...current, ...values }))
-  }
   const setFullDue = () => {
-    setBuckets({
-      liquid: Math.round(active.plan.liquidRemaining).toString(),
-      mwekeza: Math.round(active.plan.mwekezaRemaining).toString(),
-      debtUtt: Math.round(active.plan.debtUttRemaining).toString(),
-      debtMwekeza: Math.round(active.plan.debtMwekezaRemaining).toString(),
-    })
-  }
-  const setNormalOnly = () => {
-    setBuckets({
-      liquid: Math.round(active.plan.liquidRemaining).toString(),
-      mwekeza: Math.round(active.plan.mwekezaRemaining).toString(),
-      debtUtt: '',
-      debtMwekeza: '',
-    })
-  }
-  const setDebtOnly = () => {
-    setBuckets({
-      liquid: '',
-      mwekeza: '',
-      debtUtt: Math.round(active.plan.debtUttRemaining).toString(),
-      debtMwekeza: Math.round(active.plan.debtMwekezaRemaining).toString(),
-    })
+    onDraft((current) => ({
+      ...current,
+      amount: Math.round(active.plan.carryover).toString(),
+    }))
   }
 
   return (
@@ -2587,14 +2531,12 @@ function PaymentsView({
         </label>
 
         <article className="payment-breakdown-card">
-          <div className="payment-breakdown-row">
-            <span>UTT due {selectedMonthLabel}</span>
-            <strong>{formatTzs(settings.liquidContribution)}</strong>
-          </div>
-          <div className="payment-breakdown-row">
-            <span>Mwekeza due {selectedMonthLabel}</span>
-            <strong>{formatTzs(settings.mwekezaContribution)}</strong>
-          </div>
+          {active.plan.penaltyRemaining > 0 ? (
+            <div className="payment-breakdown-row penalty-row">
+              <span>Penalty owed</span>
+              <strong>{formatTzs(active.plan.penaltyRemaining)}</strong>
+            </div>
+          ) : null}
           <div className="payment-breakdown-row">
             <span>UTT debt remaining</span>
             <strong>{formatTzs(active.plan.debtUttRemaining)}</strong>
@@ -2603,50 +2545,40 @@ function PaymentsView({
             <span>Mwekeza debt remaining</span>
             <strong>{formatTzs(active.plan.debtMwekezaRemaining)}</strong>
           </div>
+          <div className="payment-breakdown-row">
+            <span>Mwekeza due {selectedMonthLabel}</span>
+            <strong>{formatTzs(settings.mwekezaContribution)}</strong>
+          </div>
+          <div className="payment-breakdown-row">
+            <span>UTT due {selectedMonthLabel}</span>
+            <strong>{formatTzs(settings.liquidContribution)}</strong>
+          </div>
           <div className="payment-breakdown-total">
-            <span>Total due {selectedMonthLabel}</span>
-            <strong>{formatTzs(active.plan.due)}</strong>
+            <span>Total to fully clear</span>
+            <strong>{formatTzs(active.plan.carryover)}</strong>
           </div>
         </article>
 
         <div className="amount-chip-row">
           <button disabled={!canRecord} onClick={setFullDue} type="button">
-            Full due
-          </button>
-          <button disabled={!canRecord} onClick={setNormalOnly} type="button">
-            Normal
-          </button>
-          <button disabled={!canRecord} onClick={setDebtOnly} type="button">
-            Debt
+            Pay in full
           </button>
         </div>
 
-        <div className="payment-entry-grid">
-          {[
-            ['UTT record', 'liquid'],
-            ['Mwekeza record', 'mwekeza'],
-            ['Debt UTT', 'debtUtt'],
-            ['Debt Mwekeza', 'debtMwekeza'],
-          ].map(([label, key]) => (
-            <label className="amount-entry-card compact" key={key}>
-              <span>{label}</span>
-              <div>
-                <small>TZS</small>
-                <input
-                  inputMode="numeric"
-                  readOnly={!canRecord}
-                  value={draft[key as keyof Pick<PaymentDraft, 'liquid' | 'mwekeza' | 'debtUtt' | 'debtMwekeza'>]}
-                  onChange={(event) =>
-                    onDraft((current) => ({
-                      ...current,
-                      [key]: event.target.value,
-                    }))
-                  }
-                />
-              </div>
-            </label>
-          ))}
-        </div>
+        <label className="amount-entry-card">
+          <span>Amount received</span>
+          <div>
+            <small>TZS</small>
+            <input
+              inputMode="numeric"
+              readOnly={!canRecord}
+              value={draft.amount}
+              onChange={(event) =>
+                onDraft((current) => ({ ...current, amount: event.target.value }))
+              }
+            />
+          </div>
+        </label>
 
         <label className="payment-date-card">
           <div>
@@ -2697,17 +2629,19 @@ function PaymentsView({
           <ShieldCheck size={18} />
           <span>
             Remaining after this payment: {formatTzs(remainingAfterDraft)}
-            {paymentDateIsLate && penaltyAfterDraft > 0
-              ? ` / penalty ${formatTzs(penaltyAfterDraft)}`
-              : ''}
+            {penaltyAfterDraft > 0 ? ` / penalty still owed ${formatTzs(penaltyAfterDraft)}` : ''}
           </span>
         </div>
 
         <div className="payment-allocation-strip">
-          <Metric label="UTT" value={formatTzs(allocationPreview.liquid)} />
-          <Metric label="Mwekeza" value={formatTzs(allocationPreview.mwekeza)} />
+          <Metric label="Penalty" value={formatTzs(allocationPreview.penalty)} />
           <Metric label="Debt UTT" value={formatTzs(allocationPreview.debtUtt)} />
           <Metric label="Debt Mwekeza" value={formatTzs(allocationPreview.debtMwekeza)} />
+          <Metric label="Mwekeza" value={formatTzs(allocationPreview.mwekeza)} />
+          <Metric label="UTT" value={formatTzs(allocationPreview.liquid)} />
+          {allocationPreview.overpayment > 0 ? (
+            <Metric label="Overpayment" value={formatTzs(allocationPreview.overpayment)} />
+          ) : null}
         </div>
 
         {canRecord ? (
@@ -2748,10 +2682,13 @@ function PaymentsView({
                   <div>
                     <b>{formatTzs(transaction.amount)}</b>
                     <small>
-                      UTT {formatTzs(transaction.allocation.liquid)} / MW{' '}
-                      {formatTzs(transaction.allocation.mwekeza)} / Debt UTT{' '}
-                      {formatTzs(normalizeAllocation(transaction.allocation).debtUtt)} / Debt MW{' '}
-                      {formatTzs(normalizeAllocation(transaction.allocation).debtMwekeza)}
+                      {normalizeAllocation(transaction.allocation).penalty > 0
+                        ? `Penalty ${formatTzs(normalizeAllocation(transaction.allocation).penalty)} / `
+                        : ''}
+                      Debt UTT {formatTzs(normalizeAllocation(transaction.allocation).debtUtt)} / Debt MW{' '}
+                      {formatTzs(normalizeAllocation(transaction.allocation).debtMwekeza)} / MW{' '}
+                      {formatTzs(transaction.allocation.mwekeza)} / UTT{' '}
+                      {formatTzs(transaction.allocation.liquid)}
                     </small>
                   </div>
                   {canRecord ? (

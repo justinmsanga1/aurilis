@@ -1247,6 +1247,11 @@ textarea {
   padding-top: 14px;
 }
 
+.payment-breakdown-row.penalty-row span,
+.payment-breakdown-row.penalty-row strong {
+  color: #9a3412;
+}
+
 .payment-breakdown-total span,
 .payment-breakdown-total strong {
   color: #031f14;
@@ -1412,21 +1417,6 @@ textarea {
   display: grid;
   gap: 8px;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-.payment-entry-grid {
-  display: grid;
-  gap: 10px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.amount-entry-card.compact {
-  min-width: 0;
-}
-
-.amount-entry-card.compact input {
-  min-width: 0;
-  width: 100%;
 }
 
 .payment-date-card small {
@@ -2695,13 +2685,6 @@ textarea {
   text-transform: uppercase;
 }
 
-.profile-section-hint {
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.4;
-  margin: -4px 0 12px;
-}
-
 .member-profile {
   overflow: hidden;
 }
@@ -3217,6 +3200,60 @@ textarea {
 .penalty-box strong,
 .login-chip strong {
   color: #9a3412;
+}
+
+.penalty-card {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  margin-top: 16px;
+  padding: 14px 16px;
+}
+
+.penalty-card-label {
+  color: #9a3412;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.penalty-card-row {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+
+.penalty-card-row + .penalty-card-row {
+  border-top: 1px dashed #fed7aa;
+}
+
+.penalty-card-row span {
+  color: #9a3412;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.penalty-card-row strong {
+  color: #7c2d12;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.penalty-card-row.muted span,
+.penalty-card-row.muted strong {
+  color: #b45309;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.penalty-card-clear {
+  color: #166534;
+  font-size: 13px;
+  font-weight: 800;
+  margin: 0;
 }
 
 .timeline-row {
@@ -4796,7 +4833,6 @@ textarea:focus {
 
   .members-roster-summary,
   .profile-stat-grid,
-  .payment-entry-grid,
   .payment-allocation-strip {
     grid-template-columns: 1fr;
   }
@@ -4958,7 +4994,6 @@ body,
     text-align: right;
   }
 
-  .payment-entry-grid,
   .payment-allocation-strip {
     grid-template-columns: 1fr;
   }

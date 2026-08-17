@@ -6,6 +6,7 @@ export type PaymentAllocation = {
   debt: number
   debtUtt: number
   debtMwekeza: number
+  penalty: number
   overpayment: number
 }
 
@@ -210,6 +211,7 @@ export const emptyPaymentAllocation = (): PaymentAllocation => ({
   debt: 0,
   debtUtt: 0,
   debtMwekeza: 0,
+  penalty: 0,
   overpayment: 0,
 })
 
@@ -224,6 +226,7 @@ export const normalizeAllocation = (allocation?: Partial<PaymentAllocation>) => 
     debt: debtUtt + debtMwekeza,
     debtUtt,
     debtMwekeza,
+    penalty: allocation?.penalty ?? 0,
     overpayment: allocation?.overpayment ?? 0,
   }
 }
@@ -248,6 +251,7 @@ export const transactionsToOverrides = (
       debt: current.debt + allocation.debt,
       debtUtt: current.debtUtt + allocation.debtUtt,
       debtMwekeza: current.debtMwekeza + allocation.debtMwekeza,
+      penalty: current.penalty + allocation.penalty,
       overpayment: current.overpayment + allocation.overpayment,
     }
     return totals
@@ -264,6 +268,7 @@ export const transactionTotals = (transactions: TransactionRecord[]) =>
         debt: totals.debt + allocation.debt,
         debtUtt: totals.debtUtt + allocation.debtUtt,
         debtMwekeza: totals.debtMwekeza + allocation.debtMwekeza,
+        penalty: totals.penalty + allocation.penalty,
         overpayment: totals.overpayment + allocation.overpayment,
         combined: totals.combined + transaction.amount,
       }
@@ -274,6 +279,7 @@ export const transactionTotals = (transactions: TransactionRecord[]) =>
       debt: 0,
       debtUtt: 0,
       debtMwekeza: 0,
+      penalty: 0,
       overpayment: 0,
       combined: 0,
     },
@@ -285,7 +291,10 @@ export const liveFundTotals = (
 ) => {
   const base = historicalTotals()
   const added = transactionTotals(transactions)
-  const liquidBeforeProjects = base.liquid + added.liquid + added.debtUtt + added.overpayment
+  // Penalty money isn't earmarked for either contribution fund — like an
+  // overpayment, it lands in the liquid/UTT pool as group income.
+  const liquidBeforeProjects =
+    base.liquid + added.liquid + added.debtUtt + added.overpayment + added.penalty
 
   return {
     liquid: Math.max(liquidBeforeProjects - projectInvestmentTotal, 0),
@@ -293,38 +302,37 @@ export const liveFundTotals = (
     combined: Math.max(base.combined + added.combined - projectInvestmentTotal, 0),
     julyCashAdded: added.combined,
     debtRecovered: added.debt,
+    penaltyCollected: added.penalty,
     projectInvestmentTotal,
   }
 }
 
-export const allocateJulyPayment = (
+// A cashier enters ONE amount for a member; this decides where it goes.
+// Fixed priority, always in this order: penalty first, then debt (UTT slice
+// before Mwekeza slice), then this cycle's normal contribution (Mwekeza
+// before UTT). Whatever's left over past a fully-cleared cycle becomes
+// overpayment. The plan is built from the member's REAL current-cycle
+// overrides (not empty) so it already reflects any earlier payment made
+// this cycle before this one.
+export const allocatePaymentAmount = (
   memberId: string,
   amount: number,
-  alreadyPaid: number,
   transactions: TransactionRecord[] = [],
 ): PaymentAllocation => {
-  const plan = julyPlanForMember(memberId, {}, transactions)
-  const dueParts = [
-    { key: 'liquid' as const, amount: settings.liquidContribution },
-    { key: 'mwekeza' as const, amount: settings.mwekezaContribution },
-    { key: 'debt' as const, amount: plan.installment },
+  const paymentOverrides = transactionsToOverrides(transactions)
+  const plan = julyPlanForMember(memberId, paymentOverrides, transactions)
+  const dueParts: Array<{ key: 'penalty' | 'debtUtt' | 'debtMwekeza' | 'mwekeza' | 'liquid'; amount: number }> = [
+    { key: 'penalty', amount: plan.penaltyRemaining },
+    { key: 'debtUtt', amount: plan.debtUttRemaining },
+    { key: 'debtMwekeza', amount: plan.debtMwekezaRemaining },
+    { key: 'mwekeza', amount: plan.mwekezaRemaining },
+    { key: 'liquid', amount: plan.liquidRemaining },
   ]
-  const allocation: PaymentAllocation = {
-    liquid: 0,
-    mwekeza: 0,
-    debt: 0,
-    debtUtt: 0,
-    debtMwekeza: 0,
-    overpayment: 0,
-  }
-  let cursor = alreadyPaid
+  const allocation = emptyPaymentAllocation()
   let remaining = amount
 
   for (const part of dueParts) {
-    const alreadyCovered = Math.min(cursor, part.amount)
-    cursor = Math.max(cursor - part.amount, 0)
-    const partRemaining = Math.max(part.amount - alreadyCovered, 0)
-    const applied = Math.min(partRemaining, remaining)
+    const applied = Math.min(part.amount, remaining)
     allocation[part.key] += applied
     remaining -= applied
 
@@ -332,7 +340,7 @@ export const allocateJulyPayment = (
   }
 
   allocation.overpayment = Math.max(remaining, 0)
-  allocation.debtUtt = allocation.debt
+  allocation.debt = allocation.debtUtt + allocation.debtMwekeza
   return allocation
 }
 
@@ -361,7 +369,8 @@ export const julyPlanForMember = (
   const normalContributionPaid =
     importedPaid + manual.liquid + manual.mwekeza + manual.overpayment
   const debtPaid = manual.debtUtt + manual.debtMwekeza
-  const paid = normalContributionPaid + debtPaid
+  const penaltyPaid = manual.penalty
+  const paid = normalContributionPaid + debtPaid + penaltyPaid
   const liquidRemaining = Math.max(
     settings.liquidContribution - importedPaidBreakdown.liquid - manual.liquid,
     0,
@@ -390,7 +399,11 @@ export const julyPlanForMember = (
   const remaining = normalRemaining + debtInstallmentRemaining
   const debtPenaltyBase = remaining
   const penalty = debtPenaltyBase * settings.penaltyRate
-  const carryover = remaining + penalty
+  // penaltyPaid is a real payable bucket now (allocation.penalty), so the
+  // penalty owed for this cycle nets out whatever's already been paid toward
+  // it, same as debt/normal contribution do.
+  const penaltyRemaining = Math.max(penalty - penaltyPaid, 0)
+  const carryover = remaining + penaltyRemaining
   const status =
     remaining === 0
       ? 'Paid On Time'
@@ -418,6 +431,8 @@ export const julyPlanForMember = (
     debtInstallmentRemaining,
     debtPenaltyBase,
     penalty,
+    penaltyPaid,
+    penaltyRemaining,
     carryover,
     status,
   }
