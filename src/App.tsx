@@ -28,8 +28,8 @@ import { type FundKey, type Member, members as seedMembers, settings } from './d
 import {
   allJulyPlans,
   allocatePaymentAmount,
-  compoundingPenaltyProjection,
   contributionMonthCountForMember,
+  currentCycleMonthKey,
   debtBookTotal,
   formatTzs,
   getMemberRecords,
@@ -39,6 +39,8 @@ import {
   julySummary,
   liveFundTotals,
   normalizeAllocation,
+  penaltyPlansForMonth,
+  penaltyReviewMonths,
   transactionTotals,
   transactionsToOverrides,
   type PaymentMethod,
@@ -50,6 +52,7 @@ type Tab =
   | 'dashboard'
   | 'members'
   | 'payments'
+  | 'penalty'
   | 'funds'
   | 'projects'
   | 'reports'
@@ -1456,10 +1459,12 @@ function App() {
           <Dashboard
             activeUser={activeUser}
             avatars={avatars}
+            canRecord={canRecordPayments}
             collectionRate={collectionRate}
             debtTotal={debtBookTotal(appMembers, transactions)}
             fundTotals={fundTotals}
             memberCount={appMembers.length}
+            onOpenPenalty={() => setActiveTab('penalty')}
             personalPlan={julyPlanForMember(activeUser.id, paymentOverrides, transactions)}
             projectCount={projects.length}
             summary={summary}
@@ -1469,6 +1474,20 @@ function App() {
               setMemberDetailOpen(true)
               setActiveTab('members')
             }}
+          />
+        ) : null}
+
+        {activeTab === 'penalty' && canRecordPayments ? (
+          <PenaltyView
+            avatars={avatars}
+            members={appMembers}
+            onBack={() => setActiveTab('dashboard')}
+            onOpenMember={(memberId) => {
+              setSelectedMemberId(memberId)
+              setMemberDetailOpen(true)
+              setActiveTab('members')
+            }}
+            transactions={transactions}
           />
         ) : null}
 
@@ -1724,10 +1743,12 @@ function App() {
 function Dashboard({
   activeUser,
   avatars,
+  canRecord,
   collectionRate,
   debtTotal,
   fundTotals,
   memberCount,
+  onOpenPenalty,
   personalPlan,
   projectCount,
   summary,
@@ -1736,10 +1757,12 @@ function Dashboard({
 }: {
   activeUser: Member
   avatars: AvatarMap
+  canRecord: boolean
   collectionRate: number
   debtTotal: number
   fundTotals: ReturnType<typeof historicalTotals>
   memberCount: number
+  onOpenPenalty: () => void
   personalPlan: ReturnType<typeof julyPlanForMember>
   projectCount: number
   summary: ReturnType<typeof julySummary>
@@ -2000,6 +2023,125 @@ function Dashboard({
           ))}
         </div>
       </article>
+
+      {canRecord ? (
+        <button
+          className="bento-card insight-panel debt-insight-card penalty-bento-card"
+          onClick={onOpenPenalty}
+          type="button"
+        >
+          <div className="panel-title">
+            <div>
+              <p className="eyebrow">Penalty</p>
+              <h2>{formatTzs(summary.penaltyAtRisk)}</h2>
+            </div>
+            <ShieldCheck size={20} />
+          </div>
+          <p>
+            {summary.membersAtRisk} member{summary.membersAtRisk === 1 ? '' : 's'} at risk
+            this cycle. Tap to see every member and filter by month.
+          </p>
+          <span className="penalty-bento-cta">
+            View all members <ChevronRight size={16} />
+          </span>
+        </button>
+      ) : null}
+    </section>
+  )
+}
+
+function PenaltyView({
+  avatars,
+  members,
+  onBack,
+  onOpenMember,
+  transactions,
+}: {
+  avatars: AvatarMap
+  members: Member[]
+  onBack: () => void
+  onOpenMember: (memberId: string) => void
+  transactions: TransactionRecord[]
+}) {
+  const months = penaltyReviewMonths()
+  const currentMonth = currentCycleMonthKey()
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth)
+  const rows = penaltyPlansForMonth(members, transactions, selectedMonth)
+    .slice()
+    .sort((a, b) => b.plan.penaltyRemaining - a.plan.penaltyRemaining)
+  const totalPenalty = rows.reduce((sum, { plan }) => sum + plan.penaltyRemaining, 0)
+  const atRiskCount = rows.filter(({ plan }) => plan.penaltyRemaining > 0).length
+  const selectedMonthLabel = shortMonthLabelForDate(`${selectedMonth}-01`)
+  const isFutureMonth = selectedMonth > currentMonth
+  const isPastMonth = selectedMonth < currentMonth
+
+  return (
+    <section className="penalty-review-layout">
+      <button className="ghost-button back-button" onClick={onBack} type="button">
+        <ArrowLeft size={18} />
+        Dashboard
+      </button>
+
+      <article className="panel penalty-review-card">
+        <div className="panel-title">
+          <div>
+            <p className="eyebrow">Penalty stats</p>
+            <h2>{selectedMonthLabel}</h2>
+          </div>
+          <ShieldCheck size={20} />
+        </div>
+
+        <div className="month-filter-row">
+          {months.map((month) => (
+            <button
+              className={month === selectedMonth ? 'active' : ''}
+              key={month}
+              onClick={() => setSelectedMonth(month)}
+              type="button"
+            >
+              {shortMonthLabelForDate(`${month}-01`)}
+            </button>
+          ))}
+        </div>
+
+        {isFutureMonth ? (
+          <p className="penalty-review-note">
+            Projected: assumes no further payments happen between now and{' '}
+            {selectedMonthLabel}.
+          </p>
+        ) : isPastMonth ? (
+          <p className="penalty-review-note">
+            Historical: reconstructed from transactions actually recorded by{' '}
+            {selectedMonthLabel}.
+          </p>
+        ) : null}
+
+        <div className="penalty-review-summary">
+          <Metric label="Total penalty" value={formatTzs(totalPenalty)} />
+          <Metric label="Members at risk" value={`${atRiskCount} / ${rows.length}`} />
+        </div>
+
+        <div className="penalty-review-list">
+          {rows.map(({ member, plan }) => (
+            <button
+              className="member-row penalty-review-row"
+              key={member.id}
+              onClick={() => onOpenMember(member.id)}
+              type="button"
+            >
+              <Avatar avatar={avatars[member.id]} memberName={member.fullName} size="small" />
+              <div>
+                <strong>{member.fullName}</strong>
+                <span>{plan.status}</span>
+              </div>
+              <b className={plan.penaltyRemaining > 0 ? 'risk-hot' : 'risk-clear'}>
+                {formatTzs(plan.penaltyRemaining)}
+              </b>
+              <ChevronRight size={18} />
+            </button>
+          ))}
+        </div>
+      </article>
     </section>
   )
 }
@@ -2078,7 +2220,15 @@ function MembersView({
   const expectedMwekezaTotal = memberMonthCount * settings.mwekezaContribution
   const expectedContributionTotal = expectedUttTotal + expectedMwekezaTotal
   const expectedWithDebtAndPenalty = expectedContributionTotal + selectedPlan.carryover
-  const penaltyProjection = compoundingPenaltyProjection(selectedPlan.carryover)
+  const reviewMonths = penaltyReviewMonths()
+  const currentReviewMonthIndex = reviewMonths.indexOf(currentCycleMonthKey())
+  const nextReviewMonth =
+    currentReviewMonthIndex >= 0 ? reviewMonths[currentReviewMonthIndex + 1] : undefined
+  const nextMonthPlan = nextReviewMonth
+    ? penaltyPlansForMonth([selectedMember], transactions, nextReviewMonth).find(
+        (item) => item.member.id === selectedMember.id,
+      )?.plan
+    : undefined
   const roleCount = new Set(plans.map(({ member }) => member.role)).size
 
   if (detailOpen) {
@@ -2237,13 +2387,13 @@ function MembersView({
                     <span>Penalty this cycle</span>
                     <strong>{formatTzs(selectedPlan.penaltyRemaining)}</strong>
                   </div>
-                  {penaltyProjection.length > 1 ? (
+                  {nextReviewMonth && nextMonthPlan ? (
                     <div className="penalty-card-row muted">
                       <span>
                         Total owed if still unpaid by{' '}
-                        {shortMonthLabelForDate(`${penaltyProjection[1].month}-01`)}
+                        {shortMonthLabelForDate(`${nextReviewMonth}-01`)}
                       </span>
-                      <strong>{formatTzs(penaltyProjection[1].amountIfStillUnpaid)}</strong>
+                      <strong>{formatTzs(nextMonthPlan.carryover)}</strong>
                     </div>
                   ) : null}
                 </>

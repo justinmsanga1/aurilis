@@ -424,6 +424,7 @@ textarea {
 .profile-page,
 .members-directory,
 .member-detail-layout,
+.penalty-review-layout,
 .content-layout,
 .assistant-layout,
 .chat-layout {
@@ -2641,8 +2642,61 @@ textarea {
   background: #f2b705;
 }
 
-.member-detail-layout {
+.member-detail-layout,
+.penalty-review-layout {
   max-width: 960px;
+}
+
+.month-filter-row {
+  display: flex;
+  gap: 8px;
+  margin: 4px 0 6px;
+  overflow-x: auto;
+  padding: 2px 0;
+}
+
+.month-filter-row button {
+  background: #e5e7eb;
+  border: 0;
+  border-radius: 999px;
+  color: var(--muted);
+  cursor: pointer;
+  flex: 0 0 auto;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 900;
+  min-height: 38px;
+  padding: 0 16px;
+}
+
+.month-filter-row button.active {
+  background: #031f14;
+  box-shadow: 0 8px 18px rgba(3, 31, 20, 0.18);
+  color: #fff;
+}
+
+.penalty-review-note {
+  color: var(--muted);
+  font-size: 12px;
+  font-style: italic;
+  margin: 0 0 14px;
+}
+
+.penalty-review-summary {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 18px;
+}
+
+.penalty-review-list {
+  display: grid;
+  gap: 10px;
+}
+
+.penalty-review-row b {
+  font-size: 14px;
+  font-weight: 900;
 }
 
 .member-detail-card {
@@ -5193,6 +5247,51 @@ body,
 
 .debt-book-bento-card p {
   color: rgba(255, 255, 255, 0.76);
+}
+
+.penalty-bento-card {
+  background: linear-gradient(145deg, #fff7ed, #fef3e2 62%, #fde8c8);
+  border: 1px solid #fed7aa;
+  cursor: pointer;
+  display: block;
+  font: inherit;
+  text-align: left;
+  width: 100%;
+}
+
+.penalty-bento-card .eyebrow {
+  color: #9a3412;
+}
+
+.penalty-bento-card h2 {
+  color: #7c2d12;
+}
+
+.penalty-bento-card .panel-title svg {
+  background: #fde8c8;
+  border-radius: 16px;
+  box-shadow: var(--shadow-pressed);
+  color: #9a3412;
+  height: 42px;
+  padding: 10px;
+  width: 42px;
+}
+
+.penalty-bento-card p {
+  color: #9a3412;
+  font-size: 13px;
+  font-weight: 700;
+  margin: 10px 0 0;
+}
+
+.penalty-bento-cta {
+  align-items: center;
+  color: #7c2d12;
+  display: flex;
+  font-size: 13px;
+  font-weight: 900;
+  gap: 4px;
+  margin-top: 14px;
 }
 
 .debt-book-visual {

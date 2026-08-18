@@ -85,6 +85,9 @@ export const paidTotalUntil = (memberId: string, endMonthInclusive: string) =>
 const monthKey = (date: Date) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
 
+const dateKey = (date: Date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+
 export const currentCycleMonthKey = (date = new Date()) => {
   const safeDate = Number.isNaN(date.getTime()) ? new Date() : date
 
@@ -124,8 +127,9 @@ export const settledDebtBaseMonth = (date = new Date()) => {
 export const startingDebtForMember = (
   memberId: string,
   transactions: TransactionRecord[] = [],
+  asOfDate: Date = new Date(),
 ) => {
-  const debt = startingDebtBreakdownForMember(memberId, transactions)
+  const debt = startingDebtBreakdownForMember(memberId, transactions, asOfDate)
 
   return debt.utt + debt.mwekeza
 }
@@ -136,13 +140,18 @@ export const startingDebtForMember = (
 // NOT be scoped to "this cycle month" or "through the debt base month only":
 // a debt-installment payment made in July still needs to count in August,
 // September, forever, or it silently reappears as owed the moment the month
-// rolls over.
+// rolls over. When viewing a past or future month (asOfDate), only count
+// payments that had actually happened by then — a payment made after the
+// viewed date can't reduce a snapshot of an earlier point in time.
 const livePaidTotalsForMember = (
   memberId: string,
   transactions: TransactionRecord[],
-) =>
-  transactions
-    .filter((transaction) => transaction.memberId === memberId)
+  asOfDate: Date,
+) => {
+  const cutoff = dateKey(asOfDate)
+
+  return transactions
+    .filter((transaction) => transaction.memberId === memberId && transaction.date <= cutoff)
     .reduce(
       (totals, transaction) => {
         const allocation = normalizeAllocation(transaction.allocation)
@@ -154,12 +163,14 @@ const livePaidTotalsForMember = (
       },
       { utt: 0, mwekeza: 0 },
     )
+}
 
 export const startingDebtBreakdownForMember = (
   memberId: string,
   transactions: TransactionRecord[] = [],
+  asOfDate: Date = new Date(),
 ) => {
-  const debtBaseMonth = settledDebtBaseMonth()
+  const debtBaseMonth = settledDebtBaseMonth(asOfDate)
   const records = getMemberRecords(memberId)
   const monthsDue = contributionMonthCountForMember(memberId, debtBaseMonth)
   const expectedUtt = monthsDue * settings.liquidContribution
@@ -173,7 +184,7 @@ export const startingDebtBreakdownForMember = (
       }),
       { utt: 0, mwekeza: 0 },
     )
-  const livePaid = livePaidTotalsForMember(memberId, transactions)
+  const livePaid = livePaidTotalsForMember(memberId, transactions, asOfDate)
 
   return {
     utt: Math.max(expectedUtt - importedPaid.utt - livePaid.utt, 0),
@@ -184,13 +195,17 @@ export const startingDebtBreakdownForMember = (
 export const debtInstallmentForMember = (
   memberId: string,
   transactions: TransactionRecord[] = [],
-) => startingDebtForMember(memberId, transactions) / settings.debtInstallmentMonths.length
+  asOfDate: Date = new Date(),
+) =>
+  startingDebtForMember(memberId, transactions, asOfDate) /
+  settings.debtInstallmentMonths.length
 
 export const debtInstallmentBreakdownForMember = (
   memberId: string,
   transactions: TransactionRecord[] = [],
+  asOfDate: Date = new Date(),
 ) => {
-  const debt = startingDebtBreakdownForMember(memberId, transactions)
+  const debt = startingDebtBreakdownForMember(memberId, transactions, asOfDate)
 
   return {
     utt: debt.utt / settings.debtInstallmentMonths.length,
@@ -348,16 +363,17 @@ export const julyPlanForMember = (
   memberId: string,
   paymentOverrides: JulyPaymentOverride,
   transactions: TransactionRecord[] = [],
+  asOfDate: Date = new Date(),
 ) => {
-  const cycleMonth = currentCycleMonthKey()
-  const startingDebt = startingDebtForMember(memberId, transactions)
-  const startingDebtBreakdown = startingDebtBreakdownForMember(memberId, transactions)
+  const cycleMonth = currentCycleMonthKey(asOfDate)
+  const startingDebt = startingDebtForMember(memberId, transactions, asOfDate)
+  const startingDebtBreakdown = startingDebtBreakdownForMember(memberId, transactions, asOfDate)
   const isDebtInstallmentMonth = settings.debtInstallmentMonths.includes(cycleMonth)
   const debtInstallmentBreakdown = isDebtInstallmentMonth
-    ? debtInstallmentBreakdownForMember(memberId, transactions)
+    ? debtInstallmentBreakdownForMember(memberId, transactions, asOfDate)
     : { utt: 0, mwekeza: 0 }
   const installment = isDebtInstallmentMonth
-    ? debtInstallmentForMember(memberId, transactions)
+    ? debtInstallmentForMember(memberId, transactions, asOfDate)
     : 0
   const importedPaidBreakdown = paidBreakdownForMonth(memberId, cycleMonth)
   const importedPaid = importedPaidBreakdown.liquid + importedPaidBreakdown.mwekeza
@@ -442,18 +458,20 @@ export const allJulyPlans = (
   memberList: Member[],
   paymentOverrides: JulyPaymentOverride,
   transactions: TransactionRecord[] = [],
+  asOfDate: Date = new Date(),
 ) =>
   memberList.map((member) => ({
     member,
-    plan: julyPlanForMember(member.id, paymentOverrides, transactions),
+    plan: julyPlanForMember(member.id, paymentOverrides, transactions, asOfDate),
   }))
 
 export const julySummary = (
   memberList: Member[],
   paymentOverrides: JulyPaymentOverride,
   transactions: TransactionRecord[] = [],
+  asOfDate: Date = new Date(),
 ) => {
-  const plans = allJulyPlans(memberList, paymentOverrides, transactions)
+  const plans = allJulyPlans(memberList, paymentOverrides, transactions, asOfDate)
   const totalDue = plans.reduce((sum, item) => sum + item.plan.due, 0)
   const totalPaid = plans.reduce((sum, item) => sum + item.plan.paid, 0)
   const remaining = plans.reduce((sum, item) => sum + item.plan.remaining, 0)
@@ -472,9 +490,10 @@ export const julySummary = (
 export const debtBookTotal = (
   memberList: Member[],
   transactions: TransactionRecord[] = [],
+  asOfDate: Date = new Date(),
 ) =>
   memberList.reduce(
-    (sum, member) => sum + startingDebtForMember(member.id, transactions),
+    (sum, member) => sum + startingDebtForMember(member.id, transactions, asOfDate),
     0,
   )
 
@@ -486,40 +505,41 @@ const monthAfter = (month: string) => {
   return `${nextYear}-${String(nextMonthNumber).padStart(2, '0')}`
 }
 
-// An unpaid cycle shortfall (carryover) isn't a one-off 10% hit — if it's
-// still unpaid the following month, it takes ANOTHER 10% on top, and again
-// the month after, all the way through the month after the last debt
-// installment month (Oct 2026 -> compounding continues through Nov 2026).
-// The schedule starts with THIS cycle month (no extra compounding yet, just
-// the carryover as already computed), then compounds forward from there.
-export const compoundingPenaltyMonths = (cycleMonth = currentCycleMonthKey()) => {
+// Every month from the first debt-installment month through the month after
+// the last one (Jul 2026 -> Nov 2026) — the full window the penalty review
+// screen can look at, past or future.
+export const penaltyReviewMonths = () => {
   const lastInstallmentMonth =
     settings.debtInstallmentMonths[settings.debtInstallmentMonths.length - 1]
-  const finalMonth = monthAfter(lastInstallmentMonth)
 
-  if (cycleMonth > finalMonth) return []
-
-  const months: string[] = [cycleMonth]
-  let cursor = cycleMonth
-
-  while (cursor < finalMonth) {
-    cursor = monthAfter(cursor)
-    months.push(cursor)
-  }
-
-  return months
+  return [...settings.debtInstallmentMonths, monthAfter(lastInstallmentMonth)]
 }
 
-export type PenaltyProjectionStep = {
-  month: string
-  amountIfStillUnpaid: number
+// The last calendar day of a "YYYY-MM" month, used as the snapshot date for
+// reviewing that month: past its grace day, so settledDebtBaseMonth treats
+// it as fully closed, and late enough to include every transaction actually
+// dated within it.
+const lastDayOfMonth = (month: string) => {
+  const [year, monthNumber] = month.split('-').map(Number)
+
+  return new Date(year, monthNumber, 0)
 }
 
-export const compoundingPenaltyProjection = (
-  carryover: number,
-  cycleMonth = currentCycleMonthKey(),
-): PenaltyProjectionStep[] =>
-  compoundingPenaltyMonths(cycleMonth).map((month, index) => ({
-    month,
-    amountIfStillUnpaid: carryover * (1 + settings.penaltyRate) ** index,
-  }))
+// A real historical (or, for a future month, projected-if-nothing-changes)
+// snapshot for every member as of the end of `month` — reusing the exact
+// same debt/penalty math as "today", just anchored to a different date and
+// with transactions after that date excluded. This replaces any separate
+// approximate compounding formula: it recomputes the whole waterfall for
+// that month, so debt, installment, normal contribution, and penalty all
+// interact exactly as they would have (or will) for real.
+export const penaltyPlansForMonth = (
+  memberList: Member[],
+  transactions: TransactionRecord[],
+  month: string,
+) => {
+  const asOfDate = lastDayOfMonth(month)
+  const cycleMonth = currentCycleMonthKey(asOfDate)
+  const paymentOverrides = transactionsToOverrides(transactions, cycleMonth)
+
+  return allJulyPlans(memberList, paymentOverrides, transactions, asOfDate)
+}
