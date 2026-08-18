@@ -2180,6 +2180,11 @@ textarea {
 
 .floating-assistant-panel .assistant-thread {
   max-height: min(40svh, 360px);
+  overscroll-behavior: contain;
+}
+
+.floating-assistant-panel {
+  overscroll-behavior: contain;
 }
 
 .assistant-orb {
@@ -3859,6 +3864,21 @@ textarea {
   .floating-assistant {
     bottom: max(92px, calc(env(safe-area-inset-bottom) + 92px));
     right: 16px;
+  }
+
+  .floating-assistant-panel {
+    max-height: min(58svh, 460px);
+    padding: 14px;
+    width: min(320px, calc(100vw - 24px));
+  }
+
+  .floating-assistant-panel .assistant-thread {
+    max-height: min(30svh, 260px);
+  }
+
+  .floating-assistant-greeting {
+    max-width: 180px;
+    padding: 10px 12px;
   }
 
   .dashboard-grid,
