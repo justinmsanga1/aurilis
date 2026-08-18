@@ -21,6 +21,7 @@ import {
   UserRound,
   UsersRound,
   WalletCards,
+  X,
 } from 'lucide-react'
 import { type CSSProperties, type ChangeEvent, useEffect, useMemo, useState } from 'react'
 import './App.css'
@@ -60,7 +61,6 @@ type Tab =
   | 'notices'
   | 'meetings'
   | 'chat'
-  | 'assistant'
   | 'profile'
 
 type LoginState = {
@@ -237,7 +237,6 @@ const navItems: Array<{ id: Tab; label: string; icon: typeof Home }> = [
   { id: 'profile', label: 'Profile', icon: UserRound },
   { id: 'reports', label: 'Reports', icon: ReceiptText },
   { id: 'chat', label: 'Chat', icon: MessageCircle },
-  { id: 'assistant', label: 'Auralis', icon: Bot },
   { id: 'notices', label: 'Updates', icon: Megaphone },
   { id: 'funds', label: 'Funds', icon: Landmark },
   { id: 'settings', label: 'Settings', icon: Settings },
@@ -1083,13 +1082,17 @@ function App() {
     settings,
     mathRules: {
       monthlyContribution:
-        'Monthly contribution is UTT contribution plus Mwekeza contribution.',
+        'Monthly contribution is UTT (100,000) plus Mwekeza (20,000) = 120,000 TZS.',
       debt:
-        'Opening debt is split into UTT debt and Mwekeza debt. Debt paid reduces the individual member debt first in its matching bucket.',
-      funds:
-        'Combined fund includes UTT normal, Mwekeza normal, UTT debt, Mwekeza debt, and overpayments. UTT debt goes to UTT fund. Mwekeza debt goes to Mwekeza fund.',
+        'Real debt owed is recalculated fresh every time: everything a member should have paid from their first tracked month through today, minus everything they have ever actually paid (imported history + every live transaction, any bucket, any month). It is not a fixed snapshot — it grows if they keep missing months and shrinks permanently whenever they pay debt down.',
+      debtInstallment:
+        'Only during the installment window (July-October 2026): this cycle\'s debt installment is 25% of the current real debt owed, recomputed each month. Outside that window (November 2026+) no debt installment is due — a known gap, flag it if asked.',
       penalty:
-        'When required payment is not fully cleared after the month deadline, penalty risk is 10% of current unpaid debt plus unpaid normal contribution.',
+        'Penalty is 10% of ONLY this cycle\'s unpaid amount (unpaid debt installment + unpaid normal contribution) — never 10% of the whole debt book. carryover ("debt with penalty") = this cycle\'s unpaid amount + that penalty. If a cycle stays unpaid, the carryover compounds another 10% each following month through November 2026.',
+      paymentAllocationOrder:
+        'A cashier enters one total amount. It auto-splits in fixed order: penalty owed first, then debt-UTT, then debt-Mwekeza, then normal Mwekeza, then normal UTT, with any leftover becoming overpayment. Penalty is a real payable bucket (allocation.penalty), not just a displayed number.',
+      funds:
+        'UTT/liquid fund holds normal UTT contributions, UTT debt repayments, overpayments, and penalty money. Mwekeza fund holds normal Mwekeza contributions and Mwekeza debt repayments.',
     },
     fundTotals,
     calculatedFundTotals,
@@ -1626,18 +1629,6 @@ function App() {
           />
         ) : null}
 
-        {activeTab === 'assistant' ? (
-          <AssistantView
-            draft={assistantDraft}
-            error={assistantError}
-            loading={assistantLoading}
-            messages={assistantMessages}
-            onDraft={setAssistantDraft}
-            onSend={sendAssistantMessage}
-            user={activeUser}
-          />
-        ) : null}
-
         {activeTab === 'profile' ? (
           <ProfileView
             announcements={announcements}
@@ -1736,6 +1727,16 @@ function App() {
           </div>
         </div>
       ) : null}
+
+      <FloatingAssistant
+        draft={assistantDraft}
+        error={assistantError}
+        loading={assistantLoading}
+        messages={assistantMessages}
+        onDraft={setAssistantDraft}
+        onSend={sendAssistantMessage}
+        user={activeUser}
+      />
     </div>
   )
 }
@@ -4304,7 +4305,7 @@ function ChatView({
   )
 }
 
-function AssistantView({
+function FloatingAssistant({
   draft,
   error,
   loading,
@@ -4321,6 +4322,8 @@ function AssistantView({
   onSend: (event: React.FormEvent) => void
   user: Member
 }) {
+  const [open, setOpen] = useState(false)
+  const [showGreeting, setShowGreeting] = useState(true)
   const prompts = [
     'How am I doing with my payments?',
     'Who still owes the most money?',
@@ -4328,70 +4331,110 @@ function AssistantView({
     'Break down the penalty math for me.',
   ]
 
-  return (
-    <section className="assistant-layout">
-      <article className="panel assistant-panel">
-        <div className="assistant-hero">
-          <div className="assistant-orb">
-            <Bot size={26} />
-          </div>
-          <div>
-            <p className="eyebrow">Finance buddy</p>
-            <h2>Auralis</h2>
-            <span>Reading the system as {user.fullName}</span>
-          </div>
-        </div>
+  useEffect(() => {
+    const timer = setTimeout(() => setShowGreeting(false), 8000)
+    return () => clearTimeout(timer)
+  }, [])
 
-        <div className="assistant-prompt-row">
-          {prompts.map((prompt) => (
+  const openPanel = () => {
+    setOpen(true)
+    setShowGreeting(false)
+  }
+
+  return (
+    <div className="floating-assistant">
+      {open ? (
+        <div className="floating-assistant-panel">
+          <div className="floating-assistant-header">
+            <div className="assistant-orb">
+              <Bot size={20} />
+            </div>
+            <div>
+              <strong>Auralis</strong>
+              <span>Reading the system as {user.fullName}</span>
+            </div>
             <button
-              disabled={loading}
-              key={prompt}
-              onClick={() => onDraft(prompt)}
+              aria-label="Close Auralis"
+              className="icon-button"
+              onClick={() => setOpen(false)}
               type="button"
             >
-              {prompt}
+              <X size={18} />
             </button>
-          ))}
+          </div>
+
+          <div className="assistant-prompt-row">
+            {prompts.map((prompt) => (
+              <button
+                disabled={loading}
+                key={prompt}
+                onClick={() => onDraft(prompt)}
+                type="button"
+              >
+                {prompt}
+              </button>
+            ))}
+          </div>
+
+          <div className="assistant-thread">
+            {messages.length === 0 ? (
+              <div className="assistant-message auralis">
+                <strong>Auralis</strong>
+                <p>Hello, I'm Auralis. Ask me anything about the group's members, payments, debt, or penalties.</p>
+              </div>
+            ) : null}
+            {messages.map((message) => (
+              <div
+                className={
+                  message.role === 'user'
+                    ? 'assistant-message user'
+                    : 'assistant-message auralis'
+                }
+                key={message.id}
+              >
+                <strong>{message.role === 'user' ? user.fullName : 'Auralis'}</strong>
+                <p>{message.body}</p>
+              </div>
+            ))}
+            {loading ? (
+              <div className="assistant-message auralis thinking">
+                <strong>Auralis</strong>
+                <p>Let me check the records real quick...</p>
+              </div>
+            ) : null}
+          </div>
+
+          {error ? <p className="form-error">{error}</p> : null}
+
+          <form className="assistant-composer" onSubmit={onSend}>
+            <input
+              aria-label="Ask Auralis"
+              placeholder="Ask me anything about the group finances..."
+              value={draft}
+              onChange={(event) => onDraft(event.target.value)}
+            />
+            <button className="primary-button" disabled={loading} type="submit">
+              Send
+            </button>
+          </form>
         </div>
+      ) : null}
 
-        <div className="assistant-thread">
-          {messages.map((message) => (
-            <div
-              className={
-                message.role === 'user'
-                  ? 'assistant-message user'
-                  : 'assistant-message auralis'
-              }
-              key={message.id}
-            >
-              <strong>{message.role === 'user' ? user.fullName : 'Auralis'}</strong>
-              <p>{message.body}</p>
-            </div>
-          ))}
-          {loading ? (
-            <div className="assistant-message auralis thinking">
-              <strong>Auralis</strong>
-              <p>Let me check the records real quick...</p>
-            </div>
-          ) : null}
-        </div>
+      {!open && showGreeting ? (
+        <button className="floating-assistant-greeting" onClick={openPanel} type="button">
+          Hello, I'm Auralis — ask me anything!
+        </button>
+      ) : null}
 
-        {error ? <p className="form-error">{error}</p> : null}
-
-        <form className="assistant-composer" onSubmit={onSend}>
-          <input
-            aria-label="Ask Auralis"
-            placeholder="Ask me anything about the group finances..."
-            value={draft}
-            onChange={(event) => onDraft(event.target.value)}
-          />
-          <button className="primary-button" disabled={loading} type="submit">
-            Send
-          </button>
-        </form>
-      </article>
-    </section>
+      <button
+        aria-label={open ? 'Close Auralis assistant' : 'Open Auralis assistant'}
+        className="floating-assistant-toggle"
+        onClick={() => (open ? setOpen(false) : openPanel())}
+        type="button"
+      >
+        {open ? <X size={24} /> : <Bot size={24} />}
+      </button>
+    </div>
   )
 }
 
