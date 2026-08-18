@@ -4347,12 +4347,9 @@ function FloatingAssistant({
         <div className="floating-assistant-panel">
           <div className="floating-assistant-header">
             <div className="assistant-orb">
-              <Bot size={20} />
+              <Bot size={18} />
             </div>
-            <div>
-              <strong>Auralis</strong>
-              <span>Finance buddy</span>
-            </div>
+            <strong>Auralis</strong>
             <button
               aria-label="Close Auralis"
               className="icon-button"
@@ -4363,18 +4360,20 @@ function FloatingAssistant({
             </button>
           </div>
 
-          <div className="assistant-prompt-row">
-            {prompts.map((prompt) => (
-              <button
-                disabled={loading}
-                key={prompt}
-                onClick={() => onDraft(prompt)}
-                type="button"
-              >
-                {prompt}
-              </button>
-            ))}
-          </div>
+          {messages.length === 0 ? (
+            <div className="assistant-prompt-row">
+              {prompts.map((prompt) => (
+                <button
+                  disabled={loading}
+                  key={prompt}
+                  onClick={() => onDraft(prompt)}
+                  type="button"
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
+          ) : null}
 
           <div className="assistant-thread">
             {messages.length === 0 ? (
