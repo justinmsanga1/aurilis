@@ -2151,16 +2151,21 @@ textarea {
   border: 1px solid rgba(193, 218, 198, 0.76);
   border-radius: 8px;
   box-shadow: 0 30px 70px rgba(3, 31, 20, 0.28);
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 14px;
   max-height: min(72svh, 640px);
+  max-width: calc(100vw - 32px);
+  overflow: hidden;
+  overscroll-behavior: contain;
   padding: 16px;
-  width: min(380px, calc(100vw - 32px));
+  width: 380px;
 }
 
 .floating-assistant-header {
   align-items: center;
   display: grid;
+  flex-shrink: 0;
   gap: 12px;
   grid-template-columns: auto minmax(0, 1fr) auto;
 }
@@ -2168,6 +2173,9 @@ textarea {
 .floating-assistant-header strong {
   display: block;
   font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .floating-assistant-header span {
@@ -2176,15 +2184,23 @@ textarea {
   font-size: 11px;
   font-weight: 800;
   margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.floating-assistant-panel .assistant-prompt-row {
+  flex-shrink: 0;
 }
 
 .floating-assistant-panel .assistant-thread {
-  max-height: min(40svh, 360px);
+  flex: 1;
+  min-height: 0;
   overscroll-behavior: contain;
 }
 
-.floating-assistant-panel {
-  overscroll-behavior: contain;
+.floating-assistant-panel .assistant-composer {
+  flex-shrink: 0;
 }
 
 .assistant-orb {
@@ -2235,6 +2251,7 @@ textarea {
 .assistant-message {
   border-radius: 8px;
   max-width: 760px;
+  min-width: 0;
   padding: 13px;
 }
 
@@ -2247,6 +2264,7 @@ textarea {
 .assistant-message p {
   line-height: 1.55;
   margin: 0;
+  overflow-wrap: break-word;
   white-space: pre-wrap;
 }
 
@@ -3869,11 +3887,7 @@ textarea {
   .floating-assistant-panel {
     max-height: min(58svh, 460px);
     padding: 14px;
-    width: min(320px, calc(100vw - 24px));
-  }
-
-  .floating-assistant-panel .assistant-thread {
-    max-height: min(30svh, 260px);
+    width: 320px;
   }
 
   .floating-assistant-greeting {

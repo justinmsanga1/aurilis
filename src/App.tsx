@@ -4351,7 +4351,7 @@ function FloatingAssistant({
             </div>
             <div>
               <strong>Auralis</strong>
-              <span>Reading the system as {user.fullName}</span>
+              <span>Finance buddy</span>
             </div>
             <button
               aria-label="Close Auralis"
