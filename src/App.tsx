@@ -1521,14 +1521,12 @@ function App() {
           <MembersView
             activeUser={activeUser}
             avatars={avatars}
-            canRecord={canRecordPayments}
             detailOpen={memberDetailOpen}
             draft={memberDraft}
             isAdmin={isAdmin}
             onAvatar={handleAvatar}
             onBack={() => setMemberDetailOpen(false)}
             onDelete={deleteMember}
-            onDeleteTransaction={deleteTransaction}
             onDraft={setMemberDraft}
             onMakeChairman={makeChairman}
             onMakeCashier={makeCashier}
@@ -2206,14 +2204,12 @@ function PenaltyView({
 function MembersView({
   activeUser,
   avatars,
-  canRecord,
   detailOpen,
   draft,
   isAdmin,
   onAvatar,
   onBack,
   onDelete,
-  onDeleteTransaction,
   onDraft,
   onMakeCashier,
   onMakeChairman,
@@ -2227,14 +2223,12 @@ function MembersView({
 }: {
   activeUser: Member
   avatars: AvatarMap
-  canRecord: boolean
   detailOpen: boolean
   draft: MemberDraft
   isAdmin: boolean
   onAvatar: (memberId: string, event: ChangeEvent<HTMLInputElement>) => void
   onBack: () => void
   onDelete: (memberId: string) => void
-  onDeleteTransaction: (transactionId: string) => void
   onDraft: React.Dispatch<React.SetStateAction<MemberDraft>>
   onMakeCashier: (memberId: string) => void
   onMakeChairman: (memberId: string) => void
@@ -2277,16 +2271,6 @@ function MembersView({
   const expectedUttTotal = memberMonthCount * settings.liquidContribution
   const expectedMwekezaTotal = memberMonthCount * settings.mwekezaContribution
   const expectedContributionTotal = expectedUttTotal + expectedMwekezaTotal
-  const expectedWithDebtAndPenalty = expectedContributionTotal + selectedPlan.carryover
-  const reviewMonths = penaltyReviewMonths()
-  const currentReviewMonthIndex = reviewMonths.indexOf(currentCycleMonthKey())
-  const nextReviewMonth =
-    currentReviewMonthIndex >= 0 ? reviewMonths[currentReviewMonthIndex + 1] : undefined
-  const nextMonthPlan = nextReviewMonth
-    ? penaltyPlansForMonth([selectedMember], transactions, nextReviewMonth).find(
-        (item) => item.member.id === selectedMember.id,
-      )?.plan
-    : undefined
   const roleCount = new Set(plans.map(({ member }) => member.role)).size
 
   if (detailOpen) {
@@ -4714,36 +4698,6 @@ function Metric({ label, value }: { label: string; value: string }) {
     <div className="metric-card">
       <span>{label}</span>
       <strong>{value}</strong>
-    </div>
-  )
-}
-
-function MetricPair({
-  label,
-  leftLabel,
-  leftValue,
-  rightLabel,
-  rightValue,
-}: {
-  label: string
-  leftLabel: string
-  leftValue: string
-  rightLabel: string
-  rightValue: string
-}) {
-  return (
-    <div className="metric-card metric-pair">
-      <span>{label}</span>
-      <div className="metric-pair-row">
-        <div className="metric-pair-half">
-          <small>{leftLabel}</small>
-          <strong>{leftValue}</strong>
-        </div>
-        <div className="metric-pair-half">
-          <small>{rightLabel}</small>
-          <strong>{rightValue}</strong>
-        </div>
-      </div>
     </div>
   )
 }
