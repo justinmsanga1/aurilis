@@ -103,16 +103,13 @@ const monthIndex = (month: string) => {
   return year * 12 + monthNumber
 }
 
-const monthSpanInclusive = (startMonth: string, endMonth: string) =>
-  Math.max(monthIndex(endMonth) - monthIndex(startMonth) + 1, 0)
-
 export const contributionMonthCountForMember = (
   memberId: string,
   endMonth = currentCycleMonthKey(),
 ) => {
   const firstRecord = getMemberRecords(memberId)[0]
 
-  return firstRecord ? monthSpanInclusive(firstRecord.month, endMonth) : 0
+  return firstRecord ? Math.max(monthIndex(endMonth) - monthIndex(firstRecord.month), 0) : 0
 }
 
 export const settledDebtBaseMonth = (date = new Date()) => {

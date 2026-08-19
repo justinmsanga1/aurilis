@@ -5,6 +5,7 @@ import {
   Camera,
   CalendarDays,
   ChevronRight,
+  ChevronDown,
   CircleDollarSign,
   Trash2,
   Home,
@@ -436,6 +437,7 @@ function App() {
   const canManageComms = activeUser?.role === 'Chairman' || activeUser?.role === 'Secretary'
   const [activeTab, setActiveTab] = useState<Tab>('dashboard')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [seenNotifications, setSeenNotifications] = useState<Record<string, number>>(
     () => {
@@ -580,6 +582,25 @@ function App() {
   const visibleProjects = projects
   const collectionRate =
     summary.totalDue > 0 ? Math.round((summary.totalPaid / summary.totalDue) * 100) : 0
+
+  const penaltyTrendData = useMemo(() => {
+    const monthMap = new Map<string, number>()
+    for (const transaction of transactions) {
+      const alloc = normalizeAllocation(transaction.allocation)
+      if (alloc.penalty <= 0) continue
+      const mk = transaction.date.slice(0, 7)
+      monthMap.set(mk, (monthMap.get(mk) ?? 0) + alloc.penalty)
+    }
+    const sorted = [...monthMap.entries()].sort(([a], [b]) => a.localeCompare(b))
+    const last7 = sorted.slice(-7)
+    let cumulative = 0
+    return last7.map(([month, penalty]) => {
+      cumulative += penalty
+      return { month, penalty, cumulative }
+    })
+  }, [transactions])
+
+  const totalPenaltyCollected = penaltyTrendData.reduce((s, d) => s + d.penalty, 0)
 
   const topDebtors = useMemo(
     () =>
@@ -1468,6 +1489,8 @@ function App() {
             fundTotals={fundTotals}
             memberCount={appMembers.length}
             onOpenPenalty={() => setActiveTab('penalty')}
+            penaltyTrendData={penaltyTrendData}
+            totalPenaltyCollected={totalPenaltyCollected}
             personalPlan={julyPlanForMember(activeUser.id, paymentOverrides, transactions)}
             projectCount={projects.length}
             summary={summary}
@@ -1750,6 +1773,8 @@ function Dashboard({
   fundTotals,
   memberCount,
   onOpenPenalty,
+  penaltyTrendData,
+  totalPenaltyCollected,
   personalPlan,
   projectCount,
   summary,
@@ -1764,6 +1789,8 @@ function Dashboard({
   fundTotals: ReturnType<typeof historicalTotals>
   memberCount: number
   onOpenPenalty: () => void
+  penaltyTrendData: Array<{ month: string; penalty: number; cumulative: number }>
+  totalPenaltyCollected: number
   personalPlan: ReturnType<typeof julyPlanForMember>
   projectCount: number
   summary: ReturnType<typeof julySummary>
@@ -1870,6 +1897,35 @@ function Dashboard({
           </i>
         </div>
       </article>
+
+      {totalPenaltyCollected > 0 ? (
+        <article className="bento-card bento-penalty-trend">
+          <div className="panel-title">
+            <div>
+              <p className="eyebrow">Penalty collected</p>
+              <h2>{formatTzs(totalPenaltyCollected)}</h2>
+            </div>
+            <CircleDollarSign size={20} />
+          </div>
+          <div className="penalty-trend-bars">
+            {penaltyTrendData.map((d) => {
+              const maxPenalty = Math.max(...penaltyTrendData.map((x) => x.penalty), 1)
+              const height = Math.round((d.penalty / maxPenalty) * 100)
+
+              return (
+                <div className="penalty-trend-col" key={d.month}>
+                  <i style={{ height: `${Math.max(height, 8)}%` }} />
+                  <span>{d.month.slice(5)}</span>
+                </div>
+              )
+            })}
+          </div>
+          <div className="penalty-trend-summary">
+            <small>{penaltyTrendData.length} month{penaltyTrendData.length === 1 ? '' : 's'} tracked</small>
+            <strong>{formatTzs(totalPenaltyCollected)} total</strong>
+          </div>
+        </article>
+      ) : null}
 
       <article className="bento-card bento-trend">
         <div>
@@ -2195,6 +2251,7 @@ function MembersView({
   const selectedTransactions = transactions.filter(
     (transaction) => transaction.memberId === selectedMember.id,
   )
+  const [expandedTx, setExpandedTx] = useState<string | null>(null)
   const importedTotals = getMemberRecords(selectedMember.id).reduce(
     (totals, record) => ({
       utt: totals.utt + record.liquid,
@@ -2234,219 +2291,227 @@ function MembersView({
 
   if (detailOpen) {
     return (
-      <section className="member-detail-layout">
-        <button className="ghost-button back-button" onClick={onBack} type="button">
-          <ArrowLeft size={18} />
-          Members
-        </button>
-        <article className="member-profile member-detail-card">
-          <div className="profile-cover">
-            <Avatar
-              avatar={avatars[selectedMember.id]}
-              memberName={selectedMember.fullName}
-              size="large"
-            />
-            {selectedMember.id === activeUser.id ? (
-              <label className="upload-button">
-                <Camera size={16} />
-                Upload DP
-                <input
-                  accept="image/*"
-                  onChange={(event) => onAvatar(selectedMember.id, event)}
-                  type="file"
-                />
-              </label>
-            ) : null}
-          </div>
-          <div className="profile-body">
-            <p className="eyebrow">{selectedMember.role}</p>
-            <h2>{selectedMember.fullName}</h2>
-            {isAdmin ? (
-              <div className="admin-actions">
-                {selectedMember.role !== 'Chairman' ? (
-                  <button
-                    className="ghost-button"
-                    onClick={() => onMakeChairman(selectedMember.id)}
-                    type="button"
-                  >
-                    <ShieldCheck size={18} />
-                    Make Chairman
-                  </button>
-                ) : null}
-                {selectedMember.role !== 'Chairman' ? (
-                  <button
-                    className="ghost-button"
-                    onClick={() => onMakeCashier(selectedMember.id)}
-                    type="button"
-                  >
-                    <ReceiptText size={18} />
-                    {selectedMember.role === 'Cashier'
-                      ? 'Remove Cashier'
-                      : 'Make Cashier'}
-                  </button>
-                ) : null}
-                {selectedMember.role !== 'Chairman' ? (
-                  <button
-                    className="ghost-button"
-                    onClick={() => onMakeSecretary(selectedMember.id)}
-                    type="button"
-                  >
-                    <Megaphone size={18} />
-                    {selectedMember.role === 'Secretary'
-                      ? 'Remove Secretary'
-                      : 'Make Secretary'}
-                  </button>
-                ) : null}
-                <button
-                  className="danger-button"
-                  disabled={selectedMember.id === activeUser.id}
-                  onClick={() => onDelete(selectedMember.id)}
-                  type="button"
-                >
-                  <Trash2 size={18} />
-                  Delete member
-                </button>
-              </div>
-            ) : null}
-            <div className="profile-section">
-              <p className="profile-section-label">Contributions</p>
-              <div className="profile-metrics">
-                <MetricPair
-                  label="All-time"
-                  leftLabel="Paid"
-                  leftValue={formatTzs(allTimeContributionTotal)}
-                  rightLabel="Expected"
-                  rightValue={formatTzs(expectedContributionTotal)}
-                />
-                <MetricPair
-                  label="UTT"
-                  leftLabel="Paid"
-                  leftValue={formatTzs(allTimeUttTotal)}
-                  rightLabel="Expected"
-                  rightValue={formatTzs(expectedUttTotal)}
-                />
-                <MetricPair
-                  label="Mwekeza"
-                  leftLabel="Paid"
-                  leftValue={formatTzs(allTimeMwekezaTotal)}
-                  rightLabel="Expected"
-                  rightValue={formatTzs(expectedMwekezaTotal)}
-                />
-              </div>
-            </div>
-            <div className="profile-section">
-              <p className="profile-section-label">Debt</p>
-              <div className="profile-metrics">
-                <Metric label="Real debt owed" value={formatTzs(selectedPlan.remainingStartingDebt)} />
-                <MetricPair
-                  label="Debt breakdown"
-                  leftLabel="UTT debt"
-                  leftValue={formatTzs(selectedPlan.remainingStartingDebtUtt)}
-                  rightLabel="Mwekeza debt"
-                  rightValue={formatTzs(selectedPlan.remainingStartingDebtMwekeza)}
-                />
-                <MetricPair
-                  label={`Due ${currentMonthLabel}`}
-                  leftLabel="25% debt installment"
-                  leftValue={formatTzs(selectedPlan.installment)}
-                  rightLabel="+ Normal payment"
-                  rightValue={formatTzs(selectedPlan.normalContribution)}
-                />
-                <Metric label={`Total due ${currentMonthLabel}`} value={formatTzs(selectedPlan.due)} />
-                <MetricPair
-                  label="Unpaid this cycle"
-                  leftLabel="Debt installment"
-                  leftValue={formatTzs(selectedPlan.debtInstallmentRemaining)}
-                  rightLabel="Normal contribution"
-                  rightValue={formatTzs(selectedPlan.normalRemaining)}
-                />
-              </div>
-            </div>
-            <div className="profile-section">
-              <p className="profile-section-label">This month</p>
-              <div className="profile-metrics">
-                <Metric label={`UTT due ${currentMonthLabel}`} value={formatTzs(settings.liquidContribution)} />
-                <Metric label={`Mwekeza due ${currentMonthLabel}`} value={formatTzs(settings.mwekezaContribution)} />
-              </div>
-            </div>
-            <div className="profile-section">
-              <p className="profile-section-label">Summary</p>
-              <div className="profile-metrics">
-                <Metric label="Remaining this cycle" value={formatTzs(selectedPlan.remaining)} />
-                <Metric label="Debt with penalty" value={formatTzs(selectedPlan.carryover)} />
-                <Metric
-                  label="Expected with debt + penalty"
-                  value={formatTzs(expectedWithDebtAndPenalty)}
-                />
-              </div>
-            </div>
-            <div className="penalty-card">
-              <p className="penalty-card-label">Penalty</p>
-              {selectedPlan.penaltyRemaining > 0 ? (
+      <section className="member-stats-dashboard">
+        <header className="stats-header">
+          <button className="ghost-button back-button-light" onClick={onBack} type="button">
+            <ArrowLeft size={18} />
+            Back
+          </button>
+          
+          <div className="stats-profile-actions">
+            {isAdmin && selectedMember.role !== 'Chairman' ? (
                 <>
-                  <div className="penalty-card-row">
-                    <span>Penalty this cycle</span>
-                    <strong>{formatTzs(selectedPlan.penaltyRemaining)}</strong>
-                  </div>
-                  {nextReviewMonth && nextMonthPlan ? (
-                    <div className="penalty-card-row muted">
-                      <span>
-                        Total owed if still unpaid by{' '}
-                        {shortMonthLabelForDate(`${nextReviewMonth}-01`)}
-                      </span>
-                      <strong>{formatTzs(nextMonthPlan.carryover)}</strong>
-                    </div>
-                  ) : null}
+                  <button className="ghost-button" onClick={() => onMakeChairman(selectedMember.id)}>Make Chair</button>
+                  <button className="ghost-button" onClick={() => onMakeCashier(selectedMember.id)}>Cashier</button>
+                  <button className="ghost-button" onClick={() => onMakeSecretary(selectedMember.id)}>Secretary</button>
                 </>
+              ) : null}
+              {isAdmin && selectedMember.id !== activeUser.id ? (
+                <button className="danger-button" onClick={() => onDelete(selectedMember.id)}>Delete</button>
+              ) : null}
+              {selectedMember.id === activeUser.id ? (
+                <label className="stats-avatar-upload" title="Change photo">
+                  <Avatar avatar={avatars[selectedMember.id]} memberName={selectedMember.fullName} size="small" />
+                  <div className="stats-avatar-overlay">
+                    <Camera size={14} />
+                  </div>
+                  <input style={{ display: 'none' }} accept="image/*" onChange={(event) => onAvatar(selectedMember.id, event)} type="file" />
+                </label>
               ) : (
-                <p className="penalty-card-clear">No penalty — fully paid this cycle</p>
+                <Avatar avatar={avatars[selectedMember.id]} memberName={selectedMember.fullName} size="small" />
+              )}
+          </div>
+        </header>
+
+        <div className="stats-hero">
+          <div className="stats-hero-text">
+            <p className="eyebrow-light">Track your balance, recent activity, and financial goals</p>
+            <h1>{selectedMember.fullName}</h1>
+          </div>
+          
+          <div className="stats-hero-card">
+            <div className="stats-hero-card-header">
+               <span><CircleDollarSign size={14} style={{ marginRight: 6 }}/> OUTSTANDING BALANCE</span>
+               <small>{currentMonthLabel}</small>
+            </div>
+            <strong>{formatTzs(selectedPlan.remaining)}</strong>
+            <div className="stats-hero-card-footer">
+              {selectedPlan.penaltyRemaining > 0 ? (
+                <span className="penalty-badge-inline">↗ Incl. {formatTzs(selectedPlan.penaltyRemaining)} penalty</span>
+              ) : (
+                <span className="success-badge-inline">↗ No active penalty</span>
               )}
             </div>
-            <div className="member-report-section">
-              <div className="panel-title">
-                <div>
-                  <p className="eyebrow">Member report</p>
-                  <h2>History and {currentMonthLabel} entries</h2>
-                </div>
-                <ReceiptText size={20} />
-              </div>
-              <div className="timeline">
-                {getMemberRecords(selectedMember.id)
-                  .filter((record) => record.liquid + record.mwekeza > 0)
-                  .map((record) => (
-                  <div className="timeline-row" key={record.month}>
-                    <span>{record.label}</span>
-                    <div>
-                      <b>{formatTzs(record.liquid + record.mwekeza)}</b>
-                      <small>
-                        UTT {formatTzs(record.liquid)} / Mwekeza{' '}
-                        {formatTzs(record.mwekeza)}
-                      </small>
-                    </div>
-                  </div>
-                ))}
-                {selectedTransactions.map((transaction) => (
-                  <div className="timeline-row local-entry" key={transaction.id}>
-                    <span>{transaction.date}</span>
-                    <div>
-                      <b>{formatTzs(transaction.amount)}</b>
-                      <small>
-                        {transaction.method} / Debt {formatTzs(normalizeAllocation(transaction.allocation).debt)}
-                      </small>
-                    </div>
-                    {canRecord ? (
-                      <button
-                        className="ghost-button delete-transaction-btn"
-                        onClick={() => onDeleteTransaction(transaction.id)}
-                        type="button"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    ) : null}
-                  </div>
-                ))}
-              </div>
+          </div>
+        </div>
+
+        <div className="stats-bento-grid">
+          <article className="bento-card bento-overview">
+            <div className="bento-card-header">
+              <h3>Overview</h3>
+              <div className="chart-controls">Year <ChevronRight size={14}/></div>
             </div>
+            <strong>{formatTzs(allTimeContributionTotal)}</strong>
+            <small>Total Paid All-Time</small>
+            <div className="overview-chart-placeholder">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div key={i} className="chart-bar-container">
+                  <div className="chart-bar" style={{ height: `${Math.max(15, Math.random() * 85)}%` }} />
+                  <span className="chart-label">{['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][i]}</span>
+                </div>
+              ))}
+            </div>
+          </article>
+          
+          <article className="bento-card bento-tile">
+            <div className="bento-card-header">
+              <h3>Contributions Base</h3>
+              <PieChart size={18} />
+            </div>
+            <strong>{formatTzs(expectedContributionTotal)}</strong>
+            <small>Expected Target Up to Now</small>
+            <div className="bento-mini-metric">
+               <span className={allTimeContributionTotal >= expectedContributionTotal ? 'trend-up' : 'trend-down'}>
+                 {allTimeContributionTotal >= expectedContributionTotal ? '↗' : '↘'} {formatTzs(Math.abs(allTimeContributionTotal - expectedContributionTotal))} {allTimeContributionTotal >= expectedContributionTotal ? 'surplus' : 'deficit'}
+               </span>
+            </div>
+          </article>
+
+          <article className="bento-card bento-tile">
+            <div className="bento-card-header">
+              <h3>Monthly Installment</h3>
+              <CalendarDays size={18} />
+            </div>
+            <strong>{formatTzs(settings.liquidContribution + settings.mwekezaContribution)}</strong>
+            <small>Due Every Cycle</small>
+            <div className="bento-mini-metric">
+              <span>UTT {formatTzs(settings.liquidContribution)} / MW {formatTzs(settings.mwekezaContribution)}</span>
+            </div>
+          </article>
+
+          <article className="bento-card bento-tile dark-tile">
+            <div className="bento-card-header">
+              <h3>Debt Initial Breakdown</h3>
+              <CircleDollarSign size={18} />
+            </div>
+            <strong>{formatTzs(selectedPlan.remainingStartingDebt)}</strong>
+            <small>Total Principal Unpaid</small>
+            <div className="bento-mini-metric split">
+              <span>UTT: {formatTzs(selectedPlan.remainingStartingDebtUtt)}</span>
+              <span>MW: {formatTzs(selectedPlan.remainingStartingDebtMwekeza)}</span>
+            </div>
+          </article>
+
+          <article className="bento-card bento-tile">
+            <div className="bento-card-header">
+              <h3>Current Unpaid Total</h3>
+              <CircleDollarSign size={18} />
+            </div>
+            <strong>{formatTzs(selectedPlan.due)}</strong>
+            <small>Due {currentMonthLabel}</small>
+            <div className="bento-mini-metric split">
+              <span>Debt UTT: {formatTzs(selectedPlan.debtUttRemaining)}</span>
+              <span>Debt MW: {formatTzs(selectedPlan.debtMwekezaRemaining)}</span>
+            </div>
+          </article>
+
+          <article className={`bento-card bento-tile ${selectedPlan.penaltyRemaining > 0 ? 'dark-tile' : ''}`}>
+            <div className="bento-card-header">
+              <h3>Penalty</h3>
+              <ShieldCheck size={18} />
+            </div>
+            <strong>{formatTzs(selectedPlan.penaltyRemaining)}</strong>
+            <small>{selectedPlan.penaltyRemaining > 0 ? 'At risk this cycle' : 'No penalty'}</small>
+            {selectedPlan.penaltyRemaining > 0 ? (
+              <div className="bento-mini-metric danger">
+                <span>10% of {formatTzs(selectedPlan.debtPenaltyBase)} overdue</span>
+              </div>
+            ) : null}
+          </article>
+        </div>
+
+        <article className="panel stats-transactions-panel">
+          <div className="panel-title">
+            <div>
+              <p className="eyebrow">Activity</p>
+              <h2>Recent Transactions</h2>
+            </div>
+            <ReceiptText size={20} />
+          </div>
+          <div className="stats-tx-list">
+            {selectedTransactions.slice(0, 3).map((transaction) => {
+              const isOpen = expandedTx === transaction.id
+              const alloc = normalizeAllocation(transaction.allocation)
+
+              return (
+                <div className={`stats-tx-row ${isOpen ? 'tx-expanded' : ''}`} key={transaction.id}>
+                  <button
+                    className="stats-tx-row-header"
+                    onClick={() => setExpandedTx(isOpen ? null : transaction.id)}
+                    type="button"
+                  >
+                    <div className="tx-icon">
+                      <ReceiptText size={18} />
+                    </div>
+                    <div className="tx-details">
+                      <span>{transaction.method} Payment</span>
+                      <small>{transaction.date}</small>
+                    </div>
+                    <strong className="tx-amount plus">+{formatTzs(transaction.amount)}</strong>
+                    <ChevronDown size={16} className={`tx-chevron ${isOpen ? 'open' : ''}`} />
+                  </button>
+                  {isOpen ? (
+                    <div className="tx-expand-body">
+                      {transaction.note ? (
+                        <div className="tx-expand-row">
+                          <span className="tx-expand-label">Note</span>
+                          <span className="tx-expand-value">{transaction.note}</span>
+                        </div>
+                      ) : null}
+                      <div className="tx-expand-row">
+                        <span className="tx-expand-label">Recorded by</span>
+                        <span className="tx-expand-value">{transaction.recordedBy}</span>
+                      </div>
+                      <div className="tx-expand-divider" />
+                      <span className="tx-expand-section-title">Allocation Breakdown</span>
+                      <div className="tx-expand-grid">
+                        {alloc.liquid > 0 ? (
+                          <div className="tx-expand-pill">
+                            <span>UTT</span> <b>{formatTzs(alloc.liquid)}</b>
+                          </div>
+                        ) : null}
+                        {alloc.mwekeza > 0 ? (
+                          <div className="tx-expand-pill">
+                            <span>MW</span> <b>{formatTzs(alloc.mwekeza)}</b>
+                          </div>
+                        ) : null}
+                        {alloc.debtUtt > 0 ? (
+                          <div className="tx-expand-pill">
+                            <span>Debt UTT</span> <b>{formatTzs(alloc.debtUtt)}</b>
+                          </div>
+                        ) : null}
+                        {alloc.debtMwekeza > 0 ? (
+                          <div className="tx-expand-pill">
+                            <span>Debt MW</span> <b>{formatTzs(alloc.debtMwekeza)}</b>
+                          </div>
+                        ) : null}
+                        {alloc.penalty > 0 ? (
+                          <div className="tx-expand-pill">
+                            <span>Penalty</span> <b>{formatTzs(alloc.penalty)}</b>
+                          </div>
+                        ) : null}
+                        {alloc.overpayment > 0 ? (
+                          <div className="tx-expand-pill">
+                            <span>Overpay</span> <b>{formatTzs(alloc.overpayment)}</b>
+                          </div>
+                        ) : null}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              )
+            })}
+            {selectedTransactions.length === 0 ? <p className="empty">No recent transactions</p> : null}
           </div>
         </article>
       </section>
@@ -2549,6 +2614,9 @@ function MembersView({
                     <small>Outstanding</small>
                   </>
                 )}
+                {plan.penaltyRemaining > 0 ? (
+                  <span className="roster-penalty-badge">{formatTzs(plan.penaltyRemaining)} penalty</span>
+                ) : null}
               </div>
               <div className="roster-progress">
                 <i style={{ width: `${paidPercent}%` }} />
@@ -3164,7 +3232,7 @@ function ProjectsView({
           </div>
         </article>
 
-        <article className="bento-card bento-trend">
+      <article className="bento-card bento-trend">
           <div>
             <span>Project Activity</span>
             <div className="trend-bars">
