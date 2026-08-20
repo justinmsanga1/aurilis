@@ -2364,6 +2364,8 @@ function MembersView({
   const expectedUttTotal = memberMonthCount * settings.liquidContribution
   const expectedMwekezaTotal = memberMonthCount * settings.mwekezaContribution
   const expectedContributionTotal = expectedUttTotal + expectedMwekezaTotal
+  const heroOutstandingBalance =
+    selectedPlan.normalContribution + selectedPlan.installment + selectedPlan.penaltyRemaining
   const roleCount = new Set(plans.map(({ member }) => member.role)).size
 
   if (detailOpen) {
@@ -2411,7 +2413,7 @@ function MembersView({
                <span><CircleDollarSign size={14} style={{ marginRight: 6 }}/> OUTSTANDING BALANCE</span>
                <small>{currentMonthLabel}</small>
             </div>
-            <strong>{formatTzs(selectedPlan.remaining)}</strong>
+            <strong>{formatTzs(heroOutstandingBalance)}</strong>
             <div className="stats-hero-card-footer">
               {selectedPlan.penaltyRemaining > 0 ? (
                 <span className="penalty-badge-inline">↗ Incl. {formatTzs(selectedPlan.penaltyRemaining)} penalty</span>
