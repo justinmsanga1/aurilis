@@ -77,6 +77,32 @@ type LoginState = {
   error: string
 }
 
+const appTabs: Tab[] = [
+  'dashboard',
+  'members',
+  'payments',
+  'penalty',
+  'funds',
+  'projects',
+  'reports',
+  'settings',
+  'notices',
+  'meetings',
+  'chat',
+  'profile',
+]
+
+const tabFromHash = (): Tab => {
+  const hash = window.location.hash.replace('#', '')
+
+  return appTabs.includes(hash as Tab) ? (hash as Tab) : 'dashboard'
+}
+
+const writeTabHash = (tab: Tab) => {
+  if (window.location.hash === `#${tab}`) return
+  window.history.replaceState(null, '', `#${tab}`)
+}
+
 type AvatarMap = Record<string, string>
 
 type MemberDraft = {
@@ -442,7 +468,7 @@ function App() {
   const canRecordPayments = activeUser?.role === 'Chairman' || activeUser?.role === 'Cashier'
   const canManageReports = activeUser?.role === 'Cashier'
   const canManageComms = activeUser?.role === 'Chairman' || activeUser?.role === 'Secretary'
-  const [activeTab, setActiveTab] = useState<Tab>('dashboard')
+  const [activeTab, setActiveTab] = useState<Tab>(() => tabFromHash())
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [storageHealth, setStorageHealth] = useState<Record<string, StorageStatus>>({})
 
@@ -702,11 +728,12 @@ function App() {
     }))
   }
   const navigateTo = (tab: Tab) => {
-    if (!canRecordPayments && tab === 'payments') return
+    if (!canRecordPayments && (tab === 'payments' || tab === 'penalty')) return
     if (!isAdmin && tab === 'settings') return
     if (tab === 'chat') markNotificationSeen('chat')
     if (tab === 'notices' || tab === 'meetings') markNotificationSeen('updates')
     setActiveTab(tab)
+    writeTabHash(tab)
     setMobileMenuOpen(false)
     setNotificationsOpen(false)
     if (tab === 'members') setMemberDetailOpen(false)
@@ -722,10 +749,31 @@ function App() {
   }, [activeUserId])
 
   useEffect(() => {
-    if ((!canRecordPayments && activeTab === 'payments') || (!isAdmin && activeTab === 'settings')) {
+    if (
+      (!canRecordPayments && (activeTab === 'payments' || activeTab === 'penalty')) ||
+      (!isAdmin && activeTab === 'settings')
+    ) {
       setActiveTab('dashboard')
+      writeTabHash('dashboard')
     }
   }, [activeTab, canRecordPayments, isAdmin])
+
+  useEffect(() => {
+    writeTabHash(activeTab)
+  }, [activeTab])
+
+  useEffect(() => {
+    const syncTabFromHash = () => {
+      const nextTab = tabFromHash()
+
+      if (nextTab === activeTab) return
+      setActiveTab(nextTab)
+      if (nextTab === 'members') setMemberDetailOpen(false)
+    }
+
+    window.addEventListener('hashchange', syncTabFromHash)
+    return () => window.removeEventListener('hashchange', syncTabFromHash)
+  }, [activeTab])
 
   useEffect(() => {
     window.localStorage.setItem(
@@ -753,7 +801,9 @@ function App() {
     setActiveUserId(found.id)
     setSelectedMemberId(found.id)
     window.localStorage.setItem('auralis-active-user-id', found.id)
-    setActiveTab(found.role === 'Chairman' ? 'dashboard' : 'profile')
+    const loginTab = found.role === 'Chairman' ? 'dashboard' : 'profile'
+    setActiveTab(loginTab)
+    writeTabHash(loginTab)
   }
 
   const handleAvatar = (memberId: string, event: ChangeEvent<HTMLInputElement>) => {
