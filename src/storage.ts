@@ -30,6 +30,17 @@ export function getLiveStorageCooldownRemaining() {
 export function enableLiveStorage() {
   if (getLiveStorageCooldownRemaining() > 0) return false
 
+  startLiveStorageSession()
+  return true
+}
+
+export function forceEnableLiveStorage() {
+  clearBackendFailures()
+  startLiveStorageSession()
+  return true
+}
+
+function startLiveStorageSession() {
   window.sessionStorage.setItem(liveStorageKey, 'true')
   window.sessionStorage.setItem(
     liveCooldownKey,
@@ -37,7 +48,6 @@ export function enableLiveStorage() {
   )
   backendStatePromise = null
   window.location.reload()
-  return true
 }
 
 export function pauseLiveStorage() {

@@ -53,6 +53,7 @@ import {
 } from './finance'
 import {
   enableLiveStorage,
+  forceEnableLiveStorage,
   getLiveStorageCooldownRemaining,
   onStorageStatus,
   type StorageStatus,
@@ -1566,15 +1567,19 @@ function App() {
               Figures below are offline seed values until you reconnect.
             </span>
             <button
-              disabled={liveCooldownRemaining > 0}
               onClick={() => {
+                if (liveCooldownRemaining > 0) {
+                  forceEnableLiveStorage()
+                  return
+                }
+
                 setLiveCooldownRemaining(getLiveStorageCooldownRemaining())
                 enableLiveStorage()
               }}
               type="button"
             >
               {liveCooldownRemaining > 0
-                ? `Wait ${Math.ceil(liveCooldownRemaining / 1000)}s`
+                ? 'Reset and load'
                 : 'Load live data'}
             </button>
           </div>
