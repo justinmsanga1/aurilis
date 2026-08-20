@@ -333,12 +333,22 @@ export const allocatePaymentAmount = (
 ): PaymentAllocation => {
   const paymentOverrides = transactionsToOverrides(transactions)
   const plan = julyPlanForMember(memberId, paymentOverrides, transactions)
+  const extraDebtUtt = Math.max(
+    plan.remainingStartingDebtUtt - plan.debtUttRemaining,
+    0,
+  )
+  const extraDebtMwekeza = Math.max(
+    plan.remainingStartingDebtMwekeza - plan.debtMwekezaRemaining,
+    0,
+  )
   const dueParts: Array<{ key: 'penalty' | 'debtUtt' | 'debtMwekeza' | 'mwekeza' | 'liquid'; amount: number }> = [
     { key: 'penalty', amount: plan.penaltyRemaining },
     { key: 'debtUtt', amount: plan.debtUttRemaining },
     { key: 'debtMwekeza', amount: plan.debtMwekezaRemaining },
     { key: 'mwekeza', amount: plan.mwekezaRemaining },
     { key: 'liquid', amount: plan.liquidRemaining },
+    { key: 'debtUtt', amount: extraDebtUtt },
+    { key: 'debtMwekeza', amount: extraDebtMwekeza },
   ]
   const allocation = emptyPaymentAllocation()
   let remaining = amount

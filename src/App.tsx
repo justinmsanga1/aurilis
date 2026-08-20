@@ -410,7 +410,11 @@ const contributionTotalsForRange = (
         transaction.memberId === memberId &&
         transactionInReportRange(transaction, range, baseDateValue),
     )
-    .reduce((sum, transaction) => sum + transaction.amount, 0)
+    .reduce(
+      (sum, transaction) =>
+        sum + contributionAmountFromAllocation(normalizeAllocation(transaction.allocation)),
+      0,
+    )
 
   return {
     imported,
@@ -418,6 +422,9 @@ const contributionTotalsForRange = (
     total: imported + manual,
   }
 }
+
+const contributionAmountFromAllocation = (allocation: ReturnType<typeof normalizeAllocation>) =>
+  allocation.liquid + allocation.mwekeza + allocation.debtUtt + allocation.debtMwekeza
 
 const balanceAdjustmentTotals = (adjustments: BalanceAdjustment[]) =>
   adjustments.reduce(
@@ -1959,14 +1966,7 @@ function Dashboard({
       .reduce((sum, transaction) => {
         const allocation = normalizeAllocation(transaction.allocation)
 
-        return (
-          sum +
-          allocation.liquid +
-          allocation.mwekeza +
-          allocation.debtUtt +
-          allocation.debtMwekeza +
-          allocation.overpayment
-        )
+        return sum + contributionAmountFromAllocation(allocation)
       }, 0)
 
     return {
@@ -2444,7 +2444,7 @@ function MembersView({
       const allocation = normalizeAllocation(transaction.allocation)
 
       return {
-        utt: totals.utt + allocation.liquid + allocation.debtUtt + allocation.overpayment,
+        utt: totals.utt + allocation.liquid + allocation.debtUtt,
         mwekeza: totals.mwekeza + allocation.mwekeza + allocation.debtMwekeza,
       }
     },
@@ -2730,7 +2730,7 @@ function MembersView({
                 .reduce((sum, t) => {
                   const a = normalizeAllocation(t.allocation)
 
-                  return sum + a.liquid + a.mwekeza + a.debtUtt + a.debtMwekeza + a.overpayment
+                  return sum + contributionAmountFromAllocation(a)
                 }, 0)
 
               return { memberId: member.id, total: imported + manual }
