@@ -19,6 +19,7 @@ import {
   Plus,
   ReceiptText,
   Settings,
+  ShieldAlert,
   ShieldCheck,
   UserRound,
   UsersRound,
@@ -2593,10 +2594,16 @@ function MembersView({
               const isSelf = member.id === activeUser.id
               const clear = plan.remaining === 0
               const contributionPercent = percentMap.get(member.id) ?? 0
+              const highPenalty = plan.penaltyRemaining >= 50000
+              const hasPenalty = plan.penaltyRemaining > 0
 
             return (
             <button
-              className={isSelf ? 'roster-member-card featured' : 'roster-member-card'}
+              className={[
+                'roster-member-card',
+                isSelf ? 'featured' : '',
+                highPenalty ? 'high-penalty' : '',
+              ].filter(Boolean).join(' ')}
               key={member.id}
               onClick={() => onSelect(member.id)}
               type="button"
@@ -2622,8 +2629,16 @@ function MembersView({
                   <span className="clear-status">Clear</span>
                 ) : (
                   <>
+                    <span className="balance-label">Outstanding</span>
                     <strong>{formatTzs(plan.remaining)}</strong>
-                    <small>Outstanding</small>
+                    {hasPenalty ? (
+                      <span className={highPenalty ? 'penalty-chip hot' : 'penalty-chip'}>
+                        {highPenalty ? <ShieldAlert size={12} /> : null}
+                        {highPenalty ? 'High penalty' : 'Penalty'} {formatTzs(plan.penaltyRemaining)}
+                      </span>
+                    ) : (
+                      <small>No penalty</small>
+                    )}
                   </>
                 )}
                 {plan.penaltyRemaining > 0 ? (
