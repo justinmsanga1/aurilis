@@ -1883,10 +1883,7 @@ function Dashboard({
 }) {
   const currentDateValue = todayInputValue()
   const currentMonthLabel = monthLabelForDate(currentDateValue)
-  const cashTotal = Math.max(fundTotals.liquid + fundTotals.mwekeza, 1)
   const paidMembers = Math.max(memberCount - summary.membersAtRisk, 0)
-  const mwekezaPercent = Math.round((fundTotals.mwekeza / cashTotal) * 100)
-  const liquidPercent = Math.max(100 - mwekezaPercent, 0)
   const personalProgress =
     personalPlan.due > 0
       ? Math.min(Math.round((personalPlan.paid / personalPlan.due) * 100), 100)
@@ -1958,6 +1955,11 @@ function Dashboard({
     return a.member.fullName.localeCompare(b.member.fullName)
   })
   const topContributor = rankedContributors[0]
+  const lowestContributor = [...overallContributorStats].sort((a, b) => {
+    const paidDifference = a.total - b.total
+    if (paidDifference !== 0) return paidDifference
+    return b.plan.remaining - a.plan.remaining
+  })[0]
 
   return (
     <section className="dashboard-bento">
@@ -2125,7 +2127,7 @@ function Dashboard({
         <span>Active Projects</span>
       </article>
 
-      {topContributor ? (
+      {topContributor && lowestContributor ? (
         <article className="bento-card contribution-standout-card">
           <div className="panel-title">
             <div>
@@ -2152,31 +2154,26 @@ function Dashboard({
               </div>
               <b>Keep leading us</b>
             </button>
+            <button
+              className="contribution-standout-person warning"
+              onClick={() => openMember(lowestContributor.member.id)}
+              type="button"
+            >
+              <Avatar
+                avatar={avatars[lowestContributor.member.id]}
+                memberName={lowestContributor.member.fullName}
+                size="small"
+              />
+              <div>
+                <span>Needs push</span>
+                <strong>{lowestContributor.member.fullName}</strong>
+                <small>{formatTzs(lowestContributor.total)} contributed overall</small>
+              </div>
+              <b>Letting us down</b>
+            </button>
           </div>
         </article>
       ) : null}
-
-      <article className="bento-card bento-distribution">
-        <div>
-          <span>Payment Distribution</span>
-          <div className="distribution-list">
-            <b><i /> UTT Liquid ({liquidPercent}%)</b>
-            <b><i /> Mwekeza ({mwekezaPercent}%)</b>
-            <b><i /> Debt Risk ({summary.membersAtRisk})</b>
-          </div>
-        </div>
-        <div
-          className="distribution-ring"
-          style={
-            {
-              '--liquid': `${liquidPercent}%`,
-              '--mwekeza': `${Math.min(liquidPercent + mwekezaPercent, 100)}%`,
-            } as CSSProperties
-          }
-        >
-          <ShieldCheck size={18} />
-        </div>
-      </article>
 
       <article className="bento-card action-list-card debtors-bento-card">
         <div className="panel-title">
