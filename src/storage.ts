@@ -18,7 +18,9 @@ const manualReconnectCooldownMs = 15_000
 const failureCooldownsMs = [60_000, 120_000, 300_000, 600_000]
 
 export function isLiveStorageEnabled() {
-  return window.sessionStorage.getItem(liveStorageKey) === 'true'
+  if (getLiveStorageCooldownRemaining() > 0) return false
+
+  return window.sessionStorage.getItem(liveStorageKey) !== 'false'
 }
 
 export function getLiveStorageCooldownRemaining() {
