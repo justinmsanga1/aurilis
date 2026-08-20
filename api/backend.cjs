@@ -7,7 +7,10 @@ const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABA
 const SUPABASE_TABLE = process.env.SUPABASE_STATE_TABLE || 'auralis_state'
 const USE_SUPABASE = Boolean(SUPABASE_URL && SUPABASE_KEY)
 const RETRYABLE_SUPABASE_CODES = new Set(['PGRST002'])
-const SUPABASE_REQUEST_TIMEOUT_MS = 6000
+const SUPABASE_REQUEST_TIMEOUT_MS = 3500
+const SUPABASE_COOLDOWN_MS = 60000
+let supabaseCooldownUntil = 0
+let supabaseCooldownReason = ''
 const STRUCTURED_STATE = {
   'auralis-members-v1': {
     idColumn: 'id',
@@ -74,7 +77,13 @@ async function supabaseRequest(pathname, options = {}) {
     throw new Error('Supabase is not configured. Check SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.')
   }
 
-  const maxAttempts = options.method && options.method !== 'GET' ? 1 : 2
+  if (Date.now() < supabaseCooldownUntil) {
+    throw supabaseUnavailableError(
+      supabaseCooldownReason || 'Supabase is cooling down after a database failure',
+    )
+  }
+
+  const maxAttempts = 1
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     const controller = new AbortController()
@@ -101,19 +110,21 @@ async function supabaseRequest(pathname, options = {}) {
         response.status === 503 && RETRYABLE_SUPABASE_CODES.has(details.code)
 
       if (!retryable || attempt === maxAttempts) {
-        const error = new Error(`Supabase ${response.status}: ${text}`)
+        const error = supabaseUnavailableError(`Supabase ${response.status}: ${text}`)
         error.statusCode = response.status
         error.supabaseCode = details.code
+        if (response.status === 503) tripSupabaseCooldown(error.message)
         throw error
       }
     } catch (error) {
       if (attempt === maxAttempts) {
         if (error?.name === 'AbortError') {
-          const timeoutError = new Error('Supabase request timed out')
-          timeoutError.statusCode = 503
+          const timeoutError = supabaseUnavailableError('Supabase request timed out')
+          tripSupabaseCooldown(timeoutError.message)
           throw timeoutError
         }
 
+        if (error?.statusCode === 503) tripSupabaseCooldown(error.message)
         throw error
       }
     } finally {
@@ -124,6 +135,17 @@ async function supabaseRequest(pathname, options = {}) {
   }
 
   throw new Error('Supabase request failed')
+}
+
+function supabaseUnavailableError(message) {
+  const error = new Error(message)
+  error.statusCode = 503
+  return error
+}
+
+function tripSupabaseCooldown(reason) {
+  supabaseCooldownUntil = Date.now() + SUPABASE_COOLDOWN_MS
+  supabaseCooldownReason = reason
 }
 
 function parseSupabaseError(text) {

@@ -41,7 +41,7 @@ function serialize(value: unknown) {
 export function useStoredState<T>(key: string, initialValue: T) {
   const hydrated = useRef(false)
   const initialRef = useRef(initialValue)
-  const lastSynced = useRef(serialize(initialRef.current))
+  const lastSynced = useRef(serialize(initialValue))
   const [value, setValue] = useState<T>(initialValue)
   const [status, setStatus] = useState<StorageStatus>('loading')
 
