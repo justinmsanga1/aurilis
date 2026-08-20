@@ -371,6 +371,21 @@ textarea {
   padding: 10px 14px;
 }
 
+.storage-warning-banner span {
+  flex: 1;
+}
+
+.storage-warning-banner button {
+  background: #064e3b;
+  border: 0;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  flex: 0 0 auto;
+  font: inherit;
+  padding: 8px 10px;
+}
+
 .topbar-strip {
   align-items: center;
   background: rgba(255, 255, 255, 0.78);

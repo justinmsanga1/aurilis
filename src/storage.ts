@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-export type StorageStatus = 'loading' | 'loaded' | 'stale'
+export type StorageStatus = 'paused' | 'loading' | 'loaded' | 'stale'
 
 type StorageListener = (key: string, status: StorageStatus) => void
 type BackendStateSnapshot = {
@@ -9,6 +9,22 @@ type BackendStateSnapshot = {
 
 const listeners = new Set<StorageListener>()
 let backendStatePromise: Promise<BackendStateSnapshot> | null = null
+const liveStorageKey = 'auralis-live-data-enabled'
+
+export function isLiveStorageEnabled() {
+  return window.sessionStorage.getItem(liveStorageKey) === 'true'
+}
+
+export function enableLiveStorage() {
+  window.sessionStorage.setItem(liveStorageKey, 'true')
+  backendStatePromise = null
+  window.location.reload()
+}
+
+export function pauseLiveStorage() {
+  window.sessionStorage.removeItem(liveStorageKey)
+  backendStatePromise = null
+}
 
 export function onStorageStatus(listener: StorageListener) {
   listeners.add(listener)
@@ -43,12 +59,21 @@ export function useStoredState<T>(key: string, initialValue: T) {
   const initialRef = useRef(initialValue)
   const lastSynced = useRef(serialize(initialValue))
   const [value, setValue] = useState<T>(initialValue)
-  const [status, setStatus] = useState<StorageStatus>('loading')
+  const [status, setStatus] = useState<StorageStatus>(
+    isLiveStorageEnabled() ? 'loading' : 'paused',
+  )
 
   useEffect(() => {
     let cancelled = false
 
     async function loadFromBackend() {
+      if (!isLiveStorageEnabled()) {
+        setStatus('paused')
+        notify(key, 'paused')
+        hydrated.current = true
+        return
+      }
+
       try {
         const payload = await loadBackendState()
         const state = payload.state ?? {}
