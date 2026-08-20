@@ -5512,6 +5512,15 @@ body,
   width: 100%;
 }
 
+.penalty-trend-col.empty i {
+  background: rgba(154, 52, 18, 0.2);
+  opacity: 1;
+}
+
+.penalty-trend-col.empty span {
+  opacity: 0.55;
+}
+
 .penalty-trend-col:last-child i {
   opacity: 1;
 }

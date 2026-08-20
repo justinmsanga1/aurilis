@@ -1860,6 +1860,15 @@ function Dashboard({
     personalPlan.remaining > 0
       ? `${formatTzs(personalPlan.penalty)} at risk`
       : 'No penalty risk'
+  const penaltyTrendBars =
+    penaltyTrendData.length > 0
+      ? penaltyTrendData
+      : [
+          { month: currentCycleMonthKey(), penalty: 0, cumulative: 0 },
+          { month: currentCycleMonthKey(), penalty: 0, cumulative: 0 },
+          { month: currentCycleMonthKey(), penalty: 0, cumulative: 0 },
+          { month: currentCycleMonthKey(), penalty: 0, cumulative: 0 },
+        ]
 
   return (
     <section className="dashboard-bento">
@@ -1925,34 +1934,39 @@ function Dashboard({
         </div>
       </article>
 
-      {totalPenaltyCollected > 0 ? (
-        <article className="bento-card bento-penalty-trend">
-          <div className="panel-title">
-            <div>
-              <p className="eyebrow">Penalty collected</p>
-              <h2>{formatTzs(totalPenaltyCollected)}</h2>
-            </div>
-            <CircleDollarSign size={20} />
+      <article className="bento-card bento-penalty-trend">
+        <div className="panel-title">
+          <div>
+            <p className="eyebrow">Penalty collected</p>
+            <h2>{formatTzs(totalPenaltyCollected)}</h2>
           </div>
-          <div className="penalty-trend-bars">
-            {penaltyTrendData.map((d) => {
-              const maxPenalty = Math.max(...penaltyTrendData.map((x) => x.penalty), 1)
-              const height = Math.round((d.penalty / maxPenalty) * 100)
+          <CircleDollarSign size={20} />
+        </div>
+        <div className="penalty-trend-bars">
+          {penaltyTrendBars.map((d, index) => {
+            const maxPenalty = Math.max(...penaltyTrendBars.map((x) => x.penalty), 1)
+            const height = d.penalty > 0 ? Math.round((d.penalty / maxPenalty) * 100) : 12
 
-              return (
-                <div className="penalty-trend-col" key={d.month}>
-                  <i style={{ height: `${Math.max(height, 8)}%` }} />
-                  <span>{d.month.slice(5)}</span>
-                </div>
-              )
-            })}
-          </div>
-          <div className="penalty-trend-summary">
-            <small>{penaltyTrendData.length} month{penaltyTrendData.length === 1 ? '' : 's'} tracked</small>
-            <strong>{formatTzs(totalPenaltyCollected)} total</strong>
-          </div>
-        </article>
-      ) : null}
+            return (
+              <div
+                className={d.penalty > 0 ? 'penalty-trend-col' : 'penalty-trend-col empty'}
+                key={`${d.month}-${index}`}
+              >
+                <i style={{ height: `${Math.max(height, 8)}%` }} />
+                <span>{d.month.slice(5)}</span>
+              </div>
+            )
+          })}
+        </div>
+        <div className="penalty-trend-summary">
+          <small>
+            {penaltyTrendData.length > 0
+              ? `${penaltyTrendData.length} month${penaltyTrendData.length === 1 ? '' : 's'} tracked`
+              : 'No penalty cash collected yet'}
+          </small>
+          <strong>{formatTzs(totalPenaltyCollected)} total</strong>
+        </div>
+      </article>
 
       <article className="bento-card bento-trend">
         <div>
