@@ -148,6 +148,27 @@ async function getBackendState() {
   const state = {}
   let updatedAt = ''
 
+  try {
+    const rows = await supabaseRequest(`${SUPABASE_TABLE}?select=key,value,updated_at`)
+    for (const row of rows) {
+      state[row.key] = row.value
+      if (!updatedAt || row.updated_at > updatedAt) updatedAt = row.updated_at
+    }
+
+    if (rows.length > 0) {
+      return {
+        backend: 'supabase',
+        createdAt: updatedAt || new Date().toISOString(),
+        updatedAt: updatedAt || new Date().toISOString(),
+        state,
+      }
+    }
+  } catch (error) {
+    if (isBackendUnavailable(error)) throw error
+    // Older installs may not have the compact table yet; structured tables
+    // below remain a fallback source.
+  }
+
   for (const [key, config] of Object.entries(STRUCTURED_STATE)) {
     try {
       const result = await getStructuredValue(config)
@@ -160,16 +181,6 @@ async function getBackendState() {
       // Structured tables may not exist in older installs; the legacy table
       // below is still the fallback source of truth for those projects.
     }
-  }
-
-  try {
-    const rows = await supabaseRequest(`${SUPABASE_TABLE}?select=key,value,updated_at`)
-    for (const row of rows) {
-      if (!(row.key in state)) state[row.key] = row.value
-      if (!updatedAt || row.updated_at > updatedAt) updatedAt = row.updated_at
-    }
-  } catch {
-    // The legacy table is optional after structured tables are installed.
   }
 
   return {
@@ -191,24 +202,26 @@ async function checkBackendConnection() {
 
 async function getBackendValue(key) {
   const config = STRUCTURED_STATE[key]
+  try {
+    const legacy = await getLegacyBackendValue(key)
+    if (legacy.exists) return legacy
+  } catch (error) {
+    if (isBackendUnavailable(error)) throw error
+    // Fall through to structured tables for older installs.
+  }
 
   if (config) {
     try {
       const result = await getStructuredValue(config)
-      if (result.exists) return result
-
-      const legacy = await getLegacyBackendValue(key)
-      if (legacy.exists) {
-        await setStructuredValue(config, legacy.value)
-        return { ...legacy, backend: 'supabase', migrated: true }
+      if (result.exists) {
+        await setLegacyBackendValue(key, result.value)
+        return { ...result, cached: true }
       }
 
       return result
     } catch (error) {
       if (isBackendUnavailable(error)) throw error
 
-      const legacy = await getLegacyBackendValue(key)
-      if (legacy.exists) return legacy
       return {
         backend: 'supabase',
         exists: false,
@@ -235,17 +248,6 @@ async function getLegacyBackendValue(key) {
 }
 
 async function setBackendValue(key, value) {
-  const config = STRUCTURED_STATE[key]
-  if (config) {
-    try {
-      return await setStructuredValue(config, value)
-    } catch (error) {
-      if (isBackendUnavailable(error)) throw error
-
-      return setLegacyBackendValue(key, value)
-    }
-  }
-
   return setLegacyBackendValue(key, value)
 }
 
@@ -286,65 +288,6 @@ async function getStructuredValue(config) {
     updatedAt,
     value: rows.map((row) => row.data),
   }
-}
-
-async function setStructuredValue(config, value) {
-  const updatedAt = new Date().toISOString()
-  const rows = toStructuredRows(config, value, updatedAt)
-  const nextIds = new Set(rows.map((row) => row[config.idColumn]))
-
-  if (rows.length > 0) {
-    await supabaseRequest(`${config.table}?on_conflict=${config.idColumn}`, {
-      body: JSON.stringify(rows),
-      headers: {
-        Prefer: 'resolution=merge-duplicates,return=minimal',
-      },
-      method: 'POST',
-    })
-  }
-
-  const existingRows = await supabaseRequest(`${config.table}?select=${config.idColumn}`)
-  const staleIds = existingRows
-    .map((row) => row[config.idColumn])
-    .filter((id) => !nextIds.has(id))
-
-  if (staleIds.length > 0) {
-    await supabaseRequest(
-      `${config.table}?${config.idColumn}=in.(${staleIds.map(formatPostgrestValue).join(',')})`,
-      { method: 'DELETE' },
-    )
-  }
-
-  return { backend: 'supabase', updatedAt }
-}
-
-function formatPostgrestValue(value) {
-  return `"${String(value).replaceAll('"', '\\"')}"`
-}
-
-function toStructuredRows(config, value, updatedAt) {
-  if (config.kind === 'avatarMap') {
-    if (!value || typeof value !== 'object') return []
-    return Object.entries(value)
-      .filter(([, image]) => typeof image === 'string' && image)
-      .map(([memberId, image], index) => ({
-        image,
-        member_id: memberId,
-        sort_order: index,
-        updated_at: updatedAt,
-      }))
-  }
-
-  if (!Array.isArray(value)) return []
-  return value
-    .map((item, index) => ({ item, index }))
-    .filter(({ item }) => item && typeof item === 'object' && item.id)
-    .map(({ item, index }) => ({
-      data: item,
-      id: item.id,
-      sort_order: index,
-      updated_at: updatedAt,
-    }))
 }
 
 module.exports = {
