@@ -10,20 +10,54 @@ type BackendStateSnapshot = {
 const listeners = new Set<StorageListener>()
 let backendStatePromise: Promise<BackendStateSnapshot> | null = null
 const liveStorageKey = 'auralis-live-data-enabled'
+const liveCooldownKey = 'auralis-live-data-cooldown-until'
+const liveFailureCountKey = 'auralis-live-data-failure-count'
+const loadTimeoutMs = 20_000
+const saveDebounceMs = 900
+const manualReconnectCooldownMs = 15_000
+const failureCooldownsMs = [60_000, 120_000, 300_000, 600_000]
 
 export function isLiveStorageEnabled() {
   return window.sessionStorage.getItem(liveStorageKey) === 'true'
 }
 
+export function getLiveStorageCooldownRemaining() {
+  const cooldownUntil = Number(window.sessionStorage.getItem(liveCooldownKey) ?? '0')
+
+  return Math.max(cooldownUntil - Date.now(), 0)
+}
+
 export function enableLiveStorage() {
+  if (getLiveStorageCooldownRemaining() > 0) return false
+
   window.sessionStorage.setItem(liveStorageKey, 'true')
+  window.sessionStorage.setItem(
+    liveCooldownKey,
+    String(Date.now() + manualReconnectCooldownMs),
+  )
   backendStatePromise = null
   window.location.reload()
+  return true
 }
 
 export function pauseLiveStorage() {
   window.sessionStorage.removeItem(liveStorageKey)
   backendStatePromise = null
+}
+
+function clearBackendFailures() {
+  window.sessionStorage.removeItem(liveFailureCountKey)
+  window.sessionStorage.removeItem(liveCooldownKey)
+}
+
+function registerBackendFailure() {
+  const failureCount = Number(window.sessionStorage.getItem(liveFailureCountKey) ?? '0') + 1
+  const cooldown =
+    failureCooldownsMs[Math.min(failureCount - 1, failureCooldownsMs.length - 1)]
+
+  window.sessionStorage.setItem(liveFailureCountKey, String(failureCount))
+  window.sessionStorage.setItem(liveCooldownKey, String(Date.now() + cooldown))
+  pauseLiveStorage()
 }
 
 export function onStorageStatus(listener: StorageListener) {
@@ -38,12 +72,24 @@ function notify(key: string, status: StorageStatus) {
 }
 
 function loadBackendState() {
-  backendStatePromise ??= fetch('/api/state').then(async (response) => {
+  backendStatePromise ??= fetchWithTimeout('/api/state').then(async (response) => {
     if (!response.ok) throw new Error('Backend unavailable')
-    return (await response.json()) as BackendStateSnapshot
+    const payload = (await response.json()) as BackendStateSnapshot
+    clearBackendFailures()
+    return payload
   })
 
   return backendStatePromise
+}
+
+function fetchWithTimeout(input: RequestInfo | URL, init?: RequestInit) {
+  const controller = new AbortController()
+  const timeout = window.setTimeout(() => controller.abort(), loadTimeoutMs)
+
+  return fetch(input, {
+    ...init,
+    signal: controller.signal,
+  }).finally(() => window.clearTimeout(timeout))
 }
 
 function serialize(value: unknown) {
@@ -88,6 +134,7 @@ export function useStoredState<T>(key: string, initialValue: T) {
         }
       } catch (error) {
         console.error(`Auralis storage load failed for ${key}`, error)
+        registerBackendFailure()
         // The backend is unreachable, so the current value is NOT the real
         // state — flag it so the UI can warn instead of silently showing
         // wrong numbers.
@@ -112,20 +159,26 @@ export function useStoredState<T>(key: string, initialValue: T) {
     const nextValue = serialize(value)
     if (nextValue === lastSynced.current) return
 
-    void fetch(`/api/state/${encodeURIComponent(key)}`, {
-      body: nextValue ? `{"value":${nextValue}}` : JSON.stringify({ value }),
-      headers: { 'Content-Type': 'application/json' },
-      method: 'PUT',
-    })
+    const timeout = window.setTimeout(() => {
+      void fetchWithTimeout(`/api/state/${encodeURIComponent(key)}`, {
+        body: nextValue ? `{"value":${nextValue}}` : JSON.stringify({ value }),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'PUT',
+      })
       .then((response) => {
         if (!response.ok) throw new Error('Backend unavailable')
+        clearBackendFailures()
         lastSynced.current = nextValue
       })
       .catch((error) => {
         console.error(`Auralis storage save failed for ${key}`, error)
+        registerBackendFailure()
         setStatus('stale')
         notify(key, 'stale')
       })
+    }, saveDebounceMs)
+
+    return () => window.clearTimeout(timeout)
   }, [key, status, value])
 
   return [value, setValue] as const

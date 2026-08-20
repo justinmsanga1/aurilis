@@ -53,6 +53,7 @@ import {
 } from './finance'
 import {
   enableLiveStorage,
+  getLiveStorageCooldownRemaining,
   onStorageStatus,
   type StorageStatus,
   useStoredState,
@@ -472,11 +473,22 @@ function App() {
   const [activeTab, setActiveTab] = useState<Tab>(() => tabFromHash())
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [storageHealth, setStorageHealth] = useState<Record<string, StorageStatus>>({})
+  const [liveCooldownRemaining, setLiveCooldownRemaining] = useState(() =>
+    getLiveStorageCooldownRemaining(),
+  )
 
   useEffect(() => {
     return onStorageStatus((key, status) => {
       setStorageHealth((current) => ({ ...current, [key]: status }))
     })
+  }, [])
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setLiveCooldownRemaining(getLiveStorageCooldownRemaining())
+    }, 1000)
+
+    return () => window.clearInterval(interval)
   }, [])
 
   const [notificationsOpen, setNotificationsOpen] = useState(false)
@@ -1553,8 +1565,17 @@ function App() {
               Live database loading is paused to protect Supabase while it recovers.
               Figures below are offline seed values until you reconnect.
             </span>
-            <button onClick={enableLiveStorage} type="button">
-              Load live data
+            <button
+              disabled={liveCooldownRemaining > 0}
+              onClick={() => {
+                setLiveCooldownRemaining(getLiveStorageCooldownRemaining())
+                enableLiveStorage()
+              }}
+              type="button"
+            >
+              {liveCooldownRemaining > 0
+                ? `Wait ${Math.ceil(liveCooldownRemaining / 1000)}s`
+                : 'Load live data'}
             </button>
           </div>
         ) : null}
