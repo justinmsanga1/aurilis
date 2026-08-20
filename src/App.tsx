@@ -1576,6 +1576,7 @@ function App() {
             projectCount={projects.length}
             summary={summary}
             topDebtors={topDebtors}
+            transactions={transactions}
             openMember={(memberId) => {
               setSelectedMemberId(memberId)
               setMemberDetailOpen(true)
@@ -1859,6 +1860,7 @@ function Dashboard({
   projectCount,
   summary,
   topDebtors,
+  transactions,
   openMember,
 }: {
   activeUser: Member
@@ -1876,6 +1878,7 @@ function Dashboard({
   projectCount: number
   summary: ReturnType<typeof julySummary>
   topDebtors: ReturnType<typeof allJulyPlans>
+  transactions: TransactionRecord[]
   openMember: (memberId: string) => void
 }) {
   const currentDateValue = todayInputValue()
@@ -1923,14 +1926,40 @@ function Dashboard({
           { month: currentCycleMonthKey(), penalty: 0, cumulative: 0 },
           { month: currentCycleMonthKey(), penalty: 0, cumulative: 0 },
         ]
-  const rankedContributors = [...plans].sort((a, b) => {
-    const paidDifference = b.plan.paid - a.plan.paid
+  const overallContributorStats = plans.map(({ member, plan }) => {
+    const imported = getMemberRecords(member.id).reduce(
+      (sum, record) => sum + record.liquid + record.mwekeza,
+      0,
+    )
+    const live = transactions
+      .filter((transaction) => transaction.memberId === member.id)
+      .reduce((sum, transaction) => {
+        const allocation = normalizeAllocation(transaction.allocation)
+
+        return (
+          sum +
+          allocation.liquid +
+          allocation.mwekeza +
+          allocation.debtUtt +
+          allocation.debtMwekeza +
+          allocation.overpayment
+        )
+      }, 0)
+
+    return {
+      member,
+      plan,
+      total: imported + live,
+    }
+  })
+  const rankedContributors = [...overallContributorStats].sort((a, b) => {
+    const paidDifference = b.total - a.total
     if (paidDifference !== 0) return paidDifference
     return a.member.fullName.localeCompare(b.member.fullName)
   })
   const topContributor = rankedContributors[0]
-  const lowestContributor = [...plans].sort((a, b) => {
-    const paidDifference = a.plan.paid - b.plan.paid
+  const lowestContributor = [...overallContributorStats].sort((a, b) => {
+    const paidDifference = a.total - b.total
     if (paidDifference !== 0) return paidDifference
     return b.plan.remaining - a.plan.remaining
   })[0]
@@ -2106,7 +2135,7 @@ function Dashboard({
           <div className="panel-title">
             <div>
               <p className="eyebrow">Contribution pulse</p>
-              <h2>{currentMonthLabel} standouts</h2>
+              <h2>Overall standouts</h2>
             </div>
             <Trophy size={20} />
           </div>
@@ -2124,7 +2153,7 @@ function Dashboard({
               <div>
                 <span>Top contributor</span>
                 <strong>{topContributor.member.fullName}</strong>
-                <small>{formatTzs(topContributor.plan.paid)} contributed this cycle</small>
+                <small>{formatTzs(topContributor.total)} contributed overall</small>
               </div>
               <b>Keep leading us</b>
             </button>
@@ -2141,7 +2170,7 @@ function Dashboard({
               <div>
                 <span>Needs push</span>
                 <strong>{lowestContributor.member.fullName}</strong>
-                <small>{formatTzs(lowestContributor.plan.remaining)} still outstanding</small>
+                <small>{formatTzs(lowestContributor.total)} contributed overall</small>
               </div>
               <b>Letting us down</b>
             </button>
