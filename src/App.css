@@ -751,26 +751,26 @@ textarea {
 
 .dashboard-bento .bento-balance {
   background:
-    linear-gradient(118deg, transparent 0 57%, rgba(242, 183, 5, 0.68) 58% 60%, transparent 61%),
-    radial-gradient(circle at 86% 18%, rgba(242, 183, 5, 0.42), transparent 26%),
+    linear-gradient(118deg, transparent 0 57%, rgba(242, 183, 5, 0.18) 58% 60%, transparent 61%),
+    radial-gradient(circle at 86% 18%, rgba(242, 183, 5, 0.14), transparent 26%),
     radial-gradient(circle at 22% 82%, rgba(155, 216, 169, 0.2), transparent 34%),
     linear-gradient(145deg, #031f14, #064e2b 58%, #0b6b3a);
   border: 1px solid rgba(242, 183, 5, 0.24);
   box-shadow:
     0 22px 52px rgba(3, 31, 20, 0.24),
-    0 0 34px rgba(242, 183, 5, 0.16),
+    0 0 22px rgba(242, 183, 5, 0.06),
     inset 0 1px 0 rgba(255, 255, 255, 0.14);
   color: #fff;
 }
 
 .dashboard-bento .bento-balance::before {
   background:
-    linear-gradient(135deg, transparent 0 44%, rgba(242, 183, 5, 0.84) 45% 48%, transparent 49%),
-    linear-gradient(42deg, transparent 0 48%, rgba(242, 183, 5, 0.5) 49% 51%, transparent 52%);
+    linear-gradient(135deg, transparent 0 44%, rgba(242, 183, 5, 0.24) 45% 48%, transparent 49%),
+    linear-gradient(42deg, transparent 0 48%, rgba(242, 183, 5, 0.16) 49% 51%, transparent 52%);
   content: '';
   filter: blur(0.2px);
   height: 118px;
-  opacity: 0.5;
+  opacity: 0.42;
   position: absolute;
   right: 18px;
   top: 20px;
@@ -784,16 +784,21 @@ textarea {
 }
 
 .dashboard-bento .bento-balance span {
-  color: #e7f9da;
+  color: #fff;
+}
+
+.dashboard-bento .bento-balance strong {
+  color: #fff;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.22);
 }
 
 .dashboard-bento .bento-balance small {
-  color: rgba(255, 255, 255, 0.78);
+  color: #fff;
 }
 
 .dashboard-bento .bento-balance .balance-spark i {
-  background: #f2b705;
-  box-shadow: 0 0 16px rgba(242, 183, 5, 0.36);
+  background: rgba(242, 183, 5, 0.48);
+  box-shadow: 0 0 10px rgba(242, 183, 5, 0.16);
 }
 
 .dashboard-bento .bento-mini,
