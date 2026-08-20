@@ -2641,9 +2641,6 @@ function MembersView({
                     )}
                   </>
                 )}
-                {plan.penaltyRemaining > 0 ? (
-                  <span className="roster-penalty-badge">{formatTzs(plan.penaltyRemaining)} penalty</span>
-                ) : null}
               </div>
               <div className="roster-progress">
                 <i style={{ width: `${paidPercent}%` }} />
