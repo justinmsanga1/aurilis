@@ -6477,6 +6477,17 @@ body,
   min-width: 0;
 }
 
+.stats-bento-grid .bento-tile > strong,
+.stats-bento-grid .bento-tile > small {
+  align-self: center;
+  text-align: center;
+  width: 100%;
+}
+
+.stats-bento-grid .bento-tile > strong {
+  margin-top: 14px;
+}
+
 .bento-card {
   background: #fff;
   border-radius: 12px;
