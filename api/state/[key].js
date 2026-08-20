@@ -43,7 +43,7 @@ export default async function handler(request, response) {
 
     response.status(405).json({ error: 'Method not allowed' })
   } catch (error) {
-    response.status(500).json({
+    response.status(error.statusCode || 500).json({
       error: error instanceof Error ? error.message : 'Server error',
     })
   }

@@ -8,6 +8,7 @@ import {
   ChevronDown,
   CircleDollarSign,
   Trash2,
+  TriangleAlert,
   Home,
   Landmark,
   LogOut,
@@ -48,7 +49,7 @@ import {
   type PaymentMethod,
   type TransactionRecord,
 } from './finance'
-import { useStoredState } from './storage'
+import { onStorageStatus, useStoredState } from './storage'
 
 type Tab =
   | 'dashboard'
@@ -437,6 +438,15 @@ function App() {
   const canManageComms = activeUser?.role === 'Chairman' || activeUser?.role === 'Secretary'
   const [activeTab, setActiveTab] = useState<Tab>('dashboard')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [storageHealth, setStorageHealth] = useState<Record<string, 'loading' | 'loaded' | 'stale'>>(
+    {},
+  )
+
+  useEffect(() => {
+    return onStorageStatus((key, status) => {
+      setStorageHealth((current) => ({ ...current, [key]: status }))
+    })
+  }, [])
 
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [seenNotifications, setSeenNotifications] = useState<Record<string, number>>(
@@ -1478,6 +1488,17 @@ function App() {
             </div>
           ) : null}
         </header>
+
+        {Object.values(storageHealth).some((status) => status === 'stale') ? (
+          <div className="storage-warning-banner" role="alert">
+            <TriangleAlert size={16} />
+            <span>
+              Live data is not loading right now — balances shown may be
+              incomplete or outdated. Payments recorded in the app may be
+              missing from the figures below.
+            </span>
+          </div>
+        ) : null}
 
         {activeTab === 'dashboard' ? (
           <Dashboard

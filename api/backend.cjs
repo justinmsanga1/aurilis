@@ -6,6 +6,8 @@ const SUPABASE_URL = process.env.SUPABASE_URL || ''
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || ''
 const SUPABASE_TABLE = process.env.SUPABASE_STATE_TABLE || 'auralis_state'
 const USE_SUPABASE = Boolean(SUPABASE_URL && SUPABASE_KEY)
+const RETRYABLE_SUPABASE_CODES = new Set(['PGRST002'])
+const SUPABASE_REQUEST_TIMEOUT_MS = 6000
 const STRUCTURED_STATE = {
   'auralis-members-v1': {
     idColumn: 'id',
@@ -72,34 +74,91 @@ async function supabaseRequest(pathname, options = {}) {
     throw new Error('Supabase is not configured. Check SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.')
   }
 
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/${pathname}`, {
-    ...options,
-    headers: {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
-      'Content-Type': 'application/json',
-      ...(options.headers || {}),
-    },
-  })
+  const maxAttempts = options.method && options.method !== 'GET' ? 1 : 2
 
-  if (!response.ok) {
-    const message = await response.text()
-    throw new Error(`Supabase ${response.status}: ${message}`)
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), SUPABASE_REQUEST_TIMEOUT_MS)
+
+    try {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/${pathname}`, {
+        ...options,
+        signal: controller.signal,
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          ...(options.headers || {}),
+        },
+      })
+
+      const text = await response.text()
+
+      if (response.ok) return text ? JSON.parse(text) : null
+
+      const details = parseSupabaseError(text)
+      const retryable =
+        response.status === 503 && RETRYABLE_SUPABASE_CODES.has(details.code)
+
+      if (!retryable || attempt === maxAttempts) {
+        const error = new Error(`Supabase ${response.status}: ${text}`)
+        error.statusCode = response.status
+        error.supabaseCode = details.code
+        throw error
+      }
+    } catch (error) {
+      if (attempt === maxAttempts) {
+        if (error?.name === 'AbortError') {
+          const timeoutError = new Error('Supabase request timed out')
+          timeoutError.statusCode = 503
+          throw timeoutError
+        }
+
+        throw error
+      }
+    } finally {
+      clearTimeout(timeout)
+    }
+
+    await delay(attempt * 750)
   }
 
-  const text = await response.text()
-  return text ? JSON.parse(text) : null
+  throw new Error('Supabase request failed')
+}
+
+function parseSupabaseError(text) {
+  try {
+    return JSON.parse(text)
+  } catch {
+    return {}
+  }
+}
+
+function delay(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
+}
+
+function isBackendUnavailable(error) {
+  return error?.statusCode === 503
 }
 
 async function getBackendState() {
   const state = {}
   let updatedAt = ''
 
-  for (const key of Object.keys(STRUCTURED_STATE)) {
-    const result = await getBackendValue(key)
-    if (result.exists) state[key] = result.value
-    if (result.updatedAt && (!updatedAt || result.updatedAt > updatedAt)) {
-      updatedAt = result.updatedAt
+  for (const [key, config] of Object.entries(STRUCTURED_STATE)) {
+    try {
+      const result = await getStructuredValue(config)
+      if (result.exists) state[key] = result.value
+      if (result.updatedAt && (!updatedAt || result.updatedAt > updatedAt)) {
+        updatedAt = result.updatedAt
+      }
+    } catch (error) {
+      if (isBackendUnavailable(error)) throw error
+      // Structured tables may not exist in older installs; the legacy table
+      // below is still the fallback source of truth for those projects.
     }
   }
 
@@ -121,6 +180,15 @@ async function getBackendState() {
   }
 }
 
+async function checkBackendConnection() {
+  await supabaseRequest(`${SUPABASE_TABLE}?select=key&limit=1`)
+  return {
+    backend: 'supabase',
+    ok: true,
+    supabaseConfigured: USE_SUPABASE,
+  }
+}
+
 async function getBackendValue(key) {
   const config = STRUCTURED_STATE[key]
 
@@ -137,6 +205,8 @@ async function getBackendValue(key) {
 
       return result
     } catch (error) {
+      if (isBackendUnavailable(error)) throw error
+
       const legacy = await getLegacyBackendValue(key)
       if (legacy.exists) return legacy
       return {
@@ -169,7 +239,9 @@ async function setBackendValue(key, value) {
   if (config) {
     try {
       return await setStructuredValue(config, value)
-    } catch {
+    } catch (error) {
+      if (isBackendUnavailable(error)) throw error
+
       return setLegacyBackendValue(key, value)
     }
   }
@@ -276,6 +348,7 @@ function toStructuredRows(config, value, updatedAt) {
 }
 
 module.exports = {
+  checkBackendConnection,
   getBackendState,
   getBackendValue,
   setBackendValue,

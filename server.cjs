@@ -1,5 +1,6 @@
 const http = require('node:http')
 const {
+  checkBackendConnection,
   getBackendState,
   getBackendValue,
   setBackendValue,
@@ -42,7 +43,7 @@ const server = http.createServer(async (request, response) => {
     }
 
     if (request.method === 'GET' && url.pathname === '/api/health') {
-      const store = await getBackendState()
+      const store = await checkBackendConnection()
       sendJson(response, 200, {
         backend: store.backend,
         ok: true,
@@ -92,7 +93,7 @@ const server = http.createServer(async (request, response) => {
 
     sendJson(response, 404, { error: 'Not found' })
   } catch (error) {
-    sendJson(response, 500, {
+    sendJson(response, error.statusCode || 500, {
       error: error instanceof Error ? error.message : 'Server error',
     })
   }

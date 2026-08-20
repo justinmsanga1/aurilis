@@ -18,7 +18,7 @@ export default async function handler(request, response) {
     const store = await getBackendState()
     response.status(200).json(store)
   } catch (error) {
-    response.status(500).json({
+    response.status(error.statusCode || 500).json({
       error: error instanceof Error ? error.message : 'Server error',
     })
   }

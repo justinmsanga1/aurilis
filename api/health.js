@@ -1,7 +1,7 @@
 import { createRequire } from 'node:module'
 
 const require = createRequire(import.meta.url)
-const { getBackendState, supabaseConfigured } = require('./backend.cjs')
+const { checkBackendConnection, supabaseConfigured } = require('./backend.cjs')
 
 export default async function handler(request, response) {
   if (request.method === 'OPTIONS') {
@@ -15,7 +15,7 @@ export default async function handler(request, response) {
   }
 
   try {
-    const store = await getBackendState()
+    const store = await checkBackendConnection()
     response.status(200).json({
       backend: store.backend,
       ok: true,
@@ -24,7 +24,7 @@ export default async function handler(request, response) {
       updatedAt: store.updatedAt,
     })
   } catch (error) {
-    response.status(500).json({
+    response.status(error.statusCode || 500).json({
       error: error instanceof Error ? error.message : 'Server error',
     })
   }
