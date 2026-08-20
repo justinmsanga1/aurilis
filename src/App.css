@@ -880,6 +880,115 @@ textarea {
   background: rgba(255, 255, 255, 0.16);
 }
 
+.contribution-standout-card {
+  background:
+    radial-gradient(circle at 92% 10%, rgba(242, 183, 5, 0.24), transparent 30%),
+    linear-gradient(145deg, #032414, #064e2b 62%, #0b6b3a);
+  border: 1px solid rgba(200, 239, 208, 0.14);
+  box-shadow:
+    0 18px 38px rgba(3, 31, 20, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  color: #fff;
+  grid-column: 1 / -1;
+}
+
+.contribution-standout-card .eyebrow,
+.contribution-standout-person span,
+.contribution-standout-person small {
+  color: rgba(232, 255, 237, 0.72);
+}
+
+.contribution-standout-card h2,
+.contribution-standout-person strong {
+  color: #fff;
+}
+
+.contribution-standout-card .panel-title svg {
+  background: rgba(242, 183, 5, 0.16);
+  border-radius: 16px;
+  color: #f2b705;
+  height: 42px;
+  padding: 10px;
+  width: 42px;
+}
+
+.contribution-standout-grid {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.contribution-standout-person {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(200, 239, 208, 0.16);
+  border-radius: 8px;
+  color: inherit;
+  cursor: pointer;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: auto minmax(0, 1fr);
+  padding: 12px;
+  text-align: left;
+  transition:
+    background 180ms var(--ease-out),
+    transform 180ms var(--ease-out);
+}
+
+.contribution-standout-person:hover {
+  background: rgba(255, 255, 255, 0.14);
+  transform: translateY(-1px);
+}
+
+.contribution-standout-person div {
+  min-width: 0;
+}
+
+.contribution-standout-person span,
+.contribution-standout-person small,
+.contribution-standout-person strong {
+  display: block;
+}
+
+.contribution-standout-person span {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.contribution-standout-person strong {
+  font-size: 15px;
+  line-height: 1.15;
+  margin-top: 3px;
+}
+
+.contribution-standout-person small {
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.contribution-standout-person b {
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 900;
+  grid-column: 1 / -1;
+  justify-self: start;
+  padding: 6px 9px;
+  text-transform: uppercase;
+}
+
+.contribution-standout-person.praise b {
+  background: #f2b705;
+  color: #031f14;
+}
+
+.contribution-standout-person.warning b {
+  background: #fff1f2;
+  color: #b91c1c;
+}
+
 .action-list-card,
 .debt-insight-card {
   grid-column: 1 / -1;

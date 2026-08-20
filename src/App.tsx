@@ -9,6 +9,7 @@ import {
   CircleDollarSign,
   Trash2,
   TriangleAlert,
+  Trophy,
   Home,
   Landmark,
   LogOut,
@@ -1571,6 +1572,7 @@ function App() {
             penaltyTrendData={penaltyTrendData}
             totalPenaltyCollected={totalPenaltyCollected}
             personalPlan={julyPlanForMember(activeUser.id, paymentOverrides, transactions)}
+            plans={plans}
             projectCount={projects.length}
             summary={summary}
             topDebtors={topDebtors}
@@ -1853,6 +1855,7 @@ function Dashboard({
   penaltyTrendData,
   totalPenaltyCollected,
   personalPlan,
+  plans,
   projectCount,
   summary,
   topDebtors,
@@ -1869,6 +1872,7 @@ function Dashboard({
   penaltyTrendData: Array<{ month: string; penalty: number; cumulative: number }>
   totalPenaltyCollected: number
   personalPlan: ReturnType<typeof julyPlanForMember>
+  plans: ReturnType<typeof allJulyPlans>
   projectCount: number
   summary: ReturnType<typeof julySummary>
   topDebtors: ReturnType<typeof allJulyPlans>
@@ -1919,6 +1923,17 @@ function Dashboard({
           { month: currentCycleMonthKey(), penalty: 0, cumulative: 0 },
           { month: currentCycleMonthKey(), penalty: 0, cumulative: 0 },
         ]
+  const rankedContributors = [...plans].sort((a, b) => {
+    const paidDifference = b.plan.paid - a.plan.paid
+    if (paidDifference !== 0) return paidDifference
+    return a.member.fullName.localeCompare(b.member.fullName)
+  })
+  const topContributor = rankedContributors[0]
+  const lowestContributor = [...plans].sort((a, b) => {
+    const paidDifference = a.plan.paid - b.plan.paid
+    if (paidDifference !== 0) return paidDifference
+    return b.plan.remaining - a.plan.remaining
+  })[0]
 
   return (
     <section className="dashboard-bento">
@@ -2085,6 +2100,54 @@ function Dashboard({
         <strong>{projectCount}</strong>
         <span>Active Projects</span>
       </article>
+
+      {topContributor && lowestContributor ? (
+        <article className="bento-card contribution-standout-card">
+          <div className="panel-title">
+            <div>
+              <p className="eyebrow">Contribution pulse</p>
+              <h2>{currentMonthLabel} standouts</h2>
+            </div>
+            <Trophy size={20} />
+          </div>
+          <div className="contribution-standout-grid">
+            <button
+              className="contribution-standout-person praise"
+              onClick={() => openMember(topContributor.member.id)}
+              type="button"
+            >
+              <Avatar
+                avatar={avatars[topContributor.member.id]}
+                memberName={topContributor.member.fullName}
+                size="small"
+              />
+              <div>
+                <span>Top contributor</span>
+                <strong>{topContributor.member.fullName}</strong>
+                <small>{formatTzs(topContributor.plan.paid)} contributed this cycle</small>
+              </div>
+              <b>Keep leading us</b>
+            </button>
+            <button
+              className="contribution-standout-person warning"
+              onClick={() => openMember(lowestContributor.member.id)}
+              type="button"
+            >
+              <Avatar
+                avatar={avatars[lowestContributor.member.id]}
+                memberName={lowestContributor.member.fullName}
+                size="small"
+              />
+              <div>
+                <span>Needs push</span>
+                <strong>{lowestContributor.member.fullName}</strong>
+                <small>{formatTzs(lowestContributor.plan.remaining)} still outstanding</small>
+              </div>
+              <b>Letting us down</b>
+            </button>
+          </div>
+        </article>
+      ) : null}
 
       <article className="bento-card bento-distribution">
         <div>
