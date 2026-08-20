@@ -749,6 +749,85 @@ textarea {
   width: 104px;
 }
 
+.dashboard-bento .bento-mini,
+.dashboard-bento .bento-trend,
+.dashboard-bento .bento-center,
+.dashboard-bento .cycle-progress-card,
+.dashboard-bento .debtors-bento-card {
+  background:
+    radial-gradient(circle at 88% 10%, rgba(242, 183, 5, 0.2), transparent 30%),
+    linear-gradient(145deg, #032414, #064e2b 62%, #0b6b3a);
+  border: 1px solid rgba(200, 239, 208, 0.14);
+  box-shadow:
+    0 18px 38px rgba(3, 31, 20, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.dashboard-bento .bento-mini span,
+.dashboard-bento .bento-trend span,
+.dashboard-bento .bento-center span,
+.dashboard-bento .cycle-progress-card .eyebrow,
+.dashboard-bento .cycle-progress-row span,
+.dashboard-bento .cycle-progress-money span,
+.dashboard-bento .debtors-bento-card .eyebrow {
+  color: rgba(232, 255, 237, 0.7);
+}
+
+.dashboard-bento .bento-mini strong,
+.dashboard-bento .bento-trend strong,
+.dashboard-bento .bento-center strong,
+.dashboard-bento .cycle-progress-card h2,
+.dashboard-bento .cycle-progress-row strong,
+.dashboard-bento .cycle-progress-money strong,
+.dashboard-bento .debtors-bento-card h2 {
+  color: #fff;
+}
+
+.dashboard-bento .bento-mini svg,
+.dashboard-bento .bento-mini-blue svg,
+.dashboard-bento .project-orb,
+.dashboard-bento .cycle-progress-card .panel-title svg,
+.dashboard-bento .debtors-bento-card .panel-title svg {
+  color: #f2b705;
+}
+
+.dashboard-bento .project-orb,
+.dashboard-bento .cycle-progress-row,
+.dashboard-bento .cycle-progress-money,
+.dashboard-bento .debtor-bento-row {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(200, 239, 208, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.dashboard-bento .debtor-bento-row strong,
+.dashboard-bento .debtor-bento-row b {
+  color: #fff;
+}
+
+.dashboard-bento .debtor-bento-row span {
+  color: rgba(232, 255, 237, 0.68);
+}
+
+.dashboard-bento .bento-trend small {
+  color: #f2b705;
+}
+
+.dashboard-bento .trend-bars i {
+  background: rgba(200, 239, 208, 0.62);
+}
+
+.dashboard-bento .trend-bars i:nth-child(4),
+.dashboard-bento .trend-bars i:nth-child(5) {
+  background: #f2b705;
+}
+
+.dashboard-bento .cycle-progress-track,
+.dashboard-bento .debtor-progress {
+  background: rgba(255, 255, 255, 0.16);
+}
+
 .action-list-card,
 .debt-insight-card {
   grid-column: 1 / -1;
